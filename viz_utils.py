@@ -19,12 +19,14 @@ def VizRay():
     plt.plot(wall_x, wall_y, 'black')
 
     pt1 = (0.0, 0.0)
-    pt2 = (10.0, 0.0)
+    pt2 = (150.0, 50.0)
+
 
     plt.plot([pt1[0]], [pt1[1]], 'go')
     plt.plot([pt2[0]], [pt2[1]], 'go')
 
     int_pt = ClosestPtAlongRay(pt1,pt2,-1,poly)
+    print(int_pt)
     plt.plot([pt1[0], int_pt[0]], [pt1[1], int_pt[1]], 'red')
     
     plt.savefig('test.pdf')

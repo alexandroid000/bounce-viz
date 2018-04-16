@@ -99,7 +99,7 @@ def ShootRayFromVect(p1, p2, v1, v2):
 
 def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
     psize = len(poly)
-    closest_bounce = math.inf
+    closest_bounce = 100000000000
     bounce_point = (0.0, 0.0)
 
     # check each edge for collision
