@@ -99,8 +99,8 @@ def ShootRayFromVect(p1, p2, v1, v2):
 
 def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
     psize = len(poly)
-    closest_bounce = MAXDIST
-    bounce_point = (NaN, NaN)
+    closest_bounce = math.inf
+    bounce_point = (0.0, 0.0)
 
     # check each edge for collision
     for j in range(psize):
@@ -111,7 +111,7 @@ def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
             t,pt = ShootRayFromVect(p1, p2, v1, v2)
             
             # Find closest bounce for which t > 0
-            pdist = PointDistance(pt,(x1,y1))
+            pdist = PointDistance(pt,p2)
             if ((t > 0) and (pdist < closest_bounce) and
                 BouncePointInEdge((x1,y1),pt,v1,v2)):
                 bounce_point = pt
@@ -119,4 +119,3 @@ def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
                 #bounce_param = t
                 #b_edge = j
     return bounce_point
-
