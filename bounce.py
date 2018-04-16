@@ -83,8 +83,7 @@ def main():
                 v1, v2 = poly[j], poly[(j+1) % psize]
                 x1, y1 = state[0], state[1]
                 # The line parameter t; needs divide by zero check!
-                t = ShootRay(state, v1, v2)
-                pint = (x1 + cos(state[2])*t, y1 + sin(state[2])*t)
+                t,pt = ShootRay(state, v1, v2)
                 
                 # Find closest bounce for which t > 0
                 pdist = PointDistance(pt,(x1,y1))
