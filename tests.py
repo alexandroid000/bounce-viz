@@ -7,10 +7,17 @@ from maps import *
 class TestGeomUtils(unittest.TestCase):
 
     def setUp(self):
+        self.origin = [0.0, 0.0]
+
+        # square on xy axis
         self.p1 = [ 10.0,   0.0]
         self.p2 = [-10.0,   0.0]
         self.p3 = [  0.0,  10.0]
         self.p4 = [  0.0, -10.0]
+
+        # right triangle
+        self.t1 = [6.0, 0.0]
+        self.t2 = [3.0, 4.0]
 
     def test_left(self):
         v1 = IsLeftTurn(self.p1, self.p2, self.p4)
@@ -27,6 +34,11 @@ class TestGeomUtils(unittest.TestCase):
 
     def test_notIn(self):
         self.assertFalse(IsInPoly((500.0,0.0), poly1))
+
+    def test_shootRayFromVect(self):
+        t, (x,y) = ShootRayFromVect(self.t1, self.t2, self.origin, self.p3)
+        self.assertAlmostEqual(x, 0.0)
+        self.assertAlmostEqual(y, 8.0)
 
 if __name__ == '__main__':
     unittest.main()

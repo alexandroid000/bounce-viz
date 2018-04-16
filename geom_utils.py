@@ -72,7 +72,9 @@ def ShootRay(state, v1, v2):
     a = y3 - y2
     b = x2 - x3
     c = y2*(x3-x2) - x2*(y3-y2)
-    return (-c - b*y1 - a*x1)/(a*cos(theta)+b*sin(theta))
+    t = (-c - b*y1 - a*x1)/(a*cos(theta)+b*sin(theta))
+    pint = (x1 + cos(theta)*t, y1 + sin(theta)*t)
+    return t, pint
 
 # test if point p is in poly using crossing number
 def IsInPoly(p, poly):
@@ -82,11 +84,39 @@ def IsInPoly(p, poly):
     psize = len(poly)
     for j in range(psize):
         v1, v2 = poly[j], poly[(j+1) % psize]
-        t = ShootRay(state, v1, v2)
-        x1, y1 = p[0], p[1]
-        pint = (x1 + cos(theta)*t, y1 + sin(theta)*t)
-        if t>0 and BouncePointInEdge(p, pint, v1, v2):
+        t, pt = ShootRay(state, v1, v2)
+        if t>0 and BouncePointInEdge(p, pt, v1, v2):
             intersects += 1
     return not (intersects%2 == 0)
 
+# shoot a ray starting at p1, along vector p1->p2
+# find intersection with edge v1,v2
+def ShootRayFromVect(p1, p2, v1, v2):
+    (x1,y1), (x2,y2) = p1, p2
+    (x,y) = (x2-x1, y2-y1) # recenter points so p1 is at origin
+    theta = FixAngle(math.atan2(y,x))
+    return ShootRay((x2, y2, theta), v1, v2)
+
+def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
+    psize = len(poly)
+    closest_bounce = MAXDIST
+    bounce_point = (NaN, NaN)
+
+    # check each edge for collision
+    for j in range(psize):
+        if (j != last_bounce_edge):
+            v1, v2 = poly[j], poly[(j+1) % psize]
+            x1, y1 = p2[0], p2[1]
+            # The line parameter t; needs divide by zero check!
+            t,pt = ShootRayFromVect(p1, p2, v1, v2)
+            
+            # Find closest bounce for which t > 0
+            pdist = PointDistance(pt,(x1,y1))
+            if ((t > 0) and (pdist < closest_bounce) and
+                BouncePointInEdge((x1,y1),pt,v1,v2)):
+                bounce_point = pt
+                closest_bounce = pdist
+                #bounce_param = t
+                #b_edge = j
+    return bounce_point
 
