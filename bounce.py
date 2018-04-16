@@ -84,19 +84,15 @@ def main():
                 x1, y1 = state[0], state[1]
                 # The line parameter t; needs divide by zero check!
                 t = ShootRay(state, v1, v2)
-                #t = (-c - b*y1 - a*x1)/(a*cos(state[2])+b*sin(state[2]))
                 pint = (x1 + cos(state[2])*t, y1 + sin(state[2])*t)
                 
                 # Find closest bounce for which t > 0
-                pdist = PointDistance(pint,(state[0],state[1]))
+                pdist = PointDistance(pt,(x1,y1))
                 if ((t > 0) and (pdist < closest_bounce) and
-                    BouncePointInEdge((x1,y1),pint,v1,v2)):
-                    bounce_point = pint
+                    BouncePointInEdge((x1,y1),pt,v1,v2)):
+                    bounce_point = pt
                     closest_bounce = pdist
-                    bnormal = FixAngle(pi/2.0 + 
-                                       atan2(poly[(j+1)%psize][1]-poly[j][1],\
-                                             poly[(j+1)%psize][0]-poly[j][0]))
-                    bounce_edge = j
+                    b_edge = j
 #                    print "bnormal:",bnormal
 #                    print "pdist:",pdist,"closest_bounce:",closest_bounce,"pint:",pint
 
@@ -112,8 +108,11 @@ def main():
 
 # Set the last argument to PerformBounce:
 # 0 = random, 1 = right angle, 2 = billiard, 3 = normal
+        bnormal = FixAngle(pi/2.0 + 
+                           atan2(poly[(b_edge+1)%psize][1]-poly[b_edge][1],\
+                                 poly[(b_edge+1)%psize][0]-poly[b_edge][0]))
         state = PerformBounce(state,bounce_point,bnormal,3)
-        last_bounce_edge = bounce_edge
+        last_bounce_edge = b_edge
 
         for e in pygame.event.get():
 	        if e.type == QUIT or (e.type == KEYUP and e.key == K_ESCAPE):
