@@ -50,5 +50,9 @@ class TestGeomUtils(unittest.TestCase):
         self.assertAlmostEqual(x, 198.21428571428572)
         self.assertAlmostEqual(y, 66.07142857142857)
 
+    def test_reflex(self):
+        rfverts = FindReflexAngles(poly1)
+        self.assertEqual([3,7,10], rfverts)
+
 if __name__ == '__main__':
     unittest.main()

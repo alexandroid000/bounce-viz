@@ -21,9 +21,15 @@ def VizRay():
     pt1 = (0.0, 0.0)
     pt2 = (150.0, 50.0)
 
-
     plt.plot([pt1[0]], [pt1[1]], 'go')
     plt.plot([pt2[0]], [pt2[1]], 'go')
+
+    # mark reflex vertices
+    rvs = FindReflexAngles(poly)
+    for p in rvs:
+        plt.plot([poly[p][0]], [poly[p][1]], 'bo')
+
+    print(rvs)
 
     int_pt = ClosestPtAlongRay(pt1,pt2,-1,poly)
     print(int_pt)

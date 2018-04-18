@@ -119,3 +119,14 @@ def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
                 #bounce_param = t
                 #b_edge = j
     return bounce_point
+
+def FindReflexAngles(poly):
+    psize = len(poly)
+    reflex_verts = []
+
+    for j in range(psize):
+        v1, v2, v3 = poly[(j-1) % psize], poly[j], poly[(j+1) % psize]
+        if IsRightTurn(v1,v2,v3):
+            reflex_verts.append(j)
+
+    return reflex_verts
