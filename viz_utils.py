@@ -25,7 +25,7 @@ def VizRay():
     plt.plot([pt2[0]], [pt2[1]], 'go')
 
     # mark reflex vertices
-    rvs = FindReflexAngles(poly)
+    rvs = FindReflexVerts(poly)
     for p in rvs:
         plt.plot([poly[p][0]], [poly[p][1]], 'bo')
 

@@ -101,6 +101,7 @@ def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
     psize = len(poly)
     closest_bounce = 100000000000
     bounce_point = (0.0, 0.0)
+    bounce_edge = last_bounce_edge
 
     # check each edge for collision
     for j in range(psize):
@@ -116,11 +117,12 @@ def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
                 BouncePointInEdge((x1,y1),pt,v1,v2)):
                 bounce_point = pt
                 closest_bounce = pdist
+                bounce_edge = j
                 #bounce_param = t
                 #b_edge = j
-    return bounce_point
+    return bounce_point, bounce_edge
 
-def FindReflexAngles(poly):
+def FindReflexVerts(poly):
     psize = len(poly)
     reflex_verts = []
 
@@ -130,3 +132,15 @@ def FindReflexAngles(poly):
             reflex_verts.append(j)
 
     return reflex_verts
+
+# group by edge so we can insert them in correct order
+def ShootRaysFromReflex(poly, j):
+    psize = len(poly)
+    p2 = poly[j]
+    p1_ccw = poly[(j+1) % psize]
+    p1_cw = poly[(j-1) % psize]
+
+    int_1, k = ClosestPtAlongRay(p1_ccw,p2,j,poly)
+    int_2, l = ClosestPtAlongRay(p1_cw,p2,j,poly)
+
+    return (int_1, k), (int_2, l)
