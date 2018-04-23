@@ -28,13 +28,13 @@ def VizRay():
     rvs = FindReflexVerts(poly)
     for p in rvs:
         plt.plot([poly[p][0]], [poly[p][1]], 'bo')
-
+        (p1, i), (p2, j) = ShootRaysFromReflex(poly, p)
+        print(p1)
+        plt.plot([poly[p][0], p1[0]], [poly[p][1], p1[1]], 'green')
+        plt.plot([poly[p][0], p2[0]], [poly[p][1], p2[1]], 'green')
+    
     print(rvs)
 
-    int_pt = ClosestPtAlongRay(pt1,pt2,-1,poly)
-    print(int_pt)
-    plt.plot([pt1[0], int_pt[0]], [pt1[1], int_pt[1]], 'red')
-    
     plt.savefig('test.pdf')
 
 if __name__ == '__main__':

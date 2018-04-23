@@ -141,6 +141,6 @@ def ShootRaysFromReflex(poly, j):
     p1_cw = poly[(j-1) % psize]
 
     int_1, k = ClosestPtAlongRay(p1_ccw,p2,j,poly)
-    int_2, l = ClosestPtAlongRay(p1_cw,p2,j,poly)
+    int_2, l = ClosestPtAlongRay(p1_cw,p2,((j-1) % psize),poly)
 
     return (int_1, k), (int_2, l)
