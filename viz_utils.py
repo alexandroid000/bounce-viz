@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 
 def VizRay():
-    poly = poly1
+    poly = simple_bit
     # Set the title
     wall_x = [x for (x,y) in poly]
     wall_x.append(wall_x[0])
@@ -29,9 +29,10 @@ def VizRay():
     for p in rvs:
         plt.plot([poly[p][0]], [poly[p][1]], 'bo')
         (p1, i), (p2, j) = ShootRaysFromReflex(poly, p)
-        print(p1)
-        plt.plot([poly[p][0], p1[0]], [poly[p][1], p1[1]], 'green')
-        plt.plot([poly[p][0], p2[0]], [poly[p][1], p2[1]], 'green')
+        inc_rays = ShootRaysToReflexFromVerts(poly,p)
+        inc_rays.extend([(poly[p],p1),(poly[p],p2)])
+        for (src,target) in inc_rays:
+            plt.plot([src[0], target[0]], [src[1], target[1]], 'green')
     
     print(rvs)
 

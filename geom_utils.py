@@ -72,7 +72,12 @@ def ShootRay(state, v1, v2):
     a = y3 - y2
     b = x2 - x3
     c = y2*(x3-x2) - x2*(y3-y2)
-    t = (-c - b*y1 - a*x1)/(a*cos(theta)+b*sin(theta))
+    den = (a*cos(theta)+b*sin(theta))
+    # case when lines are parallel
+    # TODO: raise error
+    if abs(den) < 0.000001:
+        return -10000, (0,0)
+    t = (-c - b*y1 - a*x1)/den
     pint = (x1 + cos(theta)*t, y1 + sin(theta)*t)
     return t, pint
 
