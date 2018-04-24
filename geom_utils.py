@@ -91,16 +91,24 @@ def IsInPoly(p, poly):
 
 # shoot a ray starting at p1, along vector p1->p2
 # find intersection with edge v1,v2
-def ShootRayFromVect(p1, p2, v1, v2):
+# will return first intersection *after* start
+def ShootRayFromVect(p1, p2, v1, v2, start=()):
+    if start == ():
+        start = p2
     (x1,y1), (x2,y2) = p1, p2
     (x,y) = (x2-x1, y2-y1) # recenter points so p1 is at origin
     theta = FixAngle(math.atan2(y,x))
-    return ShootRay((x2, y2, theta), v1, v2)
+    state = (start[0], start[1], theta)
+    return ShootRay(state, v1, v2)
 
-def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
+
+# shoot ray from p1 toward p2 in poly, return closest intersect point
+# will not return point on "last_bounce_edge"
+def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1,start=()):
     psize = len(poly)
     closest_bounce = 100000000000
     bounce_point = (0.0, 0.0)
+    found_coll = False
     bounce_edge = last_bounce_edge
 
     # check each edge for collision
@@ -109,18 +117,22 @@ def ClosestPtAlongRay(p1,p2,last_bounce_edge,poly):
             v1, v2 = poly[j], poly[(j+1) % psize]
             x1, y1 = p2[0], p2[1]
             # The line parameter t; needs divide by zero check!
-            t,pt = ShootRayFromVect(p1, p2, v1, v2)
+            t,pt = ShootRayFromVect(p1, p2, v1, v2, start)
             
             # Find closest bounce for which t > 0
             pdist = PointDistance(pt,p2)
             if ((t > 0) and (pdist < closest_bounce) and
                 BouncePointInEdge((x1,y1),pt,v1,v2)):
+                found_coll = True
                 bounce_point = pt
                 closest_bounce = pdist
                 bounce_edge = j
                 #bounce_param = t
                 #b_edge = j
-    return bounce_point, bounce_edge
+    if found_coll:
+        return bounce_point, bounce_edge
+    else:
+        return False
 
 def FindReflexVerts(poly):
     psize = len(poly)
@@ -133,6 +145,7 @@ def FindReflexVerts(poly):
 
     return reflex_verts
 
+# shoot two rays from each reflex vertex, along incident edges
 # group by edge so we can insert them in correct order
 def ShootRaysFromReflex(poly, j):
     psize = len(poly)
@@ -140,7 +153,23 @@ def ShootRaysFromReflex(poly, j):
     p1_ccw = poly[(j+1) % psize]
     p1_cw = poly[(j-1) % psize]
 
-    int_1, k = ClosestPtAlongRay(p1_ccw,p2,j,poly)
-    int_2, l = ClosestPtAlongRay(p1_cw,p2,((j-1) % psize),poly)
+    # do not check False return case - should always succeed lol
+    int_1, k = ClosestPtAlongRay(p1_ccw,p2,poly,j)
+    int_2, l = ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize))
 
     return (int_1, k), (int_2, l)
+
+# shoot ray from visible vertices through reflex verts
+def ShootRaysToReflexFromVerts(poly, j):
+    psize = len(poly)
+    reflex_v = poly[j]
+    pts = []
+    for i in range(psize):
+        if (i != j+1) and (i != j-1) and (i != j):
+            res = ClosestPtAlongRay(poly[i], reflex_v, poly, start=poly[i])
+            if res:
+                pt, k = res
+                pts.append((poly[i],pt))
+    return pts
+
+

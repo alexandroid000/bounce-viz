@@ -41,12 +41,12 @@ class TestGeomUtils(unittest.TestCase):
         self.assertAlmostEqual(y, 8.0)
 
     def test_intersect_interior(self):
-        (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, -1, poly1)
+        (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, poly1)
         self.assertAlmostEqual(x, 139.1304347826087)
         self.assertAlmostEqual(y, 0.0)
 
     def test_intersect_thru_vertex(self):
-        (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), -1, poly1)
+        (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), poly1)
         self.assertAlmostEqual(x, 198.21428571428572)
         self.assertAlmostEqual(y, 66.07142857142857)
 
