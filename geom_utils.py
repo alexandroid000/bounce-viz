@@ -177,13 +177,8 @@ def ShootRaysToReflexFromVerts(poly, j):
             pts.append((pt,k))
     return pts
 
-def IsInclusiveLeftTurn(p, q, r):
-    return q[0]*r[1] + p[0]*q[1] + r[0]*p[1] - \
-           (q[0]*p[1] + r[0]*q[1] + p[0]*r[1]) >= 0
-
-
 def IsIntersectSegments(p1, p2, q1, q2):
-    return (IsInclusiveLeftTurn(p1, p2, q1) != IsInclusiveLeftTurn(p1, p2, q2)) and (IsInclusiveLeftTurn(q1, q2, p1) != IsInclusiveLeftTurn(q1, q2, p2))
+    return (IsLeftTurn(p1, p2, q1) != IsLeftTurn(p1, p2, q2)) and (IsLeftTurn(q1, q2, p1) != IsLeftTurn(q1, q2, p2))
 
 def GetVisibleVertices(poly, j):
     psize = len(poly)
@@ -195,7 +190,7 @@ def GetVisibleVertices(poly, j):
             continue
         p2 = poly[i]
         for k in range(psize-1):
-            if k == i or k == j:
+            if k == i or k == (i-1)%psize or k == j or k == (j-1)%psize:
                 continue
             q1, q2 = poly[k], poly[k+1]
             if IsIntersectSegments(p1, p2, q1, q2):
