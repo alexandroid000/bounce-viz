@@ -15,17 +15,6 @@ def PolyToWindowScale(poly, ydim):
 def PointToWindowScale(p, ydim):
      return (p[0]/2.0, ydim - p[1]/2.0)
 
-# r is left of the vector formed by p->q
-def IsLeftTurn(p,q,r):
-    return q[0]*r[1] + p[0]*q[1] + r[0]*p[1] - \
-           (q[0]*p[1] + r[0]*q[1] + p[0]*r[1]) > 0
-
-# r is right of the vector formed by p->q
-def IsRightTurn(p,q,r):
-    return q[0]*r[1] + p[0]*q[1] + r[0]*p[1] - \
-           (q[0]*p[1] + r[0]*q[1] + p[0]*r[1]) < 0
-
-
 # Do we have theta1 <= theta <= theta2 (mod 2pi) ?
 # It is just a particular cyclic permutation
 def AngleBetween(theta,theta1,theta2):
@@ -48,8 +37,30 @@ def AngleDifference(theta1,theta2):
 def PointDistance(p,q):
     return sqrt((p[0]-q[0])*(p[0]-q[0])+(p[1]-q[1])*(p[1]-q[1]))
 
+def GetVectorLen(v):
+        return math.sqrt(sum((a*b) for a, b in zip(v, v)))
+
+def GetVector2Angle(v1, v2):
+    dot_prod = sum((a*b) for a, b in zip(v1, v2))
+    return math.acos(dot_prod/(GetVectorLen(v1)*GetVectorLen(v2)))
+
 def FixAngle(theta):
     return theta % (2.0*pi)
+
+# r is left of the vector formed by p->q
+def IsLeftTurn(p,q,r):
+    return q[0]*r[1] + p[0]*q[1] + r[0]*p[1] - \
+           (q[0]*p[1] + r[0]*q[1] + p[0]*r[1]) > 0
+
+# r is right of the vector formed by p->q
+def IsRightTurn(p,q,r):
+    return q[0]*r[1] + p[0]*q[1] + r[0]*p[1] - \
+           (q[0]*p[1] + r[0]*q[1] + p[0]*r[1]) < 0
+
+def IsIntersectSegments(p1, p2, q1, q2):
+    return (IsLeftTurn(p1, p2, q1) != IsLeftTurn(p1, p2, q2)) and (IsLeftTurn(q1, q2, p1) != IsLeftTurn(q1, q2, p2))
+
+
 
 # checks if vector sp->bp points within edge p1p2
 # start point, boundary point, edge p1, edge p2
@@ -177,9 +188,6 @@ def ShootRaysToReflexFromVerts(poly, j):
             pts.append((pt,k))
     return pts
 
-def IsIntersectSegments(p1, p2, q1, q2):
-    return (IsLeftTurn(p1, p2, q1) != IsLeftTurn(p1, p2, q2)) and (IsLeftTurn(q1, q2, p1) != IsLeftTurn(q1, q2, p2))
-
 def GetVisibleVertices(poly, j):
     psize = len(poly)
     p1 = poly[j]
@@ -201,11 +209,32 @@ def GetVisibleVertices(poly, j):
     visibleVertexSet.append((j-1)%psize)
     return visibleVertexSet
 
-def GetVectorLen(v):
-    return math.sqrt(sum((a*b) for a, b in zip(v, v)))
+def SortByDistance(p1, unsorted_vs):
+    return sorted(unsorted_vs, key = lambda v: PointDistance(v,p1))
 
-def GetVector2Angle(v1, v2):
-    dot_prod = sum((a*b) for a, b in zip(v1, v2))
-    return math.acos(dot_prod/(GetVectorLen(v1)*GetVectorLen(v2)))
+# find all induced transition points, sort and insert into polygon
+# probably the most naive way to do this
+def InsertAllTransitionPts(poly):
+    t_pts_grouped = {i:[] for i in range(len(poly))}
+    rvs = FindReflexVerts(poly)
+    # find all transition points, group by edge
+    for p in rvs:
+        t_pts = []
+        r1, r2 = ShootRaysFromReflex(poly, p)
+        t_pts.extend([r1,r2])
+        t_pts.extend(ShootRaysToReflexFromVerts(poly,p))
+        for (pt,i) in t_pts:
+            t_pts_grouped[i].append(pt)
 
+    # sort transition points along edge
+    for i in range(len(poly)):
+        t_pts_grouped[i] = SortByDistance(poly[i], t_pts_grouped[i])
+
+    # insert into polygon
+    new_poly = []
+    for i in range(len(poly)):
+        new_poly.append(poly[i])
+        new_poly.extend(t_pts_grouped[i])
+
+    return new_poly
 

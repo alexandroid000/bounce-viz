@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def VizRay():
-    poly = poly1
+    poly = simple_bit
     # Set the title
     wall_x = [x for (x,y) in poly]
     wall_x.append(wall_x[0])
@@ -19,24 +19,20 @@ def VizRay():
     plt.figure()
     plt.plot(wall_x, wall_y, 'black')
 
-    pt1 = (0.0, 0.0)
-    pt2 = (150.0, 50.0)
-
-    plt.plot([pt1[0]], [pt1[1]], 'go')
-    plt.plot([pt2[0]], [pt2[1]], 'go')
-
     # mark reflex vertices
     rvs = FindReflexVerts(poly)
     for p in rvs:
         plt.plot([poly[p][0]], [poly[p][1]], 'bo')
         r1, r2 = ShootRaysFromReflex(poly, p)
         transition_pts = ShootRaysToReflexFromVerts(poly,p)
-        print("reflex ",p," transitions ",transition_pts)
         transition_pts.extend([r1,r2])
         for (pt,k) in transition_pts:
             plt.plot([poly[p][0], pt[0]], [poly[p][1], pt[1]], 'green')
-    
-    print(rvs)
+
+    t_pts = InsertAllTransitionPts(poly)
+    t_x = [x for (x,y) in t_pts]
+    t_y = [y for (x,y) in t_pts]
+    plt.plot(t_x, t_y, 'ro')
 
     plt.savefig('test.pdf')
 
