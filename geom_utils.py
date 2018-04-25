@@ -177,4 +177,40 @@ def ShootRaysToReflexFromVerts(poly, j):
                 pts.append((poly[i],pt))
     return pts
 
+def IsInclusiveLeftTurn(p, q, r):
+    return q[0]*r[1] + p[0]*q[1] + r[0]*p[1] - \
+           (q[0]*p[1] + r[0]*q[1] + p[0]*r[1]) >= 0
+
+
+def IsIntersectSegments(p1, p2, q1, q2):
+    return (IsInclusiveLeftTurn(p1, p2, q1) != IsInclusiveLeftTurn(p1, p2, q2)) and (IsInclusiveLeftTurn(q1, q2, p1) != IsInclusiveLeftTurn(q1, q2, p2))
+
+def GetVisibleVertices(poly, j):
+    psize = len(poly)
+    p1 = poly[j]
+    visibleVertexSet = [(j+1)%psize]
+    for i in range(psize):
+        is_visible = True
+        if i == j or i == (j-1)%psize or i == (j+1)%psize:
+            continue
+        p2 = poly[i]
+        for k in range(psize-1):
+            if k == i or k == j:
+                continue
+            q1, q2 = poly[k], poly[k+1]
+            if IsIntersectSegments(p1, p2, q1, q2):
+                is_visible = False
+                break
+        if is_visible and IsInPoly(((p1[0]+p2[0])/2, (p1[1]+p2[1])/2), poly):
+            visibleVertexSet.append(i)
+    visibleVertexSet.append((j-1)%psize)
+    return visibleVertexSet
+
+def GetVectorLen(v):
+    return math.sqrt(sum((a*b) for a, b in zip(v, v)))
+
+def GetVector2Angle(v1, v2):
+    dot_prod = sum((a*b) for a, b in zip(v1, v2))
+    return math.acos(dot_prod/(GetVectorLen(v1)*GetVectorLen(v2)))
+
 

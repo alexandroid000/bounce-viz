@@ -2,10 +2,10 @@
 
 from geom_utils import *
 from maps import *
+import numpy as np
 
 # Used to plot the example
 import matplotlib.pyplot as plt
-
 
 def VizRay():
     poly = simple_bit
@@ -16,6 +16,7 @@ def VizRay():
     wall_y.append(wall_y[0])
     
     # Plot the outer boundary with black color
+    plt.figure()
     plt.plot(wall_x, wall_y, 'black')
 
     pt1 = (0.0, 0.0)
@@ -38,5 +39,23 @@ def VizRay():
 
     plt.savefig('test.pdf')
 
+def bounce_viz_diagram():
+    poly = poly1
+    psize = len(poly)
+    plt.figure()
+    bounce_viz_heat_map = []
+    for i in range(psize):
+        p1, p2 = poly[i], poly[(i+1) % psize]
+        v1 = (p2[0]-p1[0],p2[1]-p1[1])
+        visibleVertices = GetVisibleVertices(poly, i)
+        sweepTheta = [GetVector2Angle(v1, (poly[j][0]-p1[0],poly[j][1]-p1[1])) for j in visibleVertices[1:]]
+        for j in range(len(sweepTheta)):
+            bounce_viz_heat_map.append((i, sweepTheta[j], j))
+    print(bounce_viz_heat_map)
+    plt.plot(bounce_viz_heat_map)
+    plt.savefig('visible.pdf')
+
+
 if __name__ == '__main__':
-    VizRay()
+    # VizRay()
+    bounce_viz_diagram()
