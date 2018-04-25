@@ -54,5 +54,23 @@ class TestGeomUtils(unittest.TestCase):
         rfverts = FindReflexVerts(poly1)
         self.assertEqual([3,7,10], rfverts)
 
+    def test_transition_pts(self):
+        t3 = ShootRaysToReflexFromVerts(poly1, 3)
+        t7 = ShootRaysToReflexFromVerts(poly1, 7)
+        t10 = ShootRaysToReflexFromVerts(poly1, 10)
+        ts3 = [((-67.74193548387098, 182.25806451612902), 4), ((-60.0, 190.0), 4)]
+        ts7 = [((-206.18384401114204, -199.13649025069637),
+        8), ((-127.36842105263163, -194.21052631578948), 8)]
+        ts10 = [((207.44680851063828, 11.70212765957443), 0),
+        ((209.34065934065933, 40.10989010989009), 0), ((205.3602811950791,
+        56.32688927943761), 1), ((199.90439770554494, 63.76673040152964), 1),
+        ((190.12048192771084, 77.10843373493977), 1)]
+        self.assertEqual(ts3, t3)
+        self.assertEqual(ts7, t7)
+        self.assertEqual(ts10, t10)
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

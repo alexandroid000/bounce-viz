@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def VizRay():
-    poly = simple_bit
+    poly = poly1
     # Set the title
     wall_x = [x for (x,y) in poly]
     wall_x.append(wall_x[0])
@@ -29,11 +29,12 @@ def VizRay():
     rvs = FindReflexVerts(poly)
     for p in rvs:
         plt.plot([poly[p][0]], [poly[p][1]], 'bo')
-        (p1, i), (p2, j) = ShootRaysFromReflex(poly, p)
-        inc_rays = ShootRaysToReflexFromVerts(poly,p)
-        inc_rays.extend([(poly[p],p1),(poly[p],p2)])
-        for (src,target) in inc_rays:
-            plt.plot([src[0], target[0]], [src[1], target[1]], 'green')
+        r1, r2 = ShootRaysFromReflex(poly, p)
+        transition_pts = ShootRaysToReflexFromVerts(poly,p)
+        print("reflex ",p," transitions ",transition_pts)
+        transition_pts.extend([r1,r2])
+        for (pt,k) in transition_pts:
+            plt.plot([poly[p][0], pt[0]], [poly[p][1], pt[1]], 'green')
     
     print(rvs)
 
@@ -57,5 +58,5 @@ def bounce_viz_diagram():
 
 
 if __name__ == '__main__':
-    # VizRay()
-    bounce_viz_diagram()
+    VizRay()
+    # bounce_viz_diagram()

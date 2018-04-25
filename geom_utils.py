@@ -96,20 +96,18 @@ def IsInPoly(p, poly):
 
 # shoot a ray starting at p1, along vector p1->p2
 # find intersection with edge v1,v2
-# will return first intersection *after* start
-def ShootRayFromVect(p1, p2, v1, v2, start=()):
-    if start == ():
-        start = p2
+# will return first intersection *after* p2
+def ShootRayFromVect(p1, p2, v1, v2):
     (x1,y1), (x2,y2) = p1, p2
     (x,y) = (x2-x1, y2-y1) # recenter points so p1 is at origin
     theta = FixAngle(math.atan2(y,x))
-    state = (start[0], start[1], theta)
+    state = (p2[0], p2[1], theta)
     return ShootRay(state, v1, v2)
 
 
 # shoot ray from p1 toward p2 in poly, return closest intersect point
 # will not return point on "last_bounce_edge"
-def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1,start=()):
+def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
     psize = len(poly)
     closest_bounce = 100000000000
     bounce_point = (0.0, 0.0)
@@ -122,7 +120,7 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1,start=()):
             v1, v2 = poly[j], poly[(j+1) % psize]
             x1, y1 = p2[0], p2[1]
             # The line parameter t; needs divide by zero check!
-            t,pt = ShootRayFromVect(p1, p2, v1, v2, start)
+            t,pt = ShootRayFromVect(p1, p2, v1, v2)
             
             # Find closest bounce for which t > 0
             pdist = PointDistance(pt,p2)
@@ -165,16 +163,18 @@ def ShootRaysFromReflex(poly, j):
     return (int_1, k), (int_2, l)
 
 # shoot ray from visible vertices through reflex verts
+# Poly -> Int -> [(Point, Int)]
 def ShootRaysToReflexFromVerts(poly, j):
     psize = len(poly)
     reflex_v = poly[j]
     pts = []
-    for i in range(psize):
-        if (i != j+1) and (i != j-1) and (i != j):
-            res = ClosestPtAlongRay(poly[i], reflex_v, poly, start=poly[i])
-            if res:
-                pt, k = res
-                pts.append((poly[i],pt))
+    visible_verts = GetVisibleVertices(poly,j)
+
+    for v in visible_verts[1:-1]:
+        res = ClosestPtAlongRay(poly[v], reflex_v, poly)
+        if res:
+            pt, k = res
+            pts.append((pt,k))
     return pts
 
 def IsInclusiveLeftTurn(p, q, r):
