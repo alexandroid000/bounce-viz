@@ -177,15 +177,16 @@ def ShootRaysFromReflex(poly, j):
 # Poly -> Int -> [(Point, Int)]
 def ShootRaysToReflexFromVerts(poly, j):
     psize = len(poly)
-    reflex_v = poly[j]
+    r_v = poly[j]
     pts = []
     visible_verts = GetVisibleVertices(poly,j)
 
     for v in visible_verts[1:-1]:
-        res = ClosestPtAlongRay(poly[v], reflex_v, poly)
+        res = ClosestPtAlongRay(poly[v], r_v, poly)
         if res:
             pt, k = res
-            pts.append((pt,k))
+            if IsInPoly(((pt[0]+r_v[0])/2, (pt[1]+r_v[1])/2), poly):
+                pts.append((pt,k))
     return pts
 
 def GetVisibleVertices(poly, j):

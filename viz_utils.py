@@ -7,8 +7,7 @@ import numpy as np
 # Used to plot the example
 import matplotlib.pyplot as plt
 
-def VizRay():
-    poly = simple_bit
+def VizRay(poly):
     # Set the title
     wall_x = [x for (x,y) in poly]
     wall_x.append(wall_x[0])
@@ -33,8 +32,9 @@ def VizRay():
     t_x = [x for (x,y) in t_pts]
     t_y = [y for (x,y) in t_pts]
     plt.plot(t_x, t_y, 'ro')
+    plt.show()
 
-    plt.savefig('test.pdf')
+    #plt.savefig('test.pdf')
 
 def bounce_viz_diagram():
     poly = poly1
@@ -54,5 +54,5 @@ def bounce_viz_diagram():
 
 
 if __name__ == '__main__':
-    VizRay()
+    VizRay(simple_bit)
     # bounce_viz_diagram()
