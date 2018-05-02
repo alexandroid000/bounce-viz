@@ -335,6 +335,7 @@ def getLinkDiagram(poly):
         point = t_pts[i]
         color = vxs_color[i]
         plt.scatter(point[0], point[1], color=color)
+        plt.annotate(str(i), (point[0]+10, point[1]+10))
     plt.axis('equal')
     plt.savefig('inserted_poly.png')
     plt.show()
