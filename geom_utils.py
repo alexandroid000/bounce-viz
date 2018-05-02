@@ -5,6 +5,9 @@
 
 import random, math
 from math import sqrt,cos,sin,atan2,pi
+import numpy as np
+
+import matplotlib.pyplot as plt
 
 def PolyToWindowScale(poly, ydim):
     newpoly = []
@@ -38,11 +41,12 @@ def PointDistance(p,q):
     return sqrt((p[0]-q[0])*(p[0]-q[0])+(p[1]-q[1])*(p[1]-q[1]))
 
 def GetVectorLen(v):
-        return math.sqrt(sum((a*b) for a, b in zip(v, v)))
+    return math.sqrt(sum((a*b) for a, b in zip(v, v)))
 
 def GetVector2Angle(v1, v2):
-    dot_prod = sum((a*b) for a, b in zip(v1, v2))
-    return math.acos(dot_prod/(GetVectorLen(v1)*GetVectorLen(v2)))
+    dot_prod = v1[0]*v2[0]+v1[1]*v2[1]
+    ratio = max(min(dot_prod/(GetVectorLen(v1)*GetVectorLen(v2)), 1), -1)
+    return np.arccos(ratio)
 
 def FixAngle(theta):
     return theta % (2.0*pi)
@@ -215,6 +219,7 @@ def SortByDistance(p1, unsorted_vs):
 
 # find all induced transition points, sort and insert into polygon
 # probably the most naive way to do this
+# return a list of edge indicators for each vertex
 def InsertAllTransitionPts(poly):
     t_pts_grouped = {i:[] for i in range(len(poly))}
     rvs = FindReflexVerts(poly)
@@ -233,9 +238,78 @@ def InsertAllTransitionPts(poly):
 
     # insert into polygon
     new_poly = []
+    degeneracy_indicator = []
     for i in range(len(poly)):
         new_poly.append(poly[i])
         new_poly.extend(t_pts_grouped[i])
+        degeneracy_indicator.append(-1)
+        degeneracy_indicator.extend([i for x in range(len(t_pts_grouped[i]))])
 
-    return new_poly
+    return new_poly, degeneracy_indicator
+
+def getAngleFromThreePoint(p1, p2, origin):
+    v1 = (p1[0]-origin[0], p1[1]-origin[1])
+    v2 = (p2[0]-origin[0], p2[1]-origin[1])
+    return GetVector2Angle(v1, v2)
+
+def getLinkDiagram(poly):
+    t_pts, degeracy_indicator = InsertAllTransitionPts(poly)
+    psize = len(t_pts)
+    # store the seperating line segments in the link diagram into this array. The 3*psize is for ploting discontinuous lines.
+    link_diagram = np.nan*np.ones((psize, 3*psize))
+    for i in range(psize):
+        unfiltered_viz_vxs = GetVisibleVertices(t_pts, i)
+        # filter out the vertices on the next adjacent edge of this vertex since they will all have angle zero
+        viz_vxs = []
+        for index in unfiltered_viz_vxs:
+            if degeracy_indicator[index] != i:
+                viz_vxs.append(index)
+        # for each visible vertex, we need to calculate (1) the view angle at the current vertex w.r.t the current edge and (2) the view angle at the next vertex w.r.t the current edge. we also need to (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
+        for vx in viz_vxs:
+            curr_p = t_pts[i]
+            next_p = t_pts[(i+1)%psize]
+            # this is the point on the same line of the current edge but in front of the next vertex. Use this so that we don't get zero length vector from the next vertex perspective
+            extended_point = (curr_p[0]+2*(next_p[0]-curr_p[0]), curr_p[1]+2*(next_p[1]-curr_p[1]))
+            interest_p = t_pts[vx]
+            # (1)
+            link_diagram[vx][3*i] = getAngleFromThreePoint(next_p, interest_p, curr_p)
+            # (2)
+            # the if case is for when we are considering the "next vertex"
+            if interest_p == next_p:
+                link_diagram[vx][3*i+1] = link_diagram[vx][3*i]
+            else:
+                link_diagram[vx][3*i+1] = getAngleFromThreePoint(interest_p, extended_point, next_p)
+            # (3)
+            link_diagram[vx][3*i+2] = np.nan
+    # plotting the link diagram
+    plt.figure()
+    for i in range(psize):
+        cut_range = link_diagram[i]
+        for j in range(psize):
+            if cut_range[j] == -1:
+                cut_range[j] = np.nan
+        x = []
+        for j in range(psize):
+            x.extend([j, j+1, j+1])
+        plt.plot(x, cut_range, label= '{}'.format(i))
+        plt.axvline(x=i, linestyle='--')
+    leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
+    vxs_color = range(psize)
+    for line in leg.get_lines():
+        vxs_color[int(line.get_label())] = '{}o'.format(line.get_color())
+    plt.savefig('link_diagram.png', bbox_inches="tight")
+    plt.show()
+    # Color the vertex of the new poly with the colors selected by matplotlib for the lines 
+    plt.figure()
+    wall_x = [x for (x,y) in t_pts]
+    wall_x.append(wall_x[0])
+    wall_y = [y for (x,y) in t_pts]
+    wall_y.append(wall_y[0])
+    plt.plot(wall_x, wall_y, 'black')
+    for i in range(psize):
+        point = t_pts[i]
+        color = vxs_color[i]
+        plt.plot(point[0], point[1], color)
+    plt.savefig('inserted_poly.png')
+    plt.show()
 
