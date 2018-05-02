@@ -199,11 +199,8 @@ def IsThreePointsOnLine(p1, p2, p3):
 
 def IsThreePointsOnLineSeg(p1, p2, p3):
     if IsThreePointsOnLine(p1, p2, p3):
-        print(p1, p2, p3)
-        print('check_line segments')
         v1 = (p1[0]-p3[0], p1[1]-p3[1])
         v2 = (p2[0]-p3[0], p2[1]-p3[1])
-        print (v1[0]*v2[0]+v1[1]*v2[1])
         return (v1[0]*v2[0]+v1[1]*v2[1])<0
     return False
 
