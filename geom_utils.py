@@ -277,19 +277,17 @@ def getAngleFromThreePoint(p1, p2, origin):
     return GetVector2Angle(v1, v2)
 
 def getLinkDiagram(poly):
-    t_pts, degeracy_indicator = InsertAllTransitionPts(poly)
+    t_pts, degeneracy_indicator = InsertAllTransitionPts(poly)
     psize = len(t_pts)
     # store the seperating line segments in the link diagram into this array. The 3*psize is for ploting discontinuous lines.
     link_diagram = np.nan*np.ones((psize, 3*psize))
     all_viz_vxs = [GetVisibleVertices(t_pts, i) for i in range(psize)]
     for i in range(psize):
-        unfiltered_viz_vxs = all_viz_vxs[i]
         # filter out the vertices on the next adjacent edge of this vertex since they will all have angle zero
         viz_vxs = []
-        for index in unfiltered_viz_vxs:
-            if degeracy_indicator[index] != i:
+        for index in all_viz_vxs[i]:
+            if degeneracy_indicator[index] != i and index in all_viz_vxs[(i+1)%psize]:
                 viz_vxs.append(index)
-        viz_vxs = list([x for x in viz_vxs if x in all_viz_vxs[(i+1)%psize]])
         viz_vxs.append((i+1)%psize)
         # for each visible vertex, we need to calculate (1) the view angle at the current vertex w.r.t the current edge and (2) the view angle at the next vertex w.r.t the current edge. we also need to (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
         for vx in viz_vxs:
