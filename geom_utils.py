@@ -6,7 +6,6 @@
 import random, math
 from math import sqrt,cos,sin,atan2,pi
 import numpy as np
-
 import matplotlib.pyplot as plt
 
 def PolyToWindowScale(poly, ydim):
@@ -193,6 +192,27 @@ def ShootRaysToReflexFromVerts(poly, j):
                 pts.append((pt,k))
     return pts
 
+def IsThreePointsOnLine(p1, p2, p3):
+    degeneracy_error = 0.00001
+    cross_prod = (p1[1] - p2[1]) * (p3[0] - p2[0]) - (p1[0] - p2[0]) * (p3[1] - p2[1])
+    return abs(cross_prod)<degeneracy_error
+
+def IsThreePointsOnLineSeg(p1, p2, p3):
+    if IsThreePointsOnLine(p1, p2, p3):
+        print(p1, p2, p3)
+        print('check_line segments')
+        v1 = (p1[0]-p3[0], p1[1]-p3[1])
+        v2 = (p2[0]-p3[0], p2[1]-p3[1])
+        print (v1[0]*v2[0]+v1[1]*v2[1])
+        return (v1[0]*v2[0]+v1[1]*v2[1])<0
+    return False
+
+def IsBoundaryIntersect(p1, p2, q1, q2):
+    return (IsThreePointsOnLine(p1, p2, q1) or
+           IsThreePointsOnLine(p1, p2, q2) or
+           IsThreePointsOnLine(q1, q2, p1) or
+           IsThreePointsOnLine(q1, q2, p2))
+
 def GetVisibleVertices(poly, j):
     psize = len(poly)
     p1 = poly[j]
@@ -207,9 +227,16 @@ def GetVisibleVertices(poly, j):
                 continue
             q1, q2 = poly[k], poly[k+1]
             if IsIntersectSegments(p1, p2, q1, q2):
-                is_visible = False
-                break
-        if is_visible and IsInPoly(((p1[0]+p2[0])/2, (p1[1]+p2[1])/2), poly):
+                if IsBoundaryIntersect(p1, p2, q1, q2):
+                    continue
+                else:
+                    is_visible = False
+                    break
+        # add the check for degeneracy
+        other_vxs = range(psize)
+        other_vxs.remove(i)
+        other_vxs.remove(j)
+        if is_visible and (IsInPoly(((p1[0]+p2[0])/2, (p1[1]+p2[1])/2), poly) or any([IsThreePointsOnLine(p1, p2, poly[l]) for l in other_vxs])):
             visibleVertexSet.append(i)
     visibleVertexSet.append((j-1)%psize)
     return visibleVertexSet
@@ -257,13 +284,16 @@ def getLinkDiagram(poly):
     psize = len(t_pts)
     # store the seperating line segments in the link diagram into this array. The 3*psize is for ploting discontinuous lines.
     link_diagram = np.nan*np.ones((psize, 3*psize))
+    all_viz_vxs = [GetVisibleVertices(t_pts, i) for i in range(psize)]
     for i in range(psize):
-        unfiltered_viz_vxs = GetVisibleVertices(t_pts, i)
+        unfiltered_viz_vxs = all_viz_vxs[i]
         # filter out the vertices on the next adjacent edge of this vertex since they will all have angle zero
         viz_vxs = []
         for index in unfiltered_viz_vxs:
             if degeracy_indicator[index] != i:
                 viz_vxs.append(index)
+        viz_vxs = list(filter(lambda x: x in all_viz_vxs[(i+1)%psize], viz_vxs))
+        viz_vxs.append((i+1)%psize)
         # for each visible vertex, we need to calculate (1) the view angle at the current vertex w.r.t the current edge and (2) the view angle at the next vertex w.r.t the current edge. we also need to (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
         for vx in viz_vxs:
             curr_p = t_pts[i]
