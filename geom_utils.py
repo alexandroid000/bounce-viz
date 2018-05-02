@@ -230,7 +230,7 @@ def GetVisibleVertices(poly, j):
                     is_visible = False
                     break
         # add the check for degeneracy
-        other_vxs = range(psize)
+        other_vxs = list(range(psize))
         other_vxs.remove(i)
         other_vxs.remove(j)
         if is_visible and (IsInPoly(((p1[0]+p2[0])/2, (p1[1]+p2[1])/2), poly) or any([IsThreePointsOnLine(p1, p2, poly[l]) for l in other_vxs])):
@@ -289,7 +289,7 @@ def getLinkDiagram(poly):
         for index in unfiltered_viz_vxs:
             if degeracy_indicator[index] != i:
                 viz_vxs.append(index)
-        viz_vxs = list(filter(lambda x: x in all_viz_vxs[(i+1)%psize], viz_vxs))
+        viz_vxs = list([x for x in viz_vxs if x in all_viz_vxs[(i+1)%psize]])
         viz_vxs.append((i+1)%psize)
         # for each visible vertex, we need to calculate (1) the view angle at the current vertex w.r.t the current edge and (2) the view angle at the next vertex w.r.t the current edge. we also need to (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
         for vx in viz_vxs:
@@ -321,9 +321,9 @@ def getLinkDiagram(poly):
         plt.plot(x, cut_range, label= '{}'.format(i))
         plt.axvline(x=i, linestyle='--')
     leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
-    vxs_color = range(psize)
+    vxs_color = list(range(psize))
     for line in leg.get_lines():
-        vxs_color[int(line.get_label())] = '{}o'.format(line.get_color())
+        vxs_color[int(line.get_label())] = '{}'.format(line.get_color())
     plt.savefig('link_diagram.png', bbox_inches="tight")
     plt.show()
     # Color the vertex of the new poly with the colors selected by matplotlib for the lines 
@@ -336,7 +336,8 @@ def getLinkDiagram(poly):
     for i in range(psize):
         point = t_pts[i]
         color = vxs_color[i]
-        plt.plot(point[0], point[1], color)
+        plt.scatter(point[0], point[1], color=color)
+    plt.axis('equal')
     plt.savefig('inserted_poly.png')
     plt.show()
 
