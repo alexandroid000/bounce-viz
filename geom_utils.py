@@ -262,22 +262,20 @@ def InsertAllTransitionPts(poly):
 
     # insert into polygon
     new_poly = []
-    degeneracy_indicator = []
     for i in range(len(poly)):
         new_poly.append(poly[i])
         new_poly.extend(t_pts_grouped[i])
-        degeneracy_indicator.append(-1)
-        degeneracy_indicator.extend([i for x in range(len(t_pts_grouped[i]))])
 
-    return new_poly, degeneracy_indicator
+    return new_poly
 
 def getAngleFromThreePoint(p1, p2, origin):
     v1 = (p1[0]-origin[0], p1[1]-origin[1])
     v2 = (p2[0]-origin[0], p2[1]-origin[1])
     return GetVector2Angle(v1, v2)
 
-def getLinkDiagram(poly):
-    t_pts, degeneracy_indicator = InsertAllTransitionPts(poly)
+# the second parameter is for testing fix theta bouncing
+def getLinkDiagram(poly, hline = None):
+    t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
     # store the seperating line segments in the link diagram into this array. The 3*psize is for ploting discontinuous lines.
     link_diagram = np.nan*np.ones((psize, 3*psize))
@@ -286,7 +284,7 @@ def getLinkDiagram(poly):
         # filter out the vertices on the next adjacent edge of this vertex since they will all have angle zero
         viz_vxs = []
         for index in all_viz_vxs[i]:
-            if degeneracy_indicator[index] != i and index in all_viz_vxs[(i+1)%psize]:
+            if index in all_viz_vxs[(i+1)%psize]:
                 viz_vxs.append(index)
         viz_vxs.append((i+1)%psize)
         # for each visible vertex, we need to calculate (1) the view angle at the current vertex w.r.t the current edge and (2) the view angle at the next vertex w.r.t the current edge. we also need to (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
@@ -306,7 +304,9 @@ def getLinkDiagram(poly):
                 link_diagram[vx][3*i+1] = getAngleFromThreePoint(interest_p, extended_point, next_p)
             # (3)
             link_diagram[vx][3*i+2] = np.nan
-    # plotting the link diagram
+    # plotting the link diagram with rainbow color
+    jet = plt.cm.jet
+    colors = jet(np.linspace(0, 1, psize))
     plt.figure()
     for i in range(psize):
         cut_range = link_diagram[i]
@@ -316,13 +316,12 @@ def getLinkDiagram(poly):
         x = []
         for j in range(psize):
             x.extend([j, j+1, j+1])
-        plt.plot(x, cut_range, label= '{}'.format(i))
+        plt.plot(x, cut_range, label= '{}'.format(i), alpha=0.7, color = colors[i])
         plt.axvline(x=i, linestyle='--')
-    leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
-    vxs_color = list(range(psize))
-    for line in leg.get_lines():
-        vxs_color[int(line.get_label())] = '{}'.format(line.get_color())
-    plt.savefig('link_diagram.png', bbox_inches="tight")
+    if hline != None:
+        plt.plot(range(psize+1), hline*np.ones(psize+1))
+    leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+    plt.savefig('link_diagram.png', bbox_inches="tight", dpi = 300)
     plt.show()
     # Color the vertex of the new poly with the colors selected by matplotlib for the lines 
     plt.figure()
@@ -333,10 +332,9 @@ def getLinkDiagram(poly):
     plt.plot(wall_x, wall_y, 'black')
     for i in range(psize):
         point = t_pts[i]
-        color = vxs_color[i]
-        plt.scatter(point[0], point[1], color=color)
+        plt.scatter(point[0], point[1], color=colors[i])
         plt.annotate(str(i), (point[0]+10, point[1]+10))
     plt.axis('equal')
-    plt.savefig('inserted_poly.png')
+    plt.savefig('inserted_poly.png', dpi = 300)
     plt.show()
 

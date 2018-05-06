@@ -40,5 +40,5 @@ def VizRay(poly):
 
 
 if __name__ == '__main__':
-    VizRay(simple_bit)
-    getLinkDiagram(simple_nonconv)
+    # VizRay(simple_bit)
+    plt = getLinkDiagram(concave_quad_1, 0.9507)
