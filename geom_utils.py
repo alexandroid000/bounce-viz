@@ -214,25 +214,18 @@ def GetVisibleVertices(poly, j):
     psize = len(poly)
     p1 = poly[j]
     visibleVertexSet = [(j+1)%psize]
-    for i in range(psize):
+    non_neighbors = [x for x in range(psize) if x not in (j, (j-1)%psize, (j+1)%psize)]
+    for i in non_neighbors:
         is_visible = True
-        if i == j or i == (j-1)%psize or i == (j+1)%psize:
-            continue
         p2 = poly[i]
-        for k in range(psize-1):
-            if k == i or k == (i-1)%psize or k == j or k == (j-1)%psize:
-                continue
-            q1, q2 = poly[k], poly[k+1]
-            if IsIntersectSegments(p1, p2, q1, q2):
-                if IsBoundaryIntersect(p1, p2, q1, q2):
-                    continue
-                else:
-                    is_visible = False
-                    break
+        possible_intersect_edges = [x for x in range(psize) if x not in (i, (i-1)%psize, j, (j-1)%psize)]
+        for k in possible_intersect_edges:
+            q1, q2 = poly[k], poly[(k+1)%psize]
+            if IsIntersectSegments(p1, p2, q1, q2) and (not IsBoundaryIntersect(p1, p2, q1, q2)):
+                is_visible = False
+                break
         # add the check for degeneracy
-        other_vxs = list(range(psize))
-        other_vxs.remove(i)
-        other_vxs.remove(j)
+        other_vxs = [x for x in range(psize) if x not in (i, j)]
         if is_visible and (IsInPoly(((p1[0]+p2[0])/2, (p1[1]+p2[1])/2), poly) or any([IsThreePointsOnLine(p1, p2, poly[l]) for l in other_vxs])):
             visibleVertexSet.append(i)
     visibleVertexSet.append((j-1)%psize)
@@ -268,73 +261,60 @@ def InsertAllTransitionPts(poly):
 
     return new_poly
 
-def getAngleFromThreePoint(p1, p2, origin):
+def GetAngleFromThreePoint(p1, p2, origin):
     v1 = (p1[0]-origin[0], p1[1]-origin[1])
     v2 = (p2[0]-origin[0], p2[1]-origin[1])
     return GetVector2Angle(v1, v2)
 
-# the second parameter is for testing fix theta bouncing
-def getLinkDiagram(poly, hline = None):
+# Resolution is the number of sample points on each edge
+def GetLinkDiagram(poly, resolution = 15):
     t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
-    # store the seperating line segments in the link diagram into this array. The 3*psize is for ploting discontinuous lines.
-    link_diagram = np.nan*np.ones((psize, 3*psize))
+    link_diagram = np.nan*np.ones((psize, resolution*psize))
     all_viz_vxs = [GetVisibleVertices(t_pts, i) for i in range(psize)]
     for i in range(psize):
-        # filter out the vertices on the next adjacent edge of this vertex since they will all have angle zero
-        viz_vxs = []
-        for index in all_viz_vxs[i]:
-            if index in all_viz_vxs[(i+1)%psize]:
-                viz_vxs.append(index)
+        # get vertices that are visible to the current vertex and the next vertex
+        viz_vxs = list(set(all_viz_vxs[i]) & set(all_viz_vxs[(i+1)%psize]))
         viz_vxs.append((i+1)%psize)
-        # for each visible vertex, we need to calculate (1) the view angle at the current vertex w.r.t the current edge and (2) the view angle at the next vertex w.r.t the current edge. we also need to (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
+        # for each visible vertex, we need to calculate (1) the view angle at the current vertex w.r.t the current edge and (2) the view angle at the sample points on the edge and the next vertex w.r.t the current edge. we also need to (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
         for vx in viz_vxs:
             curr_p = t_pts[i]
             next_p = t_pts[(i+1)%psize]
             # this is the point on the same line of the current edge but in front of the next vertex. Use this so that we don't get zero length vector from the next vertex perspective
             extended_point = (curr_p[0]+2*(next_p[0]-curr_p[0]), curr_p[1]+2*(next_p[1]-curr_p[1]))
             interest_p = t_pts[vx]
-            # (1)
-            link_diagram[vx][3*i] = getAngleFromThreePoint(next_p, interest_p, curr_p)
-            # (2)
+
+            link_diagram[vx][resolution*i] = GetAngleFromThreePoint(next_p, interest_p, curr_p)
             # the if case is for when we are considering the "next vertex"
             if interest_p == next_p:
-                link_diagram[vx][3*i+1] = link_diagram[vx][3*i]
+                for stride in range(resolution)[1:-1]:
+                    link_diagram[vx][resolution*i+stride] = link_diagram[vx][resolution*i]
             else:
-                link_diagram[vx][3*i+1] = getAngleFromThreePoint(interest_p, extended_point, next_p)
-            # (3)
-            link_diagram[vx][3*i+2] = np.nan
-    # plotting the link diagram with rainbow color
+                for stride in range(resolution)[1:-1]:
+                    ratio = 1./(resolution-2)*stride
+                    origin = (ratio*next_p[0]+(1-ratio)*curr_p[0], ratio*next_p[1]+(1-ratio)*curr_p[1])
+                    link_diagram[vx][resolution*i+stride] = GetAngleFromThreePoint(interest_p, extended_point, origin)
+            link_diagram[vx][resolution*i+resolution-1] = np.nan
+    return link_diagram
+
+# Resolution is the number of sample points on each edge
+# hline is for showing fix theta bouncing
+# fname is the output file name for the link diagram
+def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_diagram.png'):
+    psize = link_diagram.shape[0]
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
     plt.figure()
+    x = []
+    for j in range(psize):
+        x.extend(list(np.linspace(j, j+1, resolution-1)))
+        x.extend([j+1])
     for i in range(psize):
-        cut_range = link_diagram[i]
-        for j in range(psize):
-            if cut_range[j] == -1:
-                cut_range[j] = np.nan
-        x = []
-        for j in range(psize):
-            x.extend([j, j+1, j+1])
-        plt.plot(x, cut_range, label= '{}'.format(i), alpha=0.7, color = colors[i])
+        plt.plot(x, link_diagram[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
         plt.axvline(x=i, linestyle='--')
     if hline != None:
         plt.plot(range(psize+1), hline*np.ones(psize+1))
     leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
-    plt.savefig('link_diagram.png', bbox_inches="tight", dpi = 300)
-    plt.show()
-    # Color the vertex of the new poly with the colors selected by matplotlib for the lines 
-    plt.figure()
-    wall_x = [x for (x,y) in t_pts]
-    wall_x.append(wall_x[0])
-    wall_y = [y for (x,y) in t_pts]
-    wall_y.append(wall_y[0])
-    plt.plot(wall_x, wall_y, 'black')
-    for i in range(psize):
-        point = t_pts[i]
-        plt.scatter(point[0], point[1], color=colors[i])
-        plt.annotate(str(i), (point[0]+10, point[1]+10))
-    plt.axis('equal')
-    plt.savefig('inserted_poly.png', dpi = 300)
+    plt.savefig(fname, bbox_inches="tight", dpi = 300)
     plt.show()
 
