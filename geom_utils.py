@@ -297,24 +297,4 @@ def GetLinkDiagram(poly, resolution = 15):
             link_diagram[vx][resolution*i+resolution-1] = np.nan
     return link_diagram
 
-# Resolution is the number of sample points on each edge
-# hline is for showing fix theta bouncing
-# fname is the output file name for the link diagram
-def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_diagram.png'):
-    psize = link_diagram.shape[0]
-    jet = plt.cm.jet
-    colors = jet(np.linspace(0, 1, psize))
-    plt.figure()
-    x = []
-    for j in range(psize):
-        x.extend(list(np.linspace(j, j+1, resolution-1)))
-        x.extend([j+1])
-    for i in range(psize):
-        plt.plot(x, link_diagram[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
-        plt.axvline(x=i, linestyle='--')
-    if hline != None:
-        plt.plot(range(psize+1), hline*np.ones(psize+1))
-    leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
-    plt.savefig(fname, bbox_inches="tight", dpi = 300)
-    plt.show()
 
