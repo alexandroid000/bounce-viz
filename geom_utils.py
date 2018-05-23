@@ -266,22 +266,42 @@ def GetAngleFromThreePoint(p1, p2, origin):
     v2 = (p2[0]-origin[0], p2[1]-origin[1])
     return GetVector2Angle(v1, v2)
 
+class VB_Graph:
+    def __init__(self):
+        self.v = []
+        self.e = []
+
+def mkPartialLocalSeqs(poly):
+    t_pts = InsertAllTransitionPts(poly)
+    psize = len(t_pts)
+    all_viz_vxs = [GetVisibleVertices(t_pts, i) for i in range(psize)]
+
+    # each element in the map is indexed by its clockwise vertex (smaller index)
+    partialLocSeq = {i:[] for i in range(psize)}
+
+    # get vertices that are visible to the current vertex and the next vertex
+    for i in range(psize):
+        viz_vxs = list(set(all_viz_vxs[i]) & set(all_viz_vxs[(i+1)%psize]))
+        viz_vxs.append((i+1)%psize)
+        partialLocSeq[i] = viz_vxs
+
+    return partialLocSeq
+
+
 # Resolution is the number of sample points on each edge
 def GetLinkDiagram(poly, resolution = 15):
     t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
     link_diagram = np.nan*np.ones((psize, resolution*psize))
-    all_viz_vxs = [GetVisibleVertices(t_pts, i) for i in range(psize)]
+    partialLocSeq = mkPartialLocalSeqs(poly)
     for i in range(psize):
-        # get vertices that are visible to the current vertex and the next vertex
-        viz_vxs = list(set(all_viz_vxs[i]) & set(all_viz_vxs[(i+1)%psize]))
-        viz_vxs.append((i+1)%psize)
-        # for each visible vertex, we need to calculate (1) the view angle at the current vertex w.r.t the current edge and (2) the view angle at the sample points on the edge and the next vertex w.r.t the current edge. we also need to (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
-        for vx in viz_vxs:
+        # for each visible vertex, we need to calculate:
+        #  (1) the view angle at the current vertex w.r.t the current edge and
+        #  (2) the view angle at the sample points on the edge and the next vertex w.r.t the current edge
+        #  (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
+        for vx in partialLocSeq[i]:
             curr_p = t_pts[i]
             next_p = t_pts[(i+1)%psize]
-            # this is the point on the same line of the current edge but in front of the next vertex. Use this so that we don't get zero length vector from the next vertex perspective
-            extended_point = (curr_p[0]+2*(next_p[0]-curr_p[0]), curr_p[1]+2*(next_p[1]-curr_p[1]))
             interest_p = t_pts[vx]
 
             link_diagram[vx][resolution*i] = GetAngleFromThreePoint(next_p, interest_p, curr_p)
@@ -291,6 +311,8 @@ def GetLinkDiagram(poly, resolution = 15):
                     link_diagram[vx][resolution*i+stride] = link_diagram[vx][resolution*i]
             else:
                 for stride in range(resolution)[1:-1]:
+                    # this is the point on the same line of the current edge but in front of the next vertex. Use this so that we don't get zero length vector from the next vertex perspective
+                    extended_point = (curr_p[0]+2*(next_p[0]-curr_p[0]), curr_p[1]+2*(next_p[1]-curr_p[1]))
                     ratio = 1./(resolution-2)*stride
                     origin = (ratio*next_p[0]+(1-ratio)*curr_p[0], ratio*next_p[1]+(1-ratio)*curr_p[1])
                     link_diagram[vx][resolution*i+stride] = GetAngleFromThreePoint(interest_p, extended_point, origin)
