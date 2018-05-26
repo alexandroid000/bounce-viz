@@ -269,13 +269,17 @@ def GetAngleFromThreePoint(p1, p2, origin):
     v2 = (p2[0]-origin[0], p2[1]-origin[1])
     return GetVector2Angle(v1, v2)
 
-def mkPartialLocalSeqs(poly):
+def mkVizSets(poly):
     t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
     all_viz_vxs = [GetVisibleVertices(t_pts, i) for i in range(psize)]
+    if DEBUG:
+        print("All visible verts:")
+        print(all_viz_vxs)
+        print("\n")
 
     # each element in the map is indexed by its clockwise vertex (smaller index)
-    partialLocSeqs = {i:[] for i in range(psize)}
+    vizSets = {i:[] for i in range(psize)}
 
     # get vertices that are visible to the current vertex and the next vertex
     for i in range(psize):
@@ -283,12 +287,12 @@ def mkPartialLocalSeqs(poly):
         # if the following line included, allows transition to next edge by wall
         # following, even if reflex angle
         # TODO: figure out if we want to allow this behavior
-        #viz_vxs.append((i+1)%psize) 
-        partialLocSeqs[i] = viz_vxs
+        viz_vxs.append((i+1)%psize) 
+        vizSets[i] = viz_vxs
 
     if DEBUG:
-        print("pls ",partialLocSeqs)
-    return partialLocSeqs
+        print("pls ", vizSets)
+    return vizSets 
 
 def mkGraph(poly):
     G = nx.DiGraph()
@@ -322,13 +326,13 @@ def GetLinkDiagram(poly, resolution = 15):
     t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
     link_diagram = np.nan*np.ones((psize, resolution*psize))
-    partialLocSeqs = mkPartialLocalSeqs(poly)
+    vizSets = mkVizSets(poly)
     for i in range(psize):
         # for each visible vertex, we need to calculate:
         #  (1) the view angle at the current vertex w.r.t the current edge and
         #  (2) the view angle at the sample points on the edge and the next vertex w.r.t the current edge
         #  (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
-        for vx in partialLocSeqs[i]:
+        for vx in vizSets[i]:
             curr_p = t_pts[i]
             next_p = t_pts[(i+1)%psize]
             interest_p = t_pts[vx]
