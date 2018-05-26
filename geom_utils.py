@@ -269,6 +269,7 @@ def GetAngleFromThreePoint(p1, p2, origin):
     v2 = (p2[0]-origin[0], p2[1]-origin[1])
     return GetVector2Angle(v1, v2)
 
+
 def mkVizSets(poly):
     t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
@@ -291,26 +292,26 @@ def mkVizSets(poly):
         vizSets[i] = viz_vxs
 
     if DEBUG:
-        print("pls ", vizSets)
+        print("viz sets")
+        print("--------")
+        print(vizSets)
+        print("")
     return vizSets 
+
 
 def mkGraph(poly):
     G = nx.DiGraph()
-    pls = mkPartialLocalSeqs(poly) # vertices that are visible to i and i+1
-    psize = len(pls)
+
+    t_pts = InsertAllTransitionPts(poly)
+    psize = len(t_pts)
+
     for i in range(psize):
-        edges = list(zip(pls[i], pls[i][1:]))+[(pls[i][-1], pls[i][0])]
-        # only include edge transition if no gap
-        viz_edges = [(i,j) for j,k in edges
-                    if k == ((j+1) % psize) # no gap
-                    or j == ((i-1) % psize)] # last adjacent edge
+        edges = [(i,v) for v in GetVisibleVertices(t_pts, i)]
         if DEBUG:
             print("Raw edges")
-            for j,k in edges:
-                print("Can see ", j, " from ", i)
-            for j,k in viz_edges:
-                print("Can see ", k, " from ", j)
-        G.add_edges_from(viz_edges)
+            for i,v in edges:
+                print("Can see ", v, " from ", i)
+        G.add_edges_from(edges)
     if DEBUG:
         print("Graph data:")
         print(G.nodes())
