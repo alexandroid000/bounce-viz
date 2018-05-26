@@ -77,7 +77,9 @@ def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_d
     plt.show()
 
 if __name__ == '__main__':
-    VizRay(simple_bit)
-    link_diagram = GetLinkDiagram(concave_pent)
+    poly = simple_bit
+    VizRay(poly)
+    link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
-    VizInsertedPoly(concave_pent)
+    VizInsertedPoly(poly)
+    mkGraph(poly)

@@ -7,6 +7,9 @@ import random, math
 from math import sqrt,cos,sin,atan2,pi
 import numpy as np
 import matplotlib.pyplot as plt
+import networkx as nx
+
+DEBUG = False
 
 def PolyToWindowScale(poly, ydim):
     newpoly = []
@@ -266,30 +269,52 @@ def GetAngleFromThreePoint(p1, p2, origin):
     v2 = (p2[0]-origin[0], p2[1]-origin[1])
     return GetVector2Angle(v1, v2)
 
-class VB_Graph:
-    def __init__(self):
-        self.v = []
-        self.e = []
-
 def mkPartialLocalSeqs(poly):
     t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
     all_viz_vxs = [GetVisibleVertices(t_pts, i) for i in range(psize)]
 
     # each element in the map is indexed by its clockwise vertex (smaller index)
-    partialLocSeq = {i:[] for i in range(psize)}
+    partialLocSeqs = {i:[] for i in range(psize)}
 
     # get vertices that are visible to the current vertex and the next vertex
     for i in range(psize):
         viz_vxs = list(set(all_viz_vxs[i]) & set(all_viz_vxs[(i+1)%psize]))
-        viz_vxs.append((i+1)%psize)
-        partialLocSeq[i] = viz_vxs
-
-    return partialLocSeq
         # if the following line included, allows transition to next edge by wall
         # following, even if reflex angle
         # TODO: figure out if we want to allow this behavior
         #viz_vxs.append((i+1)%psize) 
+        partialLocSeqs[i] = viz_vxs
+
+    if DEBUG:
+        print("pls ",partialLocSeqs)
+    return partialLocSeqs
+
+def mkGraph(poly):
+    G = nx.DiGraph()
+    pls = mkPartialLocalSeqs(poly) # vertices that are visible to i and i+1
+    psize = len(pls)
+    for i in range(psize):
+        edges = list(zip(pls[i], pls[i][1:]))+[(pls[i][-1], pls[i][0])]
+        # only include edge transition if no gap
+        viz_edges = [(i,j) for j,k in edges
+                    if k == ((j+1) % psize) # no gap
+                    or j == ((i-1) % psize)] # last adjacent edge
+        if DEBUG:
+            print("Raw edges")
+            for j,k in edges:
+                print("Can see ", j, " from ", i)
+            for j,k in viz_edges:
+                print("Can see ", k, " from ", j)
+        G.add_edges_from(viz_edges)
+    if DEBUG:
+        print("Graph data:")
+        print(G.nodes())
+        print(G.edges())
+    plt.clf()
+    nx.draw_circular(G, with_labels=True)
+    plt.savefig("graph.png")
+    return G
 
 
 # Resolution is the number of sample points on each edge
@@ -297,13 +322,13 @@ def GetLinkDiagram(poly, resolution = 15):
     t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
     link_diagram = np.nan*np.ones((psize, resolution*psize))
-    partialLocSeq = mkPartialLocalSeqs(poly)
+    partialLocSeqs = mkPartialLocalSeqs(poly)
     for i in range(psize):
         # for each visible vertex, we need to calculate:
         #  (1) the view angle at the current vertex w.r.t the current edge and
         #  (2) the view angle at the sample points on the edge and the next vertex w.r.t the current edge
         #  (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
-        for vx in partialLocSeq[i]:
+        for vx in partialLocSeqs[i]:
             curr_p = t_pts[i]
             next_p = t_pts[(i+1)%psize]
             interest_p = t_pts[vx]
@@ -322,5 +347,4 @@ def GetLinkDiagram(poly, resolution = 15):
                     link_diagram[vx][resolution*i+stride] = GetAngleFromThreePoint(interest_p, extended_point, origin)
             link_diagram[vx][resolution*i+resolution-1] = np.nan
     return link_diagram
-
 
