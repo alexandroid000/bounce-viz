@@ -18,6 +18,7 @@ class TestGeomUtils(unittest.TestCase):
         # right triangle
         self.t1 = [6.0, 0.0]
         self.t2 = [3.0, 4.0]
+        self.maxDiff = None
 
     def test_left(self):
         v1 = IsLeftTurn(self.p1, self.p2, self.p4)
@@ -65,10 +66,10 @@ class TestGeomUtils(unittest.TestCase):
         self.assertEqual(ts7, t7)
         self.assertEqual(ts10, t10)
 
-    def test_pls(self):
-        pls = mkVizSets(simple_bit)
-        pls_true = {0: [2, 5, 6, 7, 8, 9, 10, 11, 1], 1: [0, 5, 6, 7, 8, 10, 11, 2], 2: [4, 5, 6, 7, 3], 3: [2, 5, 6, 7, 4], 4: [8, 2, 3, 6, 7, 5], 5: [0, 1, 2, 3, 4, 7, 8, 11, 6], 6: [0, 1, 2, 3, 4, 5, 8, 11, 7], 7: [0, 1, 2, 4, 5, 6, 11, 8], 8: [0, 1, 10, 11, 9], 9: [0, 1, 11, 8, 10], 10: [0, 1, 2, 8, 9, 11], 11: [1, 2, 5, 6, 7, 8, 9, 10, 0]}
-        self.assertEqual(pls, pls_true)
+    def test_viz_sets(self):
+        vset = mkVizSets(simple_bit)
+        vset_true = {0: [2, 5, 6, 7, 8, 9, 10, 11, 1], 1: [0, 5, 6, 7, 8, 10, 11, 2], 2: [4, 5, 6, 7, 3], 3: [2, 5, 6, 7, 4], 4: [8, 2, 3, 6, 7, 5], 5: [0, 1, 2, 3, 4, 7, 8, 11, 6], 6: [0, 1, 2, 3, 4, 5, 8, 11, 7], 7: [0, 1, 2, 4, 5, 6, 11, 8], 8: [0, 1, 10, 11, 9], 9: [0, 1, 11, 8, 10], 10: [0, 1, 2, 8, 9, 11], 11: [1, 2, 5, 6, 7, 8, 9, 10, 0]}
+        self.assertEqual(vset, vset_true)
 
 
 
