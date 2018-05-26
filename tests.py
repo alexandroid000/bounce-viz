@@ -71,6 +71,14 @@ class TestGeomUtils(unittest.TestCase):
         vset_true = {0: [2, 5, 6, 7, 8, 9, 10, 11, 1], 1: [0, 5, 6, 7, 8, 10, 11, 2], 2: [4, 5, 6, 7, 3], 3: [2, 5, 6, 7, 4], 4: [8, 2, 3, 6, 7, 5], 5: [0, 1, 2, 3, 4, 7, 8, 11, 6], 6: [0, 1, 2, 3, 4, 5, 8, 11, 7], 7: [0, 1, 2, 4, 5, 6, 11, 8], 8: [0, 1, 10, 11, 9], 9: [0, 1, 11, 8, 10], 10: [0, 1, 2, 8, 9, 11], 11: [1, 2, 5, 6, 7, 8, 9, 10, 0]}
         self.assertEqual(vset, vset_true)
 
+    def test_angle_parallel(self):
+        a = angleBound(square, 1, 3)
+        self.assertAlmostEqual(a, 1.57079632679)
+
+    def test_angle_collinear(self):
+        p = [(0,0),(0,10),(0,20)]
+        a = angleBound(p, 0, 1)
+        self.assertAlmostEqual(a, 0.0)
 
 
 

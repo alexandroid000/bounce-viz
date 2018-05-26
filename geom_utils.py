@@ -42,9 +42,13 @@ def AngleDifference(theta1,theta2):
 def PointDistance(p,q):
     return sqrt((p[0]-q[0])*(p[0]-q[0])+(p[1]-q[1])*(p[1]-q[1]))
 
+def Points2Vect(p1,p2):
+    return (p2[0]-p1[0], p2[1]-p1[1])
+
 def GetVectorLen(v):
     return math.sqrt(sum((a*b) for a, b in zip(v, v)))
 
+# angle between two vectors in range [0,pi]
 def GetVector2Angle(v1, v2):
     dot_prod = v1[0]*v2[0]+v1[1]*v2[1]
     ratio = max(min(dot_prod/(GetVectorLen(v1)*GetVectorLen(v2)), 1), -1)
@@ -65,8 +69,6 @@ def IsRightTurn(p,q,r):
 
 def IsIntersectSegments(p1, p2, q1, q2):
     return (IsLeftTurn(p1, p2, q1) != IsLeftTurn(p1, p2, q2)) and (IsLeftTurn(q1, q2, p1) != IsLeftTurn(q1, q2, p2))
-
-
 
 # checks if vector sp->bp points within edge p1p2
 # start point, boundary point, edge p1, edge p2
@@ -121,7 +123,6 @@ def ShootRayFromVect(p1, p2, v1, v2):
     state = (p2[0], p2[1], theta)
     return ShootRay(state, v1, v2)
 
-
 # shoot ray from p1 toward p2 in poly, return closest intersect point
 # will not return point on "last_bounce_edge"
 def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
@@ -154,6 +155,7 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
     else:
         return False
 
+# return indices of all reflex vertices in poly
 def FindReflexVerts(poly):
     psize = len(poly)
     reflex_verts = []
@@ -299,19 +301,34 @@ def mkVizSets(poly):
     return vizSets 
 
 
+# the coefficent of "contraction" for the mapping from edge i to edge j
+# |f(x) - f(y)| = |x - y| * sin(theta) / sin (theta-phi)
+# -1 < |f(x) - f(y)| < 1 leads to
+# theta > phi/2
+# theta < -phi/2
+# for contraction mapping
+def angleBound(poly, i, j):
+    n = len(poly)
+    v1 = Points2Vect(poly[i], poly[(i+1) % n])
+    v2 = Points2Vect(poly[j], poly[(j+1) % n])
+    phi = GetVector2Angle(v1, v2)
+    return phi/2
+
+
 def mkGraph(poly):
     G = nx.DiGraph()
 
     t_pts = InsertAllTransitionPts(poly)
+    r_vs = FindReflexVerts(poly)
     psize = len(t_pts)
 
     for i in range(psize):
-        edges = [(i,v) for v in GetVisibleVertices(t_pts, i)]
+        edges = [(i,v,angleBound(t_pts, i, v)) for v in GetVisibleVertices(t_pts, i)]
         if DEBUG:
             print("Raw edges")
-            for i,v in edges:
-                print("Can see ", v, " from ", i)
-        G.add_edges_from(edges)
+            for i,v,a in edges:
+                print("Can see ", v, " from ", i, " with angle bound ", a)
+        G.add_weighted_edges_from(edges)
     if DEBUG:
         print("Graph data:")
         print(G.nodes())
