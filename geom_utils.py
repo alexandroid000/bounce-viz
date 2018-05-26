@@ -286,6 +286,10 @@ def mkPartialLocalSeqs(poly):
         partialLocSeq[i] = viz_vxs
 
     return partialLocSeq
+        # if the following line included, allows transition to next edge by wall
+        # following, even if reflex angle
+        # TODO: figure out if we want to allow this behavior
+        #viz_vxs.append((i+1)%psize) 
 
 
 # Resolution is the number of sample points on each edge
