@@ -77,7 +77,7 @@ def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_d
     plt.show()
 
 if __name__ == '__main__':
-    poly = simple_bit
+    poly = simple_nonconv
     VizRay(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)

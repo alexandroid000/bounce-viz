@@ -2,6 +2,7 @@
 
 import unittest
 from geom_utils import *
+from graph_utils import *
 from maps import *
 
 class TestGeomUtils(unittest.TestCase):

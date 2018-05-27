@@ -3,6 +3,8 @@
 # graph_utils.py
 # functions for constructing and querying the bounce visibility graph
 
+from geom_utils import *
+
 # the coefficent of "contraction" for the mapping from edge i to edge j
 # |f(x) - f(y)| = |x - y| * sin(theta) / sin (theta-phi)
 # -1 < |f(x) - f(y)| < 1 leads to
