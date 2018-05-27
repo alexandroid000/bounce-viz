@@ -32,6 +32,7 @@ def mkGraph(poly):
     for i in range(psize):
         edges = [(i,v,angleBound(t_pts, i, v))
                 for v in GetVisibleVertices(t_pts, i)
+                # don't allow transition to edge "around corner"
                 if not ((v in r_vs) and (v == (i+1) % psize))]
         if DEBUG:
             print("Raw edges")
@@ -42,9 +43,26 @@ def mkGraph(poly):
         print("Graph data:")
         print(G.nodes())
         print(G.edges())
-    plt.clf()
-    nx.draw_circular(G, with_labels=True)
-    plt.savefig("graph.png")
+        plt.clf()
+        nx.draw_circular(G, with_labels=True)
+        plt.savefig("graph.png")
     return G
 
+# includes transient cycles
+# complexity O((n+e)(c+1)) if there are c cycles
+# takes forever on most polygons - can we do some kind of online filter?
+def allCycles(G):
+    return nx.simple_cycles(G)
 
+# TODO - filter on previous function
+# some limit cycles exist which are compositions of transient cycles.
+# How to detect?
+# Can we find where the transient cycles put the robot once it "escapes" and
+# then look for cycles in that graph?
+# Maybe we can start by find all cycles of length up to some bound and
+# exhaustively search.
+# def allLimitCycles
+
+# find all shortest paths
+def findPaths(G, start, goal):
+    return nx.all_shortest_paths(G, source=start, target=goal)
