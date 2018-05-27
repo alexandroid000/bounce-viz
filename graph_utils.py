@@ -30,7 +30,9 @@ def mkGraph(poly):
     psize = len(t_pts)
 
     for i in range(psize):
-        edges = [(i,v,angleBound(t_pts, i, v)) for v in GetVisibleVertices(t_pts, i)]
+        edges = [(i,v,angleBound(t_pts, i, v))
+                for v in GetVisibleVertices(t_pts, i)
+                if not ((v in r_vs) and (v == (i+1) % psize))]
         if DEBUG:
             print("Raw edges")
             for i,v,a in edges:
