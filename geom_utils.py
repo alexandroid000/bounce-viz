@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 
-DEBUG = False
+DEBUG = True
 
 def PolyToWindowScale(poly, ydim):
     newpoly = []
@@ -39,6 +39,9 @@ def AngleDifference(theta1,theta2):
         d -= 2.0*pi;
     return d
 
+def FixAngle(theta):
+        return theta % (2.0*pi)
+
 def PointDistance(p,q):
     return sqrt((p[0]-q[0])*(p[0]-q[0])+(p[1]-q[1])*(p[1]-q[1]))
 
@@ -54,8 +57,10 @@ def GetVector2Angle(v1, v2):
     ratio = max(min(dot_prod/(GetVectorLen(v1)*GetVectorLen(v2)), 1), -1)
     return np.arccos(ratio)
 
-def FixAngle(theta):
-    return theta % (2.0*pi)
+def GetAngleFromThreePoint(p1, p2, origin):
+    v1 = (p1[0]-origin[0], p1[1]-origin[1])
+    v2 = (p2[0]-origin[0], p2[1]-origin[1])
+    return GetVector2Angle(v1, v2)
 
 # r is left of the vector formed by p->q
 def IsLeftTurn(p,q,r):
@@ -77,6 +82,24 @@ def BouncePointInEdge(sp,bp,ep1,ep2):
              IsRightTurn(sp,bp,ep1)) or
             (IsRightTurn(sp,bp,ep2) and
              IsLeftTurn(sp,bp,ep1)))
+
+def IsThreePointsOnLine(p1, p2, p3):
+    degeneracy_error = 0.00001
+    cross_prod = (p1[1] - p2[1]) * (p3[0] - p2[0]) - (p1[0] - p2[0]) * (p3[1] - p2[1])
+    return abs(cross_prod)<degeneracy_error
+
+def IsThreePointsOnLineSeg(p1, p2, p3):
+    if IsThreePointsOnLine(p1, p2, p3):
+        v1 = (p1[0]-p3[0], p1[1]-p3[1])
+        v2 = (p2[0]-p3[0], p2[1]-p3[1])
+        return (v1[0]*v2[0]+v1[1]*v2[1])<0
+    return False
+
+def IsBoundaryIntersect(p1, p2, q1, q2):
+    return (IsThreePointsOnLine(p1, p2, q1) or
+           IsThreePointsOnLine(p1, p2, q2) or
+           IsThreePointsOnLine(q1, q2, p1) or
+           IsThreePointsOnLine(q1, q2, p2))
 
 # find line intersection parameter of edge (v1,v2)
 # state :: (x,y,theta) initial point and angle of ray
@@ -197,23 +220,6 @@ def ShootRaysToReflexFromVerts(poly, j):
                 pts.append((pt,k))
     return pts
 
-def IsThreePointsOnLine(p1, p2, p3):
-    degeneracy_error = 0.00001
-    cross_prod = (p1[1] - p2[1]) * (p3[0] - p2[0]) - (p1[0] - p2[0]) * (p3[1] - p2[1])
-    return abs(cross_prod)<degeneracy_error
-
-def IsThreePointsOnLineSeg(p1, p2, p3):
-    if IsThreePointsOnLine(p1, p2, p3):
-        v1 = (p1[0]-p3[0], p1[1]-p3[1])
-        v2 = (p2[0]-p3[0], p2[1]-p3[1])
-        return (v1[0]*v2[0]+v1[1]*v2[1])<0
-    return False
-
-def IsBoundaryIntersect(p1, p2, q1, q2):
-    return (IsThreePointsOnLine(p1, p2, q1) or
-           IsThreePointsOnLine(p1, p2, q2) or
-           IsThreePointsOnLine(q1, q2, p1) or
-           IsThreePointsOnLine(q1, q2, p2))
 
 def GetVisibleVertices(poly, j):
     psize = len(poly)
@@ -266,12 +272,7 @@ def InsertAllTransitionPts(poly):
 
     return new_poly
 
-def GetAngleFromThreePoint(p1, p2, origin):
-    v1 = (p1[0]-origin[0], p1[1]-origin[1])
-    v2 = (p2[0]-origin[0], p2[1]-origin[1])
-    return GetVector2Angle(v1, v2)
-
-
+# make all sets of vertices visible from everywhere along edge
 def mkVizSets(poly):
     t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
@@ -299,45 +300,6 @@ def mkVizSets(poly):
         print(vizSets)
         print("")
     return vizSets 
-
-
-# the coefficent of "contraction" for the mapping from edge i to edge j
-# |f(x) - f(y)| = |x - y| * sin(theta) / sin (theta-phi)
-# -1 < |f(x) - f(y)| < 1 leads to
-# theta > phi/2
-# theta < -phi/2
-# for contraction mapping
-def angleBound(poly, i, j):
-    n = len(poly)
-    v1 = Points2Vect(poly[i], poly[(i+1) % n])
-    v2 = Points2Vect(poly[j], poly[(j+1) % n])
-    phi = GetVector2Angle(v1, v2)
-    return phi/2
-
-
-def mkGraph(poly):
-    G = nx.DiGraph()
-
-    t_pts = InsertAllTransitionPts(poly)
-    r_vs = FindReflexVerts(poly)
-    psize = len(t_pts)
-
-    for i in range(psize):
-        edges = [(i,v,angleBound(t_pts, i, v)) for v in GetVisibleVertices(t_pts, i)]
-        if DEBUG:
-            print("Raw edges")
-            for i,v,a in edges:
-                print("Can see ", v, " from ", i, " with angle bound ", a)
-        G.add_weighted_edges_from(edges)
-    if DEBUG:
-        print("Graph data:")
-        print(G.nodes())
-        print(G.edges())
-    plt.clf()
-    nx.draw_circular(G, with_labels=True)
-    plt.savefig("graph.png")
-    return G
-
 
 # Resolution is the number of sample points on each edge
 def GetLinkDiagram(poly, resolution = 15):
@@ -369,4 +331,3 @@ def GetLinkDiagram(poly, resolution = 15):
                     link_diagram[vx][resolution*i+stride] = GetAngleFromThreePoint(interest_p, extended_point, origin)
             link_diagram[vx][resolution*i+resolution-1] = np.nan
     return link_diagram
-
