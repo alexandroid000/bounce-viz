@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from geom_utils import *
+from graph_utils import *
 from maps import *
 import numpy as np
 
@@ -76,10 +77,16 @@ def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_d
     plt.savefig(fname, bbox_inches="tight", dpi = 300)
     plt.show()
 
+def PlotGraph(G, fname = "graph"):
+    plt.clf()
+    nx.draw_circular(G, with_labels=True)
+    plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
+
 if __name__ == '__main__':
     poly = simple_nonconv
     VizRay(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
     VizInsertedPoly(poly)
+    PlotGraph(mkGraph(poly))
     mkGraph(poly)
