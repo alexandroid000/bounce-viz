@@ -29,11 +29,26 @@ def mkGraph(poly):
     r_vs = FindReflexVerts(poly)
     psize = len(t_pts)
 
-    for i in range(psize):
-        edges = [(i,v,angleBound(t_pts, i, v))
-                for v in GetVisibleVertices(t_pts, i)
+    for start in range(psize):
+        edges = [(start,v,angleBound(t_pts, start, v))
+                for v in GetVisibleVertices(t_pts, start)
                 # don't allow transition to edge "around corner"
-                if not ((v in r_vs) and (v == (i+1) % psize))]
+                # don't allow zero-measure transition from one endpoint
+                # wrong - what's wrong with "viz from both" again?
+                if not (
+                       ((v in r_vs) and (v == (start+1) % psize))
+                       or
+                       ((start in r_vs) and (start == (v+1) % psize))
+                       or
+                       ((v in r_vs) and IsThreePointsOnLine(t_pts[start], t_pts[v],
+                                                            t_pts[(v+1)%psize])
+                                    and start != ((v+1) % psize))
+                       or 
+                       ((start in r_vs) and IsThreePointsOnLine(t_pts[start], t_pts[v],
+                                                            t_pts[(start+1)%psize])
+                                    and v != (start+1) % psize)
+                        )
+               ]
         if DEBUG:
             print("Raw edges")
             for i,v,a in edges:
