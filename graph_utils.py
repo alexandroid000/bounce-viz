@@ -34,7 +34,7 @@ def mkGraph(poly):
                 for v in GetVisibleVertices(t_pts, start)
                 # don't allow transition to edge "around corner"
                 # don't allow zero-measure transition from one endpoint
-                # wrong - what's wrong with "viz from both" again?
+                # TODO: clean up logic
                 if not (
                        ((v in r_vs) and (v == (start+1) % psize))
                        or
@@ -78,6 +78,21 @@ def allCycles(G):
 # exhaustively search.
 # def allLimitCycles
 
-# find all shortest paths
+# find all shortest paths (from start segment to end segment)
 def findPaths(G, start, goal):
     return nx.all_shortest_paths(G, source=start, target=goal)
+
+# return G given a range of bounce angles smaller than 0 to pi
+def reduceGraphWrtAngle(G, theta_min, theta_max):
+    H = nx.DiGraph()
+    H.add_nodes_from(G.nodes())
+    for i in H.nodes():
+        outgoing = G.edge[i]
+        for e in outgoing:
+            phi = outgoing[e]['weight']
+            if (theta_min < phi) or (theta_max > pi-phi):
+                H.add_edge(i,e)
+    return H
+
+
+

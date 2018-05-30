@@ -324,10 +324,31 @@ def GetLinkDiagram(poly, resolution = 15):
                     link_diagram[vx][resolution*i+stride] = link_diagram[vx][resolution*i]
             else:
                 for stride in range(resolution)[1:-1]:
-                    # this is the point on the same line of the current edge but in front of the next vertex. Use this so that we don't get zero length vector from the next vertex perspective
+                    # this is the point on the same line of the current edge but in front of the next vertex.
+                    # Use this so that we don't get zero length vector from the next vertex perspective
                     extended_point = (curr_p[0]+2*(next_p[0]-curr_p[0]), curr_p[1]+2*(next_p[1]-curr_p[1]))
                     ratio = 1./(resolution-2)*stride
                     origin = (ratio*next_p[0]+(1-ratio)*curr_p[0], ratio*next_p[1]+(1-ratio)*curr_p[1])
                     link_diagram[vx][resolution*i+stride] = GetAngleFromThreePoint(interest_p, extended_point, origin)
             link_diagram[vx][resolution*i+resolution-1] = np.nan
     return link_diagram
+
+# return minimum and maximum angles that allow transition from e1 to e2
+# from *somewhere* on e1
+def AnglesBetweenSegs(e1, e2):
+    (p1,p2) = e1
+    (p3,p4) = e2
+    min_ang = min(
+                GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))
+               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
+               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
+               )
+    max_ang = max(
+                GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))
+               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
+               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
+               )
+    return min_ang, max_ang
+
