@@ -19,6 +19,11 @@ class TestGeomUtils(unittest.TestCase):
         # right triangle
         self.t1 = [6.0, 0.0]
         self.t2 = [3.0, 4.0]
+
+        # edges
+        self.e1 = [self.origin, [1.0, 0.0]]
+        self.e2 = [[2.0,1.0], [2.0, 2.0]]
+
         self.maxDiff = None
 
     def test_left(self):
@@ -81,7 +86,13 @@ class TestGeomUtils(unittest.TestCase):
         a = angleBound(p, 0, 1)
         self.assertAlmostEqual(a, 0.0)
 
-
+    # use triangle properties to check that angles are calculated properly
+    def test_maxmin_angles(self):
+        max_a = 63.4349488*(pi/180)
+        min_a = 26.5650511*(pi/180)
+        min_c, max_c = AnglesBetweenSegs(self.e1, self.e2)
+        self.assertAlmostEqual(min_c, min_a)
+        self.assertAlmostEqual(max_c, max_a)
 
 if __name__ == '__main__':
     unittest.main()

@@ -18,6 +18,8 @@ def angleBound(poly, i, j):
     phi = GetVector2Angle(v1, v2)
     return phi/2
 
+# transition from edge i to edge j is a contraction map iff
+# |coeff| < 1
 def coeff(poly, i, j, theta):
     phi = 2*angleBound(poly, i, j)
     return sin(theta) / sin (theta-phi)

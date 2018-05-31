@@ -83,10 +83,12 @@ def PlotGraph(G, fname = "graph"):
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
 if __name__ == '__main__':
-    poly = simple_nonconv
+    poly = square
     VizRay(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
     VizInsertedPoly(poly)
     PlotGraph(mkGraph(poly))
-    mkGraph(poly)
+    G = mkGraph(poly)
+    H = reduceGraphWrtAngle(G, 0.0, 0.2)
+    PlotGraph(H, "reduced_graph")
