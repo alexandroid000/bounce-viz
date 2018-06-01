@@ -51,7 +51,7 @@ def VizInsertedPoly(poly):
     for i in range(psize):
         point = t_pts[i]
         plt.scatter(point[0], point[1], color=colors[i])
-        plt.annotate(str(i), (point[0]+10, point[1]+10))
+        plt.annotate(str(i), (point[0]+10, point[1]+10), size = 'small')
     plt.axis('equal')
     plt.savefig('inserted_poly.png', dpi = 300)
     plt.show()
@@ -79,16 +79,16 @@ def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_d
 
 def PlotGraph(G, fname = "graph"):
     plt.clf()
-    nx.draw_circular(G, with_labels=True)
+    nx.draw_circular(G, with_labels=True, node_color='#DA70D6')
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
 if __name__ == '__main__':
-    poly = square
+    poly = poly1
     VizRay(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
     VizInsertedPoly(poly)
     PlotGraph(mkGraph(poly))
     G = mkGraph(poly)
-    H = reduceGraphWrtAngle(G, 0.0, 0.2)
+    H = reduceGraphWrtAngle(G, 2.9, 3.1)
     PlotGraph(H, "reduced_graph")

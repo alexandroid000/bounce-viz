@@ -130,4 +130,3 @@ def reduceGraphWrtAngle(G, theta_min, theta_max):
     return H
 
 
-
