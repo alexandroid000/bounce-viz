@@ -335,20 +335,30 @@ def GetLinkDiagram(poly, resolution = 15):
 
 # return minimum and maximum angles that allow transition from e1 to e2
 # from *somewhere* on e1
+# only need to check endpoints
 def AnglesBetweenSegs(e1, e2):
     (p1,p2) = e1
     (p3,p4) = e2
-    min_ang = min(
-                GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))
-               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
-               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
-               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
-               )
-    max_ang = max(
-                GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))
-               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
-               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
-               ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
-               )
+
+    # special case if segments share an endpoint
+    if p2 == p3:
+        min_ang = 0.0
+        max_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))
+    elif p1 == p4:
+        min_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
+        max_ang = pi
+    else:
+        min_ang = min(
+                    GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))
+                   ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+                   ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
+                   ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
+                   )
+        max_ang = max(
+                    GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))
+                   ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+                   ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
+                   ,GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
+                   )
     return min_ang, max_ang
 

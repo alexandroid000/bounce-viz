@@ -24,6 +24,33 @@ def coeff(poly, i, j, theta):
     phi = 2*angleBound(poly, i, j)
     return sin(theta) / sin (theta-phi)
 
+def intersect_interval(i1, i2):
+    (a,b) = i1
+    (c,d) = i2
+    return (max(a,c), min(b,d))
+
+# returns list of intervals of valid angles (at most two intervals)
+# will return empty list if no bounces can create contraction map
+# Poly -> Int -> Int -> [(Angle, Angle)]
+def validAnglesForContract(poly, i, j):
+    epsilon = 0.0001
+    n = len(poly)
+    phi = angleBound(poly, i, j)
+    e1 = (poly[i], poly[(i+1) % n])
+    e2 = (poly[j], poly[(j+1) % n])
+    min_a, max_a = AnglesBetweenSegs(e1, e2)
+    overlap_1 = intersect_interval((0,phi),(min_a, max_a))
+    overlap_2 = intersect_interval((pi-phi,pi),(min_a, max_a))
+
+    intervals = []
+
+    if overlap_1[1] - overlap_1[0] > epsilon:
+        intervals.append(overlap_1)
+    if overlap_2[1] - overlap_2[0] > epsilon:
+        intervals.append(overlap_2)
+
+    return intervals
+
 def mkGraph(poly):
     G = nx.DiGraph()
 
@@ -32,7 +59,7 @@ def mkGraph(poly):
     psize = len(t_pts)
 
     for start in range(psize):
-        edges = [(start,v,angleBound(t_pts, start, v))
+        edges = [(start,v,validAnglesForContract(t_pts, start, v))
                 for v in GetVisibleVertices(t_pts, start)
                 # don't allow transition to edge "around corner"
                 # don't allow zero-measure transition from one endpoint
@@ -86,14 +113,20 @@ def findPaths(G, start, goal):
 
 # return G given a range of bounce angles smaller than 0 to pi
 def reduceGraphWrtAngle(G, theta_min, theta_max):
+    epsilon = 0.0001
     H = nx.DiGraph()
     H.add_nodes_from(G.nodes())
     for i in H.nodes():
         outgoing = G.edge[i]
         for e in outgoing:
-            phi = outgoing[e]['weight']
-            if (theta_min < phi) or (theta_max > pi-phi):
-                H.add_edge(i,e)
+            angle_intervals = outgoing[e]['weight']
+            for a_range in angle_intervals:
+                overlap = intersect_interval(a_range, (theta_min, theta_max))
+                if overlap[1] - overlap[0] > epsilon:
+                    H.add_edge(i,e)
+    if DEBUG:
+        print("Reduced graph H for angle interval [",theta_min,",",theta_max,"]")
+        print(H.edge)
     return H
 
 

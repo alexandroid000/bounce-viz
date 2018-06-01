@@ -94,5 +94,11 @@ class TestGeomUtils(unittest.TestCase):
         self.assertAlmostEqual(min_c, min_a)
         self.assertAlmostEqual(max_c, max_a)
 
+    def test_graph_reduce(self):
+        G = mkGraph(square)
+        H = reduceGraphWrtAngle(G, 0.0, 0.2)
+        self.assertEqual(H.edge,
+            {0: {1: {}}, 1: {2: {}}, 2: {3: {}}, 3: {0: {}}})
+
 if __name__ == '__main__':
     unittest.main()
