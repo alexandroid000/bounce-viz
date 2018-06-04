@@ -42,7 +42,12 @@ def VizInsertedPoly(poly):
     psize = len(t_pts)
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
-    plt.figure()
+
+    # plot only polygon, no axis or frame
+    fig = plt.figure(frameon=False)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.axis('off')
+
     wall_x = [x for (x,y) in t_pts]
     wall_x.append(wall_x[0])
     wall_y = [y for (x,y) in t_pts]
@@ -53,6 +58,7 @@ def VizInsertedPoly(poly):
         plt.scatter(point[0], point[1], color=colors[i])
         plt.annotate(str(i), (point[0]+10, point[1]+10), size = 'small')
     plt.axis('equal')
+
     plt.savefig('inserted_poly.png', dpi = 300)
     plt.show()
 
@@ -83,12 +89,12 @@ def PlotGraph(G, fname = "graph"):
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
 if __name__ == '__main__':
-    poly = poly1
+    poly = square
     VizRay(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
     VizInsertedPoly(poly)
-    PlotGraph(mkGraph(poly))
     G = mkGraph(poly)
-    H = reduceGraphWrtAngle(G, 2.9, 3.1)
+    PlotGraph(G, "contract_graph")
+    H = reduceGraphWrtAngle(G, 0.0, 0.2)
     PlotGraph(H, "reduced_graph")
