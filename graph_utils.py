@@ -51,6 +51,8 @@ def validAnglesForContract(poly, i, j):
 
     return intervals
 
+# creates directed edge-to-edge visibility graph
+# edge information is angle ranges which create contraction mapping
 def mkGraph(poly):
     G = nx.DiGraph()
 
@@ -85,8 +87,7 @@ def mkGraph(poly):
         G.add_weighted_edges_from(edges)
     if DEBUG:
         print("Graph data:")
-        print(G.nodes())
-        print(G.edges())
+        print(G.edge)
         plt.clf()
         nx.draw_circular(G, with_labels=True)
         plt.savefig("graph.png")
@@ -116,14 +117,19 @@ def reduceGraphWrtAngle(G, theta_min, theta_max):
     epsilon = 0.0001
     H = nx.DiGraph()
     H.add_nodes_from(G.nodes())
+    new_edges = []
     for i in H.nodes():
         outgoing = G.edge[i]
         for e in outgoing:
             angle_intervals = outgoing[e]['weight']
+            ang_info = []
             for a_range in angle_intervals:
                 overlap = intersect_interval(a_range, (theta_min, theta_max))
                 if overlap[1] - overlap[0] > epsilon:
-                    H.add_edge(i,e)
+                    ang_info.append(overlap)
+            if len(ang_info) > 0:
+                new_edges.append((i,e,ang_info))
+    H.add_weighted_edges_from(new_edges)
     if DEBUG:
         print("Reduced graph H for angle interval [",theta_min,",",theta_max,"]")
         print(H.edge)
