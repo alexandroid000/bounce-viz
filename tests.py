@@ -19,6 +19,8 @@ class TestGeomUtils(unittest.TestCase):
         # right triangle
         self.t1 = [6.0, 0.0]
         self.t2 = [3.0, 4.0]
+        self.x3 = [[0.0, 0.0],[3.0,0.0]]
+        self.y4 = [[3.0, 0.0],[3.0,4.0]]
 
         # edges
         self.e1 = [self.origin, [1.0, 0.0]]
@@ -93,6 +95,14 @@ class TestGeomUtils(unittest.TestCase):
         min_c, max_c = AnglesBetweenSegs(self.e1, self.e2)
         self.assertAlmostEqual(min_c, min_a)
         self.assertAlmostEqual(max_c, max_a)
+
+    def test_maxmin_adjacent(self):
+        min_a = 0.0
+        max_a = pi/2
+        min_c, max_c = AnglesBetweenSegs(self.x3, self.y4)
+        self.assertAlmostEqual(min_c, min_a)
+        self.assertAlmostEqual(max_c, max_a)
+
 
     def test_graph_reduce(self):
         G = mkGraph(square)
