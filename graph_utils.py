@@ -24,10 +24,13 @@ def coeff(poly, i, j, theta):
     phi = 2*angleBound(poly, i, j)
     return sin(theta) / sin (theta-phi)
 
-def intersect_interval(i1, i2):
+def intersect_intervals(i1, i2):
     (a,b) = i1
     (c,d) = i2
     return (max(a,c), min(b,d))
+
+def interval_len(interval):
+    return abs(interval[1]-interval[0])
 
 # returns list of intervals of valid angles (at most two intervals)
 # will return empty list if no bounces can create contraction map
@@ -39,14 +42,14 @@ def validAnglesForContract(poly, i, j):
     e1 = (poly[i], poly[(i+1) % n])
     e2 = (poly[j], poly[(j+1) % n])
     min_a, max_a = AnglesBetweenSegs(e1, e2)
-    overlap_1 = intersect_interval((0,phi),(min_a, max_a))
-    overlap_2 = intersect_interval((pi-phi,pi),(min_a, max_a))
+    overlap_1 = intersect_intervals((0,phi),(min_a, max_a))
+    overlap_2 = intersect_intervals((pi-phi,pi),(min_a, max_a))
 
     intervals = []
 
-    if overlap_1[1] - overlap_1[0] > epsilon:
+    if interval_len(overlap_1) > epsilon:
         intervals.append(overlap_1)
-    if overlap_2[1] - overlap_2[0] > epsilon:
+    if interval_len(overlap_2) > epsilon:
         intervals.append(overlap_2)
 
     return intervals
@@ -124,7 +127,7 @@ def reduceGraphWrtAngle(G, theta_min, theta_max):
             angle_intervals = outgoing[e]['weight']
             ang_info = []
             for a_range in angle_intervals:
-                overlap = intersect_interval(a_range, (theta_min, theta_max))
+                overlap = intersect_intervals(a_range, (theta_min, theta_max))
                 if overlap[1] - overlap[0] > epsilon:
                     ang_info.append(overlap)
             if len(ang_info) > 0:
