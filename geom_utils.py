@@ -8,6 +8,7 @@ from math import sqrt,cos,sin,atan2,pi
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+from itertools import combinations
 
 DEBUG = True
 
@@ -95,11 +96,19 @@ def IsThreePointsOnLineSeg(p1, p2, p3):
         return (v1[0]*v2[0]+v1[1]*v2[1])<0
     return False
 
-def IsBoundaryIntersect(p1, p2, q1, q2):
-    return (IsThreePointsOnLine(p1, p2, q1) or
+# return true if the four given points are not in general position
+def SegsInGeneralPos(p1, p2, q1, q2):
+    tests = (IsThreePointsOnLine(p1, p2, q1) or
            IsThreePointsOnLine(p1, p2, q2) or
            IsThreePointsOnLine(q1, q2, p1) or
            IsThreePointsOnLine(q1, q2, p2))
+    return (not tests)
+
+def PolyInGeneralPos(poly):
+    for (a,b,c) in combinations(poly,3):
+        if IsThreePointsOnLine(a,b,c):
+            return False
+    return True
 
 # find line intersection parameter of edge (v1,v2)
 # state :: (x,y,theta) initial point and angle of ray
@@ -221,6 +230,7 @@ def ShootRaysToReflexFromVerts(poly, j):
     return pts
 
 
+# breaks if original poly is not in general position
 def GetVisibleVertices(poly, j):
     psize = len(poly)
     p1 = poly[j]
@@ -232,7 +242,7 @@ def GetVisibleVertices(poly, j):
         possible_intersect_edges = [x for x in range(psize) if x not in (i, (i-1)%psize, j, (j-1)%psize)]
         for k in possible_intersect_edges:
             q1, q2 = poly[k], poly[(k+1)%psize]
-            if IsIntersectSegments(p1, p2, q1, q2) and (not IsBoundaryIntersect(p1, p2, q1, q2)):
+            if IsIntersectSegments(p1, p2, q1, q2) and (SegsInGeneralPos(p1, p2, q1, q2)):
                 is_visible = False
                 break
         # add the check for degeneracy
@@ -249,6 +259,9 @@ def SortByDistance(p1, unsorted_vs):
 # probably the most naive way to do this
 # return a list of edge indicators for each vertex
 def InsertAllTransitionPts(poly):
+    if not PolyInGeneralPos(poly):
+        print("Polygon not in general position!!!!!")
+        raise ValueError
     t_pts_grouped = {i:[] for i in range(len(poly))}
     rvs = FindReflexVerts(poly)
     # find all transition points, group by edge
