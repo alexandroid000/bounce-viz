@@ -145,6 +145,8 @@ def IsInPoly(p, poly):
             intersects += 1
     return not (intersects%2 == 0)
 
+
+
 # shoot a ray starting at p1, along vector p1->p2
 # find intersection with edge v1,v2
 # will return first intersection *after* p2

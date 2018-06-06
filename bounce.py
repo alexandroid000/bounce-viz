@@ -23,6 +23,13 @@ NUMBOUNCES = 100000
 MAXDIST = 10000000.0
 
 
+def PerformRotation(incoming, n, strategy):
+    bp = [0.0, 0.0]
+    s = (None, None, incoming)
+    snew = PerformBounce(s, bp, n, strategy)
+    return snew[2]
+
+
 # n is the inward edge normal (in degrees 0 to 2pi)
 def PerformBounce(s,bp,n,strategy):
     # Random bounce
