@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import unittest
+from bounce import *
 from geom_utils import *
 from graph_utils import *
 from maps import *

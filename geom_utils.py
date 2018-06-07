@@ -127,9 +127,12 @@ def ShootRay(state, v1, v2):
     # case when lines are parallel
     # TODO: raise error
     if abs(den) < 0.000001:
-        return -10000, (0,0)
-    t = (-c - b*y1 - a*x1)/den
-    pint = (x1 + cos(theta)*t, y1 + sin(theta)*t)
+        print("divide by zero in ray shoot")
+        print("shot from ",state,"to",v1,v2)
+        raise ValueError
+    else:
+        t = (-c - b*y1 - a*x1)/den
+        pint = (x1 + cos(theta)*t, y1 + sin(theta)*t)
     return t, pint
 
 # test if point p is in poly using crossing number
@@ -140,9 +143,12 @@ def IsInPoly(p, poly):
     psize = len(poly)
     for j in range(psize):
         v1, v2 = poly[j], poly[(j+1) % psize]
-        t, pt = ShootRay(state, v1, v2)
-        if t>0 and BouncePointInEdge(p, pt, v1, v2):
-            intersects += 1
+        try:
+            t, pt = ShootRay(state, v1, v2)
+            if t>0 and BouncePointInEdge(p, pt, v1, v2):
+                intersects += 1
+        except:
+            pass
     return not (intersects%2 == 0)
 
 
@@ -172,18 +178,22 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
             v1, v2 = poly[j], poly[(j+1) % psize]
             x1, y1 = p2[0], p2[1]
             # The line parameter t; needs divide by zero check!
-            t,pt = ShootRayFromVect(p1, p2, v1, v2)
-            
-            # Find closest bounce for which t > 0
-            pdist = PointDistance(pt,p2)
-            if ((t > 0) and (pdist < closest_bounce) and
-                BouncePointInEdge((x1,y1),pt,v1,v2)):
-                found_coll = True
-                bounce_point = pt
-                closest_bounce = pdist
-                bounce_edge = j
-                #bounce_param = t
-                #b_edge = j
+            try:
+                t,pt = ShootRayFromVect(p1, p2, v1, v2)
+                
+                # Find closest bounce for which t > 0
+                pdist = PointDistance(pt,p2)
+                if ((t > 0) and (pdist < closest_bounce) and
+                    BouncePointInEdge((x1,y1),pt,v1,v2)):
+                    found_coll = True
+                    bounce_point = pt
+                    closest_bounce = pdist
+                    bounce_edge = j
+                    #bounce_param = t
+                    #b_edge = j
+             # bounce was parallel to edge j
+            except: 
+                pass
     if found_coll:
         return bounce_point, bounce_edge
     else:
