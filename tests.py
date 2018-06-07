@@ -116,6 +116,14 @@ class TestGeomUtils(unittest.TestCase):
         self.assertFalse(PolyInGeneralPos(tworooms2))
         self.assertTrue(poly1)
 
+    def test_shootInterval(self):
+        pt1, pt2 = ShootInterval(square, 3, 0, (-10,-250), (10,-250), pi/2, pi/2)
+        self.assertAlmostEqual(pt1[0], 10)
+        self.assertAlmostEqual(pt1[1], 250)
+        self.assertAlmostEqual(pt2[0], -10)
+        self.assertAlmostEqual(pt2[1], 250)
+
+
 
 if __name__ == '__main__':
     unittest.main()

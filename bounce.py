@@ -22,6 +22,31 @@ EPSILON = 1.0
 NUMBOUNCES = 100000
 MAXDIST = 10000000.0
 
+
+def ShootInterval(poly,i,j,pt1,pt2,min_ang,max_ang):
+    psize = len(poly)
+
+    # furthest left bounce
+    lhs_state = (pt1[0], pt1[1], max_ang)
+    # furthest right bounce
+    rhs_state = (pt2[0], pt2[1], min_ang)
+
+    v1, v2 = poly[j], poly[(j+1) % psize]
+
+    t1,pt1_t = ShootRay(lhs_state, v1, v2)
+    t2,pt2_t = ShootRay(rhs_state, v1, v2)
+
+    # lhs to left of target seg
+    if IsLeftTurn(pt1, v2, pt1_t):
+        pt1_t = v2
+
+    # rhs to right of target seg
+    if IsRightTurn(pt2, v1, pt2_t):
+        pt2_t = v1
+
+    return pt2_t, pt1_t
+
+
 # n is the inward edge normal (in radians 0 to pi)
 def PerformRotation(incoming, n, strategy):
     # Random bounce
