@@ -22,29 +22,21 @@ EPSILON = 1.0
 NUMBOUNCES = 100000
 MAXDIST = 10000000.0
 
-
+# n is the inward edge normal (in radians 0 to pi)
 def PerformRotation(incoming, n, strategy):
-    bp = [0.0, 0.0]
-    s = (None, None, incoming)
-    snew = PerformBounce(s, bp, n, strategy)
-    return snew[2]
-
-
-# n is the inward edge normal (in degrees 0 to 2pi)
-def PerformBounce(s,bp,n,strategy):
     # Random bounce
     if strategy == 0:
         dir = n + random.random()*pi - pi/2.0
 
     # Right angle bounce
     elif strategy == 1:
-        dir = s[2] + pi/2.0
+        dir = incoming + pi/2.0
         if AngleDistance(dir,n) > pi/2.0:
             dir += pi
 
     # Billiard bounce
     elif strategy == 2:
-        rebound = FixAngle(s[2] + pi)
+        rebound = FixAngle(incoming + pi)
 #    print "ad:",AngleDifference(rebound,n),"rebound:",rebound,"n:",n
         dir = rebound + 2.0*AngleDifference(rebound,n)
 
@@ -54,9 +46,12 @@ def PerformBounce(s,bp,n,strategy):
     dir = FixAngle(dir)
     if AngleDistance(dir,n) > pi/2.0:
         print("Error: Illegal bounce.  n:",n,"dir:",dir)
-#    print "n:",n,"dir:",dir,"angledist:",AngleDistance(dir,n)
-    return (bp[0], bp[1], dir)
+        raise ValueError
+    return dir
 
+def PerformBounce(s,bp,n,strategy):
+    dir = PerformRotation(s[2], n, strategy)
+    return (bp[0], bp[1], dir)
 
 def main():
     # Initialize and prepare screen
