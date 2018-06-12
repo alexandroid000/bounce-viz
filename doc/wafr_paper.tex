@@ -27,6 +27,14 @@
 \usepackage{sidecap}
 \usepackage{booktabs}
 
+\newtheorem{theorem}{\bf Theorem}
+\newtheorem{todo}{\bf Todo}
+\newtheorem{remark}{\bf Remark}
+\newtheorem{corollary}{\bf Corollary}
+\newtheorem{definition}{\bf Definition}
+\newtheorem{lemma}{\bf Lemma}
+\newtheorem{proposition}[theorem]{\bf Proposition}
+
 \title{A Visibility-Based Combinatorial Data Structure for
 Mobile Robots in Polygons}
 
@@ -40,9 +48,116 @@ Mobile Robots in Polygons}
 \maketitle
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{abstract}
-%
-%\end{abstract}
+\begin{abstract}
+Inspired by motion patterns of commercially available mobile robots, in this
+paper we investigate the power of robots which move forward in straight lines
+until colliding with an environment boundary, at which point they can rotate in
+place and move forward again -- we visualize this as the robot ``bouncing" off
+boundaries. Different boundary interaction laws can be
+defined for such robots, such as ones which orient the robot relative to its
+heading prior to collision, or relative to the normal vector of the environment
+boundary. We introduce a data structure, generated from a polygonal environment
+ definition and constraints on the robot's bouncing strategy, which can be
+queried to determine the satisfiability of path-based tasks such as navigation,
+patrolling, coverage, and localization. In addition to satisfiability, this
+approach also calculates the maximum allowable uncertainty in the robot's
+actuation, providing design constraints for different environments and tasks.
+\end{abstract}
+
+
+\begin{figure}
+    \includegraphics[width=0.8\linewidth]{figures/bounce_examples.pdf}
+    \centering
+    \caption[test]{\label{fig:bex}Examples of different ``bouncing laws" which can be implemented on
+mobile robots. In the first row, $f(v_i, \theta) = \theta$. In the second row,
+$f(v_i, \theta) = \theta$ or $\pi-\theta$, depending on what is necessary to
+preserve monotonicity of travel direction along the $x$-axis. In the third
+row, $f(v_i, \theta$ rotates $v_i$ through $\theta$ in the clockwise
+direction. It is possible that this rotation will cause the 
+heading of the robot to still be facing into the boundary, in which case this model usually has the robot 
+perform the rotation again until its heading points into the free space.
+}
+\end{figure}
+
+\section{Model and Definitions}
+
+We consider the movement of point robots in two dimensions, inside simple polygonal
+environments. All index arithmetic for polygons with $n$ vertices is mod $n$ 
+throughout this paper.
+
+The robots we will consider can move forward in straight lines, and will stop
+when they encounter an environment boundary (such as when a bump or range
+sensor is triggered). Once at a boundary, the robot can rotate in place to some
+specified angle, either in its local frame or relative to the environment
+boundary normal vector, depending on the sensing power of the robot.
+
+Of course, robots rarely move perfectly, so most of our analysis will be
+nondeterministic and will result in bounds on how accurate the robot's actuation
+is required to be.
+
+\begin{definition}
+A \textbf{bounce law} is a function which returns the outgoing heading vector of
+the robot. It is a function of the robot's incoming heading (the vector $v_i$)
+and a control parameter $\theta$. For simplicity, we specify bounce laws in the
+frame where the environment normal is aligned with the positive $y$ axis and the
+robot's point of contact with the wall is the origin. See Figure \ref{fig:bex} for
+some example bounce laws.
+\end{definition}
+
+\begin{definition}
+A \textbf{bounce strategy} is a deterministic finite state machine where each
+state indicates a certain bounce law, and the input language is that of the
+robot's possible sensor readings.
+\end{definition}
+
+
+\section{Statements}
+
+
+\begin{proposition} big O complexity of graph construction and queries
+\end{proposition}
+
+\begin{lemma}
+graph contains at least one cycle (under all constraints on angle range?)
+\end{lemma}
+
+\begin{theorem}
+Navigation is sound and complete
+\end{theorem}
+
+\begin{lemma}
+cycles can contain non-contracting bounces
+\end{lemma}
+
+\begin{lemma}
+characterize limit cycles in convex polygons
+\end{lemma}
+
+\begin{theorem}
+cycle-finding is sound, complete up to bounded length
+\end{theorem}
+
+\begin{theorem}
+localization is correct and complete up to symmetry ("splitting" angle ranges
+will always exist iff symmetry is broken)
+\end{theorem}
+
+\begin{corollary} bounce angle range returned is correct, and optimal
+   (largest range)
+\end{corollary}
+
+\begin{theorem}
+reachability of graph gives ordering on the power of bounce laws
+\end{theorem}
+
+
+Examples:
+
+1. office space w/ long hallway
+2. "almost symmetric" environment
+3. worst case complexity
+
+\iffalse
 
 {\small
 \begin{center}
@@ -52,6 +167,7 @@ Mobile Robots in Polygons}
 \end{quotation}
 \end{center}
 }
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction} 
@@ -102,7 +218,7 @@ A polygon is in general position if no $3$ vertices lie on the same line. For
 the rest of this paper, we assume all polygons are in general position. All
 index arithmetic is $\mod n$ throughout the paper.
 
-A \emph{bouncing strategy} describes the robot's configuration change when it
+A \textbf{bouncing strategy} describes the robot's configuration change when it
 encounters the boundary of a polygon. We will only consider the bounce occurred
 inside an open edge of the polygon: the robot's behavior is undefined at a
 vertex of the polygon.
@@ -694,5 +810,7 @@ resulting trajectory
 
 \bibliographystyle{IEEEtran}
 \bibliography{/home/alli/common/refs}
+
+\fi
 
 \end{document}
