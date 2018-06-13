@@ -95,21 +95,29 @@ Of course, robots rarely move perfectly, so most of our analysis will be
 nondeterministic and will result in bounds on how accurate the robot's actuation
 is required to be.
 
+
 \begin{definition}
-A \textbf{bounce law} is a function which returns the outgoing heading vector of
-the robot. It is a function of the robot's incoming heading (the vector $v_i$)
+A \textbf{bounce law} is a function which returns the outgoing heading angle of
+the robot. It is a function of the robot's incoming heading (the angle $\alpha$)
 and a control parameter $\theta$. For simplicity, we specify bounce laws in the
 frame where the environment normal is aligned with the positive $y$ axis and the
 robot's point of contact with the wall is the origin. See Figure \ref{fig:bex} for
 some example bounce laws.
+
+We may also extend this definition to a \textbf{nondeterministic bounce law}, which
+returns a set of outgoing heading angles, any one of which may be executed by
+the robot.
 \end{definition}
 
 \begin{definition}
 A \textbf{bounce strategy} is a deterministic finite state machine where each
-state indicates a certain bounce law, and the input language is that of the
+state indicates a certain (possibly nondeterministic) bounce law, and the input language is that of the
 robot's possible sensor readings.
 \end{definition}
 
+Given a polygonal environment (such as the floor plan of a warehouse or office
+space), we would like to synthesize bounce strategies which allow a robot to
+perform a given task (such as navigation, patrolling, or localization).
 
 \section{Statements}
 
@@ -150,8 +158,13 @@ will always exist iff symmetry is broken)
 reachability of graph gives ordering on the power of bounce laws
 \end{theorem}
 
+\section{Algorithms}
 
-Examples:
+\subsection{Navigation}
+
+\subsubsection{Constant Angle Controllers}
+
+\section{Examples}
 
 1. office space w/ long hallway
 2. "almost symmetric" environment
