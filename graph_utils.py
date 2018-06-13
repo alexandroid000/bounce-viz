@@ -59,13 +59,12 @@ def validAnglesForContract(poly, i, j):
 def mkGraph(poly):
     G = nx.DiGraph()
 
-    t_pts = InsertAllTransitionPts(poly)
     r_vs = FindReflexVerts(poly)
-    psize = len(t_pts)
+    psize = len(poly)
 
     for start in range(psize):
-        edges = [(start,v,validAnglesForContract(t_pts, start, v))
-                for v in GetVisibleVertices(t_pts, start)
+        edges = [(start,v,validAnglesForContract(poly, start, v))
+                for v in GetVisibleVertices(poly, start)
                 # don't allow transition to edge "around corner"
                 # don't allow zero-measure transition from one endpoint
                 # TODO: clean up logic
@@ -74,12 +73,12 @@ def mkGraph(poly):
                        or
                        ((start in r_vs) and (start == (v+1) % psize))
                        or
-                       ((v in r_vs) and IsThreePointsOnLine(t_pts[start], t_pts[v],
-                                                            t_pts[(v+1)%psize])
+                       ((v in r_vs) and IsThreePointsOnLine(poly[start], poly[v],
+                                                            poly[(v+1)%psize])
                                     and start != ((v+1) % psize))
                        or 
-                       ((start in r_vs) and IsThreePointsOnLine(t_pts[start], t_pts[v],
-                                                            t_pts[(start+1)%psize])
+                       ((start in r_vs) and IsThreePointsOnLine(poly[start],
+                       poly[v], poly[(start+1)%psize])
                                     and v != (start+1) % psize)
                         )
                ]

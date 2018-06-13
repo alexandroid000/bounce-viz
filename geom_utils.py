@@ -206,7 +206,7 @@ def FindReflexVerts(poly):
 
     for j in range(psize):
         v1, v2, v3 = poly[(j-1) % psize], poly[j], poly[(j+1) % psize]
-        if IsRightTurn(v1,v2,v3):
+        if IsRightTurn(v1,v2,v3) and not IsThreePointsOnLine(v1,v2,v3):
             reflex_verts.append(j)
 
     return reflex_verts

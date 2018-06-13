@@ -37,9 +37,8 @@ def VizRay(poly):
 
     plt.savefig('viz_test.pdf')
 
-def VizInsertedPoly(poly):
-    t_pts = InsertAllTransitionPts(poly)
-    psize = len(t_pts)
+def VizPoly(poly):
+    psize = len(poly)
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
 
@@ -48,13 +47,13 @@ def VizInsertedPoly(poly):
     ax = fig.add_axes([0, 0, 1, 1])
     ax.axis('off')
 
-    wall_x = [x for (x,y) in t_pts]
+    wall_x = [x for (x,y) in poly]
     wall_x.append(wall_x[0])
-    wall_y = [y for (x,y) in t_pts]
+    wall_y = [y for (x,y) in poly]
     wall_y.append(wall_y[0])
     plt.plot(wall_x, wall_y, 'black')
     for i in range(psize):
-        point = t_pts[i]
+        point = poly[i]
         plt.scatter(point[0], point[1], color=colors[i])
         plt.annotate(str(i), (point[0]+10, point[1]+10), size = 'small')
     plt.axis('equal')
@@ -89,12 +88,13 @@ def PlotGraph(G, fname = "graph"):
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
 if __name__ == '__main__':
-    poly = square
+    poly = simple_nonconv_deep
     VizRay(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
-    VizInsertedPoly(poly)
-    G = mkGraph(poly)
+    inserted_poly = InsertAllTransitionPts(poly)
+    VizPoly(inserted_poly)
+    G = mkGraph(inserted_poly)
     PlotGraph(G, "contract_graph")
-    H = reduceGraphWrtAngle(G, 0.0, 0.2)
+    H = reduceGraphWrtAngle(G, 0.15, 0.19)
     PlotGraph(H, "reduced_graph")
