@@ -35,6 +35,8 @@
 \newtheorem{lemma}{\bf Lemma}
 \newtheorem{proposition}[theorem]{\bf Proposition}
 
+% bounce transition graph
+% visibility event graph
 \title{A Visibility-Based Combinatorial Data Structure for
 Mobile Robots in Polygons}
 
@@ -119,19 +121,109 @@ Given a polygonal environment (such as the floor plan of a warehouse or office
 space), we would like to synthesize bounce strategies which allow a robot to
 perform a given task (such as navigation, patrolling, or localization).
 
+\section{Related Work}
+
+The \textbf{partial local sequence}, defined in \cite{rourke_viz}, 
+for a vertex $v_0$ in polygon $P$ is constructed 
+by shooting a ray through $v_0$ from every vertex in $P$ that is visible from
+$v_0$. In this work, we use the partial local sequences for vertices in a polygon to calculate 
+the equivalence classes of edge visibility. Each point in each partial local
+sequence defines a \emph{transition event} where the visibility polygon seen
+from points on the polygon boundary changes combinatorially. See Figure \ref{fig:pls} for an example of the vertices in the partial local
+sequence of $v_0$ (blue dots with accompanying rays).
+
+For intuition, we can imagine a robot sliding along the polygon boundary. As it
+slides, its visibility polygon changes continuously (edges shrink or grow, but
+the combinatorial structure of the polygon remains the same). However, when two
+visible vertices come into alignment with the robot, two edges of the visibility polygon will
+merge. The other type of event is when a new vertex becomes visible from behind
+a reflex vertex, causing a new edge to appear in the visibility polygon.
+
+Thus, once all the
+partial local sequences have been inserted into the original polygon, the
+resulting intervals along the boundary define a set of equivalence classes,
+where two points in the same interval can see the same edge set of the
+original polygon (though they may see different portions of those edges). 
+Thus, we can reason over a finite set of transitions between these
+intervals, instead of the infinite set of possible transitions between points on
+the boundary of the original polygon.
+
+\begin{figure}[h]
+    \includegraphics[width=0.8\linewidth]{figures/partial_local_sequence.png}
+    \caption{Partial local sequence for $v_0$}\label{fig:pls}
+    \centering
+\end{figure}
+
+
+
+\section{Outline of Results}
+
 \section{Statements}
 
-
-\begin{proposition} big O complexity of graph construction and queries
+\begin{proposition} The bounce transition graph for a polygon with $n$ vertices has 
+$\mathcal{O}(n^2)$ vertices and $\mathcal{O}(n^4)$ edges.
 \end{proposition}
 
-\begin{lemma}
-graph contains at least one cycle (under all constraints on angle range?)
-\end{lemma}
+Consider a polygon $P$ with $n$ vertices, $r$ of which are reflex vertices. To
+construct the bounce visibility graph, we insert the vertices of the partial
+local sequence for each vertex in $P$. For a convex vertex, its partial local sequence will not have new vertex that is not
+in $P$. However, a reflex vertex can have $O(n)$ new vertices. 
+
+Up to half of the vertices in the polygon can be reflex, so $r = O(n)$; each 
+of the reflex vertices can produce $\mathcal{O}(n)$ new vertices in its partial local 
+sequence, so the size of $P'$ is $\mathcal{O}(n^2)$. 
+
+It is possible for a vertex in $P'$ to see all other vertices, so in the worst
+case, the bounce visibility graph will have $\mathcal{O}(n^4)$ edges.
+
+We might hope that if $r$ is large, then not all of the reflex vertices will
+produce a large number of new vertices, or that if there are many new vertices,
+then the new vertices will not have good visibility in $P'$ since most of them
+will be inserted into a corner of the polygon, and then we can bound the
+complexity of the BVD. Unfortunately, the number of reflex vertices, the new
+vertices produced in their partial local sequence, and the new vertices'
+visibility can be large at the same time. We will present a family of input
+polygons with BVD of $\mathcal{O}(n^4)$ complexity as follows.
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/chestnut_5.png}
+\label{fig:t4}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/chestnut_7.png}
+\label{fig:t6}
+\end{subfigure}\\
+\caption{The worst case polygon for $t = 4$ and $t = 6$ 
+\label{fig:chestnut}}
+\end{figure}
+
+Let $n = 4t+2$, where $t$ is a positive integer. We design a polygon with
+$r = 2t$ reflex vertices. The polygon is symmetric with respect to its medium
+horizontal line. In the top half, the reflex vertices are uniformly located on a
+circle and thus they are visible to each other; the convex vertices are chosen
+so that they are outside the circle and the line through an edge will not
+intersect other edges. Each reflex vertex will have at least $t-1$ new
+vertices in its partial local sequence. All vertices in the top half can see
+each vertex in the bottom half and vice versa. So there will be $2t(t-1)+n$
+vertices in the polygon after we insert all new vertices in the partial local
+sequence for all reflex vertices. Each of them can see at least $t(t-1)+n/2$
+other vertices. The final complexity for the bounce visibility diagram is
+$\mathcal{O} ((2t(t-1)+n)(t(t-1)+n/2)) = \mathcal{O}(t^4) = \mathcal{O}(n^4)$.
+Fig \ref{fig:chestnut} shows the polygons for $t = 4$ and $t=6$ with all the
+vertices in the partial local sequences. % show the diagram to edge
 
 \begin{theorem}
 Navigation is sound and complete
 \end{theorem}
+
+
+\begin{lemma}
+graph contains at least one cycle
+\end{lemma}
 
 \begin{lemma}
 cycles can contain non-contracting bounces
@@ -163,6 +255,10 @@ reachability of graph gives ordering on the power of bounce laws
 \subsection{Navigation}
 
 \subsubsection{Constant Angle Controllers}
+
+\subsection{Localization}
+
+\subsubsection{Incorporating other Sensor Models}
 
 \section{Examples}
 
@@ -499,9 +595,25 @@ Circular symmetries in a polygon can be reflected in the periodic structure of t
 
 \subsection{Combinatorial Complexity of BVD}
 
-To consider the size of the bounce visibility diagram for an input polygon $P$ with $n$ vertices, we let $r$ be the number of reflex vertices in the polygon, and $m$ be the average number of visible vertices to a vertex in $P'$. For a convex vertex, its partial local sequence will not have new vertex that is not in $P$, while for a reflex vertex, we can have $O(n)$ new vertices. We can have as many as half of the vertices to be reflex, so $r = O(n)$; each of the reflex vertices can produce $O(n)$ new vertices in its partial local sequence, so the size of $P'$ is $O(n^2)$. It is possible for a vertex in $P'$ to see all other vertex, so, in the worse case, $m = O(n^2)$. Therefore, the complexity of the bounce visibility diagram is $O(n\cdot r\cdot m) = O(n^4)$. 
+To consider the size of the bounce visibility diagram for an input polygon $P$
+with $n$ vertices, we let $r$ be the number of reflex vertices in the polygon,
+and $m$ be the average number of visible vertices to a vertex in $P'$. For a
+convex vertex, its partial local sequence will not have new vertex that is not
+in $P$, while for a reflex vertex, we can have $O(n)$ new vertices. We can have
+as many as half of the vertices to be reflex, so $r = O(n)$; each of the reflex
+vertices can produce $O(n)$ new vertices in its partial local sequence, so the
+size of $P'$ is $O(n^2)$. It is possible for a vertex in $P'$ to see all other
+vertex, so, in the worse case, $m = O(n^2)$. Therefore, the complexity of the
+bounce visibility diagram is $O(n\cdot r\cdot m) = O(n^4)$.
 
-We might hope that if $r$ is large, then not all of the reflex vertices will produce a large number of new vertices, or that if there are many new vertices, then the new vertices will not have good visibility in $P'$ since most of them will be inserted into a corner of the polygon, and then we can bound the complexity of the BVD. Unfortunately, the number of reflex vertices, the new vertices produced in their partial local sequence, and the new vertices' visibility can be large at the same time. We will present a family of input polygons with BVD of $\Theta(n^4)$ complexity as follows. 
+We might hope that if $r$ is large, then not all of the reflex vertices will
+produce a large number of new vertices, or that if there are many new vertices,
+then the new vertices will not have good visibility in $P'$ since most of them
+will be inserted into a corner of the polygon, and then we can bound the
+complexity of the BVD. Unfortunately, the number of reflex vertices, the new
+vertices produced in their partial local sequence, and the new vertices'
+visibility can be large at the same time. We will present a family of input
+polygons with BVD of $\mathcal{O}(n^4)$ complexity as follows.
 
 \begin{figure}
 %\hspace{-40px}
