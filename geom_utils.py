@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from itertools import combinations
 import visilibity as vis
+from copy import copy, deepcopy
 
 DEBUG = False
 
@@ -270,7 +271,7 @@ def GetVisibleVertices(poly, j):
     # Outer boundary polygon must be COUNTER-CLOCK-WISE(ccw)
     # Create the outer boundary polygon
     # Define an epsilon value (should be != 0.0)
-    epsilon = 0.0000001
+    epsilon = 0.001
     vpoly = [vis.Point(*pt) for pt in poly]
     walls = vis.Polygon(vpoly)
     walls.enforce_standard_form()
@@ -289,10 +290,11 @@ def GetVisibleVertices(poly, j):
     vvs = [(isovist[i].x(), isovist[i].y()) for i in range(isovist.n())]
     #print(vvs)
     visibleVertexSet = []
-    for v in vvs:
-        for pt in range(psize):
-            if (abs(PointDistance(v, poly[pt])) < epsilon) and pt != j:
-                visibleVertexSet.append(pt)
+    for i in range(psize):
+        p = vis.Point(*poly[i])
+        vp = copy(p).projection_onto_boundary_of(isovist)
+        if (vis.distance(vp, p) < epsilon) and i != j:
+            visibleVertexSet.append(i)
 
 #    p1 = poly[j]
 #    visibleVertexSet = [(j+1)%psize]
