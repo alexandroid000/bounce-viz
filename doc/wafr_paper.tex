@@ -69,9 +69,10 @@ heading prior to collision, or relative to the normal vector of the environment
 boundary. We introduce a data structure, generated from a polygonal environment
  definition and constraints on the robot's bouncing strategy, which can be
 queried to determine the satisfiability of path-based tasks such as navigation,
-patrolling, coverage, and localization. In addition to satisfiability, this
-approach also calculates the maximum allowable uncertainty in the robot's
-actuation, providing design constraints for different environments and tasks.
+patrolling, coverage, and localization. If the task is satisfiable, this
+approach then synthesizes a controller and calculates the maximum allowable 
+uncertainty in the robot's actuation, providing design constraints for different 
+environments and tasks.
 \end{abstract}
 
 
@@ -105,18 +106,40 @@ Of course, robots rarely move perfectly, so most of our analysis will be
 nondeterministic and will result in bounds on how accurate the robot's actuation
 is required to be.
 
+More formally, our modle of the robot includes:
+
+\begin{itemize}
+\item The \emph{configuration space} $X = P \times S^1$. $P$ is a simple polygon with 
+boundary $\partial P$, and $S^1$ is the robot's orientation in the plane. For the most part, we will ignore configurations in the interior
+of the polygon and only consider transitions between points and intervals on the
+boundary.
+\item The \emph{observation space} $Y$ of sensor readings from sensors that the
+robot is equipped with, and the \emph{sensor mapping} $h: X \to Y$ which maps
+the robot state to sensor readings. All robot designs in this paper will have at
+least a contact sensor, with sensor mapping $h(x) = 1$ if $x \in \partial
+P \times S^1$, and $h(x) = 0$ otherwise.
+\item The \emph{action space} $U = [0,\pi]$, where $u \in U$ is executed when
+the robot is in contact with an environment boundary and rotates to angle $u$
+relative to the boundary. $u = \pi/2$ is the normal vector to the boundary.
+\item The \emph{state transition function} $f: X \times U \to X$, which
+describes how the state of the robot changes according to which action is
+chosen. We will often lift this function to act nondeterministically over sets
+of states and actions, propagating each state forward with each possible action,
+and unioning the resulting set of states.
+\item We model time as proceeding in stages, where at each stage $k$ the robot
+is in contact with the environment boundary, executes an action $u_k$, and then
+moves forward until the next contact with the boundary at stage $u_{k+1}$.
+\end{itemize}
+
 
 \begin{definition}
-A \textbf{bounce law} is a function which returns the outgoing heading angle of
-the robot. It is a function of the robot's incoming heading (the angle $\alpha$)
-and a control parameter $\theta$. For simplicity, we specify bounce laws in the
+A \textbf{bounce law} is a specific controller for the robot, which determines
+what action the robot will take at a collision with the boundary. 
+It is a function of the robot's incoming heading (the angle $\alpha$)
+and a control parameter $\theta$. We specify bounce laws in the
 frame where the environment normal is aligned with the positive $y$ axis and the
 robot's point of contact with the wall is the origin. See Figure \ref{fig:bex} for
 some example bounce laws.
-
-We may also extend this definition to a \textbf{nondeterministic bounce law}, which
-returns a set of outgoing heading angles, any one of which may be executed by
-the robot.
 \end{definition}
 
 \begin{definition}
@@ -941,9 +964,9 @@ resulting trajectory
 
 
 
-\bibliographystyle{IEEEtran}
-\bibliography{/home/alli/common/refs}
 
 \fi
 
+\bibliographystyle{IEEEtran}
+\bibliography{/home/alli/common/refs}
 \end{document}

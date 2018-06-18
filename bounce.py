@@ -47,6 +47,7 @@ def ShootInterval(poly,i,j,pt1,pt2,min_ang,max_ang):
     return pt2_t, pt1_t
 
 
+
 # n is the inward edge normal (in radians 0 to pi)
 def PerformRotation(incoming, n, strategy):
     # Random bounce
