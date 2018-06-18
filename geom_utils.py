@@ -11,7 +11,7 @@ import networkx as nx
 from itertools import combinations
 import visilibity as vis
 
-DEBUG = True
+DEBUG = False
 
 def PolyToWindowScale(poly, ydim):
     newpoly = []
@@ -126,10 +126,10 @@ def ShootRay(state, v1, v2):
     c = y2*(x3-x2) - x2*(y3-y2)
     den = (a*cos(theta)+b*sin(theta))
     # case when lines are parallel
-    # TODO: raise error
     if abs(den) < 0.000001:
-        print("divide by zero in ray shoot")
-        print("shot from ",state,"to",v1,v2)
+        if DEBUG:
+            print("divide by zero in ray shoot")
+            print("shot from ",state,"to",v1,v2)
         raise ValueError
     else:
         t = (-c - b*y1 - a*x1)/den
@@ -264,36 +264,35 @@ def ShootRaysToReflexFromVerts(poly, j):
 
 # for polygons not in general position: returns all visible vertices along a ray
 def GetVisibleVertices(poly, j):
+    #print("At vertex",j)
     psize = len(poly)
 
     # Outer boundary polygon must be COUNTER-CLOCK-WISE(ccw)
     # Create the outer boundary polygon
     # Define an epsilon value (should be != 0.0)
-#    epsilon = 0.0000001
-#    vpoly = [vis.Point(*pt) for pt in poly]
-#    walls = vis.Polygon(vpoly)
-#    walls.enforce_standard_form()
-#
-#    # point from which to calculate visibility
-#    p1 = poly[j]
-#    vp1 = vis.Point(*p1)
-#
-#    # Create environment, wall will be the outer boundary because
-#    # is the first polygon in the list. The other polygons will be holes
-#    env = vis.Environment([walls])
-#    # Necesary to generate the visibility polygon
-#    vp1.snap_to_boundary_of(env, epsilon)
-#    vp1.snap_to_vertices_of(env, epsilon)
-#    isovist = vis.Visibility_Polygon(vp1, env, epsilon)
-#    return isovist
-#    vvs = [(isovist[i].x(), isovist[i].y()) for i in range(psize-1)]
-#    print(vvs)
-#    non_neighbors = [x for x in range(psize) if x not in (j, (j-1)%psize, (j+1)%psize)]
-#    visibleVertexSet = []
-#    for pt in non_neighbors:
-#        for v in vvs:
-#            if abs(PointDistance(v, poly[pt])) < epsilon:
-#                visibleVertexSet.append(pt)
+    epsilon = 0.0000001
+    vpoly = [vis.Point(*pt) for pt in poly]
+    walls = vis.Polygon(vpoly)
+    walls.enforce_standard_form()
+
+    # point from which to calculate visibility
+    p1 = poly[j]
+    vp1 = vis.Point(*p1)
+
+    # Create environment, wall will be the outer boundary because
+    # is the first polygon in the list. The other polygons will be holes
+    env = vis.Environment([walls])
+    # Necesary to generate the visibility polygon
+    vp1.snap_to_boundary_of(env, epsilon)
+    vp1.snap_to_vertices_of(env, epsilon)
+    isovist = vis.Visibility_Polygon(vp1, env, epsilon)
+    vvs = [(isovist[i].x(), isovist[i].y()) for i in range(isovist.n())]
+    #print(vvs)
+    visibleVertexSet = []
+    for v in vvs:
+        for pt in range(psize):
+            if (abs(PointDistance(v, poly[pt])) < epsilon) and pt != j:
+                visibleVertexSet.append(pt)
 
 #    p1 = poly[j]
 #    visibleVertexSet = [(j+1)%psize]
@@ -302,6 +301,7 @@ def GetVisibleVertices(poly, j):
 #        print("checking if vertex",i,"is visible")
 #        is_visible = True
 #        p2 = poly[i]
+#
 #        possible_intersect_edges = [x for x in range(psize) if x not in (i, (i-1)%psize, j, (j-1)%psize)]
 #        for k in possible_intersect_edges:
 #            q1, q2 = poly[k], poly[(k+1)%psize]
@@ -362,9 +362,8 @@ def InsertAllTransitionPts(poly):
 
 # make all sets of vertices visible from everywhere along edge
 def mkVizSets(poly):
-    t_pts = InsertAllTransitionPts(poly)
-    psize = len(t_pts)
-    all_viz_vxs = [GetVisibleVertices(t_pts, i) for i in range(psize)]
+    psize = len(poly)
+    all_viz_vxs = [GetVisibleVertices(poly, i) for i in range(psize)]
     if DEBUG:
         print("All visible verts:")
         print(all_viz_vxs)
@@ -427,6 +426,7 @@ def GetLinkDiagram(poly, resolution = 15):
 def AnglesBetweenSegs(e1, e2):
     (p1,p2) = e1
     (p3,p4) = e2
+    print("finding angle between",e1,"and",e2)
 
     min_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
     max_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))

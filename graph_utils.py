@@ -58,7 +58,6 @@ def validAnglesForContract(poly, i, j):
 # edge information is angle ranges which create contraction mapping
 def mkGraph(poly):
     G = nx.DiGraph()
-
     r_vs = FindReflexVerts(poly)
     psize = len(poly)
 

@@ -88,13 +88,13 @@ def PlotGraph(G, fname = "graph"):
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
 if __name__ == '__main__':
-    poly = simple_nonconv_deep
-    VizRay(poly)
-    link_diagram = GetLinkDiagram(poly)
-    PlotLinkDiagram(link_diagram, hline = 1.4707)
+    poly = tworooms
+    #VizRay(poly)
+    #link_diagram = GetLinkDiagram(poly)
+    #PlotLinkDiagram(link_diagram, hline = 1.4707)
     inserted_poly = InsertAllTransitionPts(poly)
     VizPoly(inserted_poly)
     G = mkGraph(inserted_poly)
-    PlotGraph(G, "contract_graph")
-    H = reduceGraphWrtAngle(G, 0.15, 0.19)
-    PlotGraph(H, "reduced_graph")
+    PlotGraph(G)
+    #H = reduceGraphWrtAngle(G, 0.15, 0.19)
+    #PlotGraph(H, "reduced_graph")
