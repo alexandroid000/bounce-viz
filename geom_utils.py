@@ -316,19 +316,20 @@ def GetVisibleVertices(poly, j):
 #        for v in other_vxs:
 #            p3 = poly[v]
 #        # halfway point in polygon is bad heuristic
-#            if is_visible and IsThreePointsOnLine(p1, p2, p3) and IsInPoly(((p2[0]+p3[0])/2, (p2[1]+p3[1])/2), poly):
-#                pass
-#            else:
+#            if is_visible and IsThreePointsOnLine(p1, p2, p3) and not IsInPoly(((p2[0]+p3[0])/2, (p2[1]+p3[1])/2), poly):
+#                print("Degeneracy which is not visible")
 #                is_visible = False
 #
 #
 #    if is_visible:
 #        visibleVertexSet.append(i)
 #    visibleVertexSet.append((j-1)%psize)
+    print("vertices",visibleVertexSet,"visible from",j)
     return visibleVertexSet
 
+# sort by distance and remove duplicates
 def SortByDistance(p1, unsorted_vs):
-    return sorted(unsorted_vs, key = lambda v: PointDistance(v,p1))
+    return sorted(list(set(unsorted_vs)), key = lambda v: PointDistance(v,p1))
 
 # find all induced transition points, sort and insert into polygon
 # probably the most naive way to do this
