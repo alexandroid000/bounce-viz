@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 from itertools import combinations
+import visilibity as vis
 
 DEBUG = True
 
@@ -191,9 +192,28 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
                     bounce_edge = j
                     #bounce_param = t
                     #b_edge = j
-             # bounce was parallel to edge j
-            except: 
+            # bounce was parallel to edge j
+            # check if it's parallel and overlapping for degenerate polys
+            except:
                 pass
+#                if IsThreePointsOnLine(p2, v1, v2):
+#                    d1 = PointDistance(p2, v1)
+#                    d2 = PointDistance(p2, v2)
+#                    if (d1 < closest_bounce) or (d2 < closest_bounce):
+#                        if d1 < d2:
+#                            bounce_point = v1
+#                            closest_bounce = d1
+#                            bounce_edge = j
+#                            found_coll = True
+#                        else:
+#                            bounce_point = v2
+#                            closest_bounce = d2
+#                            bounce_edge = j+1
+#                            found_coll = True
+#
+#
+#                else:
+#                    pass
     if found_coll:
         return bounce_point, bounce_edge
     else:
@@ -242,26 +262,69 @@ def ShootRaysToReflexFromVerts(poly, j):
     return pts
 
 
-# breaks if original poly is not in general position
+# for polygons not in general position: returns all visible vertices along a ray
 def GetVisibleVertices(poly, j):
     psize = len(poly)
-    p1 = poly[j]
-    visibleVertexSet = [(j+1)%psize]
-    non_neighbors = [x for x in range(psize) if x not in (j, (j-1)%psize, (j+1)%psize)]
-    for i in non_neighbors:
-        is_visible = True
-        p2 = poly[i]
-        possible_intersect_edges = [x for x in range(psize) if x not in (i, (i-1)%psize, j, (j-1)%psize)]
-        for k in possible_intersect_edges:
-            q1, q2 = poly[k], poly[(k+1)%psize]
-            if IsIntersectSegments(p1, p2, q1, q2) and (SegsInGeneralPos(p1, p2, q1, q2)):
-                is_visible = False
-                break
-        # add the check for degeneracy
-        other_vxs = [x for x in range(psize) if x not in (i, j)]
-        if is_visible and (IsInPoly(((p1[0]+p2[0])/2, (p1[1]+p2[1])/2), poly) or any([IsThreePointsOnLine(p1, p2, poly[l]) for l in other_vxs])):
-            visibleVertexSet.append(i)
-    visibleVertexSet.append((j-1)%psize)
+
+    # Outer boundary polygon must be COUNTER-CLOCK-WISE(ccw)
+    # Create the outer boundary polygon
+    # Define an epsilon value (should be != 0.0)
+#    epsilon = 0.0000001
+#    vpoly = [vis.Point(*pt) for pt in poly]
+#    walls = vis.Polygon(vpoly)
+#    walls.enforce_standard_form()
+#
+#    # point from which to calculate visibility
+#    p1 = poly[j]
+#    vp1 = vis.Point(*p1)
+#
+#    # Create environment, wall will be the outer boundary because
+#    # is the first polygon in the list. The other polygons will be holes
+#    env = vis.Environment([walls])
+#    # Necesary to generate the visibility polygon
+#    vp1.snap_to_boundary_of(env, epsilon)
+#    vp1.snap_to_vertices_of(env, epsilon)
+#    isovist = vis.Visibility_Polygon(vp1, env, epsilon)
+#    return isovist
+#    vvs = [(isovist[i].x(), isovist[i].y()) for i in range(psize-1)]
+#    print(vvs)
+#    non_neighbors = [x for x in range(psize) if x not in (j, (j-1)%psize, (j+1)%psize)]
+#    visibleVertexSet = []
+#    for pt in non_neighbors:
+#        for v in vvs:
+#            if abs(PointDistance(v, poly[pt])) < epsilon:
+#                visibleVertexSet.append(pt)
+
+#    p1 = poly[j]
+#    visibleVertexSet = [(j+1)%psize]
+#    non_neighbors = [x for x in range(psize) if x not in (j, (j-1)%psize, (j+1)%psize)]
+#    for i in non_neighbors:
+#        print("checking if vertex",i,"is visible")
+#        is_visible = True
+#        p2 = poly[i]
+#        possible_intersect_edges = [x for x in range(psize) if x not in (i, (i-1)%psize, j, (j-1)%psize)]
+#        for k in possible_intersect_edges:
+#            q1, q2 = poly[k], poly[(k+1)%psize]
+#            print("Is it blocked by edge",k,(k+1)%psize)
+#            q1, q2 = poly[k], poly[(k+1)%psize]
+#            if IsIntersectSegments(p1, p2, q1, q2) and (SegsInGeneralPos(p1, p2, q1, q2)):
+#                print("yes")
+#                is_visible = False
+#                break
+#        # add the check for degeneracy
+#        other_vxs = [x for x in range(psize) if x not in (i, j)]
+#        for v in other_vxs:
+#            p3 = poly[v]
+#        # halfway point in polygon is bad heuristic
+#            if is_visible and IsThreePointsOnLine(p1, p2, p3) and IsInPoly(((p2[0]+p3[0])/2, (p2[1]+p3[1])/2), poly):
+#                pass
+#            else:
+#                is_visible = False
+#
+#
+#    if is_visible:
+#        visibleVertexSet.append(i)
+#    visibleVertexSet.append((j-1)%psize)
     return visibleVertexSet
 
 def SortByDistance(p1, unsorted_vs):
@@ -273,7 +336,7 @@ def SortByDistance(p1, unsorted_vs):
 def InsertAllTransitionPts(poly):
     if not PolyInGeneralPos(poly):
         print("Polygon not in general position!!!!!")
-        raise ValueError
+        #raise ValueError
     t_pts_grouped = {i:[] for i in range(len(poly))}
     rvs = FindReflexVerts(poly)
     # find all transition points, group by edge
