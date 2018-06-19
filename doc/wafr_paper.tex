@@ -7,6 +7,7 @@
 
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}    % need for subequations
+\usepackage{amsthm}
 \usepackage{graphicx}   % need for figures
 \usepackage[font=footnotesize,labelfont=footnotesize]{caption}
 \usepackage{verbatim}   % useful for program listings
@@ -180,14 +181,9 @@ the entire forward projected state of the robot within a single
 linear segment of the polygonal environment. However, this algorithm is
 not complete, due to the method used to discretize the environment boundary and
 the restriction of only allowing deterministic transitions between boundary
-segments. Additionally, this approach required hand-crafted
-local planners for navigating long hallways.
-
-{\color{red} is this true?}
-Their navigation graph has $O(n^4)$ nodes, which is
-the same complexity as our proposed data structure, but our method can also
-achieve navigation without hand-crafted local planners due to the
-visibility-based decomposition of the environment boundary.
+segments. Their navigation graph has $O(n^4)$ nodes, while ours includes only $O(n^2)$
+nodes. This approach requires heuristics for searching the graph efficiently,
+and also requires hand-crafted local planners for navigating long hallways.
 
 In \cite{alam2017minimalist} and \cite{alam2018space}, the authors describe
 navigation, coverage, and localization algorithms for a robot with a clock and
@@ -234,9 +230,15 @@ the boundary of the original polygon.
     \centering
 \end{figure}
 
-
-
 \section{Outline of Results}
+
+First, we construct a graph representing possible transitions between points on
+the polygon boundary. Each node in this graph corresponds to a segement of the
+boundary where the visibility polygon at each point is combinatorially ``the
+same."
+
+Then, we show how this graph can be augmented and queried to solve different
+robotic tasks, such as navigation, patrolling, and localization.
 
 \section{Statements}
 
@@ -244,6 +246,7 @@ the boundary of the original polygon.
 $\mathcal{O}(n^2)$ vertices and $\mathcal{O}(n^4)$ edges.
 \end{proposition}
 
+\begin{proof}
 Consider a polygon $P$ with $n$ vertices, $r$ of which are reflex vertices. To
 construct the bounce visibility graph, we insert the vertices of the partial
 local sequence for each vertex in $P$. For a convex vertex, its partial local sequence will not have new vertex that is not
@@ -295,6 +298,8 @@ other vertices. The final complexity for the bounce visibility diagram is
 $\mathcal{O} ((2t(t-1)+n)(t(t-1)+n/2)) = \mathcal{O}(t^4) = \mathcal{O}(n^4)$.
 Fig \ref{fig:chestnut} shows the polygons for $t = 4$ and $t=6$ with all the
 vertices in the partial local sequences. % show the diagram to edge
+
+\end{proof}
 
 \begin{theorem}
 Navigation is sound and complete
