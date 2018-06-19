@@ -69,8 +69,8 @@ class TestGeomUtils(unittest.TestCase):
         t7 = ShootRaysToReflexFromVerts(poly1, 7)
         t9 = ShootRaysToReflexFromVerts(poly1, 9)
         t10 = ShootRaysToReflexFromVerts(poly1, 10)
-        ts3 = [((-169.23076923076923, 65.3846153846154), 5), ((141.07142857142858, 8.92857142857136), 9), ((109.82142857142857, 186.60714285714286), 1)]
-        ts7 = [((-206.18384401114204, -199.13649025069637), 8), ((-127.36842105263163, -194.21052631578948), 8), ((86.28571428571405, -180.8571428571429), 8), ((-37.599999999999994, 187.59999999999997), 3)]
+        ts3 = [((-67.74193548387098, 182.25806451612902), 4), ((109.82142857142857, 186.60714285714286), 1), ((-60.0, 190.0), 4)]
+        ts7 = [((-206.18384401114204, -199.13649025069637), 8), ((-127.36842105263163, -194.21052631578948), 8)]
         ts10 = [((-177.77777777777777, 50.00000000000004), 5), ((207.44680851063828, 11.70212765957443), 0), ((209.34065934065933, 40.10989010989009), 0), ((205.3602811950791, 56.32688927943761), 1), ((199.90439770554494, 63.76673040152964), 1), ((190.12048192771084, 77.10843373493977), 1)]
         self.assertEqual(ts3, t3)
         self.assertEqual(ts7, t7)
@@ -79,8 +79,12 @@ class TestGeomUtils(unittest.TestCase):
 
     def test_viz_verts(self):
         p = InsertAllTransitionPts(simple_bit)
-        self.assertEqual([2, 4, 5, 6], GetVisibleVertices(p,3))
-        self.assertEqual([0, 1, 3, 4, 5, 6, 7, 9, 10], GetVisibleVertices(p,2))
+        self.assertEqual([2, 4, 5, 6, 7], GetVisibleVertices(p,3))
+        self.assertEqual([0, 1, 3, 4, 5, 6, 7, 8, 10, 11], GetVisibleVertices(p,2))
+
+    def test_viz_gp(self):
+        p = InsertAllTransitionPts(tworooms)
+        self.assertEqual([1, 2, 11, 12, 13, 14, 15], GetVisibleVertices(p, 0))
 
     def test_angle_parallel(self):
         a = angleBound(square, 1, 3)

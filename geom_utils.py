@@ -254,12 +254,17 @@ def ShootRaysToReflexFromVerts(poly, j):
     pts = []
     visible_verts = GetVisibleVertices(poly,j)
 
-    for v in visible_verts[1:-1]:
-        res = ClosestPtAlongRay(poly[v], r_v, poly)
-        if res:
-            pt, k = res
-            if IsInPoly(((pt[0]+r_v[0])/2, (pt[1]+r_v[1])/2), poly):
-                pts.append((pt,k))
+    # only ray shoot from non-adjacent vertices
+    # previous and next neighbors always visible
+    for v in visible_verts:
+        if (v != (j-1)%psize) and (v != (j+1)%psize):
+            #print("shooting ray from",v,"to",j)
+            res = ClosestPtAlongRay(poly[v], r_v, poly)
+            if res:
+                pt, k = res
+                if IsInPoly(((pt[0]+r_v[0])/2, (pt[1]+r_v[1])/2), poly):
+                    #print("successful insert")
+                    pts.append((pt,k))
     return pts
 
 
@@ -295,38 +300,8 @@ def GetVisibleVertices(poly, j):
         vp = copy(p).projection_onto_boundary_of(isovist)
         if (vis.distance(vp, p) < epsilon) and i != j:
             visibleVertexSet.append(i)
-
-#    p1 = poly[j]
-#    visibleVertexSet = [(j+1)%psize]
-#    non_neighbors = [x for x in range(psize) if x not in (j, (j-1)%psize, (j+1)%psize)]
-#    for i in non_neighbors:
-#        print("checking if vertex",i,"is visible")
-#        is_visible = True
-#        p2 = poly[i]
-#
-#        possible_intersect_edges = [x for x in range(psize) if x not in (i, (i-1)%psize, j, (j-1)%psize)]
-#        for k in possible_intersect_edges:
-#            q1, q2 = poly[k], poly[(k+1)%psize]
-#            print("Is it blocked by edge",k,(k+1)%psize)
-#            q1, q2 = poly[k], poly[(k+1)%psize]
-#            if IsIntersectSegments(p1, p2, q1, q2) and (SegsInGeneralPos(p1, p2, q1, q2)):
-#                print("yes")
-#                is_visible = False
-#                break
-#        # add the check for degeneracy
-#        other_vxs = [x for x in range(psize) if x not in (i, j)]
-#        for v in other_vxs:
-#            p3 = poly[v]
-#        # halfway point in polygon is bad heuristic
-#            if is_visible and IsThreePointsOnLine(p1, p2, p3) and not IsInPoly(((p2[0]+p3[0])/2, (p2[1]+p3[1])/2), poly):
-#                print("Degeneracy which is not visible")
-#                is_visible = False
-#
-#
-#    if is_visible:
-#        visibleVertexSet.append(i)
-#    visibleVertexSet.append((j-1)%psize)
-    print("vertices",visibleVertexSet,"visible from",j)
+    if DEBUG:
+        print("vertices",visibleVertexSet,"visible from",j)
     return visibleVertexSet
 
 # sort by distance and remove duplicates
@@ -337,9 +312,6 @@ def SortByDistance(p1, unsorted_vs):
 # probably the most naive way to do this
 # return a list of edge indicators for each vertex
 def InsertAllTransitionPts(poly):
-    if not PolyInGeneralPos(poly):
-        print("Polygon not in general position!!!!!")
-        #raise ValueError
     t_pts_grouped = {i:[] for i in range(len(poly))}
     rvs = FindReflexVerts(poly)
     # find all transition points, group by edge
@@ -348,8 +320,8 @@ def InsertAllTransitionPts(poly):
         r1, r2 = ShootRaysFromReflex(poly, p)
         t_pts.extend([r1,r2])
         t_pts.extend(ShootRaysToReflexFromVerts(poly,p))
-        for (pt,i) in t_pts:
-            t_pts_grouped[i].append(pt)
+        for (pt,edge_i) in t_pts:
+            t_pts_grouped[edge_i].append(pt)
 
     # sort transition points along edge
     for i in range(len(poly)):
@@ -396,7 +368,7 @@ def GetLinkDiagram(poly, resolution = 15):
     t_pts = InsertAllTransitionPts(poly)
     psize = len(t_pts)
     link_diagram = np.nan*np.ones((psize, resolution*psize))
-    vizSets = mkVizSets(poly)
+    vizSets = mkVizSets(t_pts)
     for i in range(psize):
         # for each visible vertex, we need to calculate:
         #  (1) the view angle at the current vertex w.r.t the current edge and
