@@ -23,7 +23,7 @@
 \usepackage{amssymb}
 \usepackage{float}
 \usepackage{algorithm}
-\usepackage{algorithmic}
+\usepackage{algpseudocode}
 \usepackage{comment}
 \usepackage{sidecap}
 \usepackage{booktabs}
@@ -42,6 +42,12 @@
 
 % synthesis of paths with high-level dynamical properties from simple
 % compliant environmental interactions
+
+% skeptical questions:
+
+% - what if the robot starts very near to a boundary of equivalence classes?
+% - under what conditions will an *interval* of bounce angles take a robot from
+%   one interval to another? With contraction?
 
 % Using Visibility Equivalence Classes for High-Level Dynamical Path Synthesis
 
@@ -75,7 +81,6 @@ approach then synthesizes a controller and calculates the maximum allowable
 uncertainty in the robot's actuation, providing design constraints for different 
 environments and tasks.
 \end{abstract}
-
 
 \begin{figure}
     \includegraphics[width=0.8\linewidth]{figures/bounce_examples.pdf}
@@ -240,7 +245,17 @@ same."
 Then, we show how this graph can be augmented and queried to solve different
 robotic tasks, such as navigation, patrolling, and localization.
 
-\section{Statements}
+\section{Partitioning Polygons}
+
+\begin{algorithm}
+\caption{Partition the boundary of a polygon into visibility
+equivalence classes.}
+\label{algo:insert}
+\begin{algorithmic}
+\State \Call{ShootRay}{v1, v2}
+\end{algorithmic}
+\end{algorithm}
+
 
 \begin{proposition} The bounce transition graph for a polygon with $n$ vertices has 
 $\mathcal{O}(n^2)$ vertices and $\mathcal{O}(n^4)$ edges.
@@ -294,11 +309,58 @@ vertices in its partial local sequence. All vertices in the top half can see
 each vertex in the bottom half and vice versa. So there will be $2t(t-1)+n$
 vertices in the polygon after we insert all new vertices in the partial local
 sequence for all reflex vertices. Each of them can see at least $t(t-1)+n/2$
-other vertices. The final complexity for the bounce visibility diagram is
+other vertices. Thus the number of edges in the transition graph for the
+polygon with inserted vertices is
 $\mathcal{O} ((2t(t-1)+n)(t(t-1)+n/2)) = \mathcal{O}(t^4) = \mathcal{O}(n^4)$.
 Fig \ref{fig:chestnut} shows the polygons for $t = 4$ and $t=6$ with all the
 vertices in the partial local sequences. % show the diagram to edge
 
+\end{proof}
+
+\begin{lemma}
+Each edge $e_{ij} \in E(G)$ implies a family of bounce laws that will cause a
+robot to transition from segment $i \in \partial P$ to segment $j \in \partial
+P$.
+
+Specifically, the existence of an edge $e_{ij} \in E(G)$ implies that from any point $x$ in the
+segment $i$, there exists a range of departure angles
+$\tilde{\theta}$ such that $f(x,\theta) \in j$.
+\end{lemma}
+
+\begin{proof}
+By construction, edge $e_{ij}$ exists iff there is a point $x$ on the (open)
+segment $i$ and a point $y$ on the (open) segment $j$ such that $x$ and $y$ are
+visible to each other.
+
+Thus, 
+\end{proof}
+
+\begin{definition}
+\textbf{Navigation}:
+Given a polygonal environment $P$, a start set of possible robot positions along the
+environment boundary $S$, and a goal set $G$, determine a strategy $\pi$ which
+will be guaranteed to take the robot from any point in $S$ to a point in $G$.
+\end{definition}
+
+\begin{lemma}
+Given $\Pi$, a non-overlapping partition of the environment boundary $\partial P$, and the resulting edge-to-edge visibility graph
+$G$, and points $x,y \in \partial P$, let $v_x \in V(G)$ be the node representing
+the segment in $\Pi$ that contains $x$, and $v_y$ be the node corresponding to
+the segment containing $y$. Then, a path in $G$ from $v_x$ to $v_y$ corresponds
+to a family of strategies which take a robot from $x$ to $y$.
+\end{lemma}
+
+\begin{proof}
+Each edge in $G$ corresponds to a family of bounce laws. 
+
+If the robot is known to be in an interval $x \in \partial P$, which lies
+entirely within one of the partitions induced by Algorithm \ref{algo:insert}.
+
+
+When a navigation strategy $\pi$ is executed from $x$, it describes a sequence
+of (possibly nondeterministic) bounce laws, $b_0, \ldots, b_k$. Each of these
+bounce laws causes a point or interval along $\partial P$ to be mapped to
+another point or interval. 
 \end{proof}
 
 \begin{theorem}
