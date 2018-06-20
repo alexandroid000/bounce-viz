@@ -153,6 +153,13 @@ def IsInPoly(p, poly):
             pass
     return not (intersects%2 == 0)
 
+def VertexExists(v, poly):
+    print(poly)
+    epsilon = 0.0001
+    for pt in poly:
+        if PointDistance(v, pt) < epsilon:
+            return True
+    return False
 
 
 # shoot a ray starting at p1, along vector p1->p2
@@ -191,8 +198,6 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
                     bounce_point = pt
                     closest_bounce = pdist
                     bounce_edge = j
-                    #bounce_param = t
-                    #b_edge = j
             # bounce was parallel to edge j
             # check if it's parallel and overlapping for degenerate polys
             except:
@@ -240,11 +245,20 @@ def ShootRaysFromReflex(poly, j):
     p1_ccw = poly[(j+1) % psize]
     p1_cw = poly[(j-1) % psize]
 
-    # do not check False return case - should always succeed lol
-    int_1, k = ClosestPtAlongRay(p1_ccw,p2,poly,j)
-    int_2, l = ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize))
+    int_pts = []
 
-    return (int_1, k), (int_2, l)
+    # ClosestPtAlongRay returns False if we shoot ray into existing vertex
+    if ClosestPtAlongRay(p1_ccw,p2,poly,j):
+        pt, k = ClosestPtAlongRay(p1_ccw,p2,poly,j)
+        if not VertexExists(pt, poly):
+            int_pts.append((pt,k))
+
+    if ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize)):
+        pt, k = ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize))
+        if not VertexExists(pt, poly):
+            int_pts.append((pt,k))
+
+    return int_pts
 
 # shoot ray from visible vertices through reflex verts
 # Poly -> Int -> [(Point, Int)]
@@ -262,7 +276,8 @@ def ShootRaysToReflexFromVerts(poly, j):
             res = ClosestPtAlongRay(poly[v], r_v, poly)
             if res:
                 pt, k = res
-                if IsInPoly(((pt[0]+r_v[0])/2, (pt[1]+r_v[1])/2), poly):
+                if (IsInPoly(((pt[0]+r_v[0])/2, (pt[1]+r_v[1])/2), poly) and
+                    not VertexExists(pt, poly)):
                     #print("successful insert")
                     pts.append((pt,k))
     return pts
@@ -306,7 +321,9 @@ def GetVisibleVertices(poly, j):
 
 # sort by distance and remove duplicates
 def SortByDistance(p1, unsorted_vs):
-    return sorted(list(set(unsorted_vs)), key = lambda v: PointDistance(v,p1))
+    unsorted_vs.append(p1)
+    verts = list(set(unsorted_vs))
+    return sorted(verts, key = lambda v: PointDistance(v,p1))
 
 # find all induced transition points, sort and insert into polygon
 # probably the most naive way to do this
@@ -317,21 +334,23 @@ def InsertAllTransitionPts(poly):
     # find all transition points, group by edge
     for p in rvs:
         t_pts = []
-        r1, r2 = ShootRaysFromReflex(poly, p)
-        t_pts.extend([r1,r2])
+        t_pts.extend(ShootRaysFromReflex(poly, p))
         t_pts.extend(ShootRaysToReflexFromVerts(poly,p))
         for (pt,edge_i) in t_pts:
             t_pts_grouped[edge_i].append(pt)
 
     # sort transition points along edge
+    new_poly_grouped = {}
     for i in range(len(poly)):
-        t_pts_grouped[i] = SortByDistance(poly[i], t_pts_grouped[i])
+        new_poly_grouped[i] = SortByDistance(poly[i], t_pts_grouped[i])
+        if DEBUG:
+            print("Inserted verts", new_poly_grouped[i], "on edge",i)
 
     # insert into polygon
     new_poly = []
     for i in range(len(poly)):
-        new_poly.append(poly[i])
-        new_poly.extend(t_pts_grouped[i])
+        new_poly.extend(new_poly_grouped[i])
+
 
     return new_poly
 
