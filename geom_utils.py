@@ -154,8 +154,7 @@ def IsInPoly(p, poly):
     return not (intersects%2 == 0)
 
 def VertexExists(v, poly):
-    print(poly)
-    epsilon = 0.0001
+    epsilon = 0.00000001
     for pt in poly:
         if PointDistance(v, pt) < epsilon:
             return True
@@ -350,8 +349,6 @@ def InsertAllTransitionPts(poly):
     new_poly = []
     for i in range(len(poly)):
         new_poly.extend(new_poly_grouped[i])
-
-
     return new_poly
 
 # make all sets of vertices visible from everywhere along edge
@@ -420,7 +417,8 @@ def GetLinkDiagram(poly, resolution = 15):
 def AnglesBetweenSegs(e1, e2):
     (p1,p2) = e1
     (p3,p4) = e2
-    print("finding angle between",e1,"and",e2)
+    if DEBUG:
+        print("finding angle between",e1,"and",e2)
 
     min_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
     max_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))

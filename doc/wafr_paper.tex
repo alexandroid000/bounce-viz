@@ -203,6 +203,19 @@ consider all possible bounce strategies in our combinatorial representation. Our
 representation may be reduced to one which can be used to solve the same
 problems as this work, by applying constraints on the types of bounces allowed.
 
+The questions we pose, and our methods of attacking the problem, are related to
+work on visibility in computational geometry. We will construct the edge-edge 
+visibility graph for a partition of a polygon $P$, which was analyzed along with
+the vertex-edge visibility graph in \cite{rourke_viz}.
+{\color{red} they have an
+O(n+k) algo for constructing vertex-edge. But correspondence to edge-edge 
+requires $O(n^2)$ at least - confirm? Also, is this valid w/out general position?
+Strong assumption on g.p. in O'Rourke paper}
+
+Our work is also related to lines of questions in computational geometry on what
+parts of a polygon will be illuminated by a light source after multiple
+reflections (as if the walls of the polygon are mirrors) \cite{Aronov1996,
+prasad1998visibility}.
 
 The \textbf{partial local sequence}, defined in \cite{rourke_viz}, 
 for a vertex $v_0$ in polygon $P$ is constructed 
@@ -322,18 +335,29 @@ Each edge $e_{ij} \in E(G)$ implies a family of bounce laws that will cause a
 robot to transition from segment $i \in \partial P$ to segment $j \in \partial
 P$.
 
-Specifically, the existence of an edge $e_{ij} \in E(G)$ implies that from any point $x$ in the
-segment $i$, there exists a range of departure angles
-$\tilde{\theta}$ such that $f(x,\theta) \in j$.
+Specifically, the existence of an edge $e_{ij} \in E(G)$ implies that from any
+point $x$ in the segment $i$, there exists a range of angles $\tilde{\theta}$
+such that $f(x,\theta) \in j$.
 \end{lemma}
 
 \begin{proof}
 By construction, edge $e_{ij}$ exists iff there is a point $x$ on the (open)
 segment $i$ and a point $y$ on the (open) segment $j$ such that $x$ and $y$ are
-visible to each other.
+visible to each other. Since $y$ is in the open segment, there will always be some $\epsilon$-neighborhood around
+$y$ which is also visible from $x$, and the endpoints of this
+$\epsilon$-neighborhood define a range of angles at which the robot may leave
+$x$ and arrive on segment $j$.
 
-Thus, 
+This angle range can be easily constructed through simple trigonometry for a
+given point and target segment.
 \end{proof}
+
+\begin{lemma}
+Given two mutually visible segments $i,j \in \partial P$, there exists a range 
+of angles from which a transition from $i$ to $j$ is possible from an open interval 
+of $i$.
+{\color{red} does this need to be a lemma or just part of an algorithm}
+\end{lemma}
 
 \begin{definition}
 \textbf{Navigation}:
@@ -523,55 +547,6 @@ angle and optionally an angle $\theta$.
 
 \subsection{Related Work}
 
-In \cite{microorganism2017}, the authors show that a
-\textit{Chlamydomonas reinhardtii} cell would bounce off a surface with a
-monotonic fixed angle bounce. This line of work characterizes periodic and
-chaotic trajectories in regular polygons, planar curves, and other environments.
-They analyze dynamics of fixed bounce angles, without a focus on control.
-
-\cite{LewOKa13} partially solved the navigation task with a very similar robot
-model. Their robot moves in straight lines until encountering an environment
-boundary, at which point it is able to rotate in place, with some nondeterministic but
-bounded error. They then generate a strategy as a sequence of bounce angles which can navigate the robot between given start and end locations in a known environment. Their approach only allows "safe actions," which place
-the entire forward projected state of the robot within a single
-linear segment of the polygonal environment. They then solve the navigation task by
-planning in a graph where each node is a point or segment
-location of the robot, and edges are safe actions. However, this algorithm is
-not complete, due to the restriction on safe actions -
-sometimes the uncertainty of the actuators make it impossible to create a
-strategy which only uses safe actions. Additionally, it requires hand-crafted
-local planners for navigating long hallways, due to the way the environment
-segmentation is done. At most, their graph search has $O(n^4)$ nodes, which is
-the same complexity as our proposed data structure, but our method can also
-achieve navigation without hand-crafted local planners due to the
-visibility-based decomposition of the environment boundary.
-
-In \cite{alam2017minimalist} and \cite{alam2018space}, the authors describe
-navigation, coverage, and localization algorithms for a robot with a clock and
-contact sensor that is capable of performing relative angle bounces. Their
-approach uses a discretization of the robot configuration space and actuation
-space, then searches the discretized dynamical system for limit cycles. The
-algorithm is complete and correct up to discretization error - periodic
-trajectories may exist which require bounce angles not allowed by the
-discretization. Our work is very similar in spirit to this approach, however, we
-use a more natural discretization induced by the environment geometry and
-consider all possible bounce strategies in our combinatorial representation. Our
-representation may be reduced to one which can be used to solve the same
-problems as this work, by applying constraints on the types of bounces allowed.
-
-
-\section{Combinatorial Visibility Data Structures}
-
-We will provide an overview of some data structures related to visibility in
-polygons, some of which we are using directly, and some of which provided
-inspiration for this work.
-
-\subsection{Visibility Graphs}
-
-
-Let $P$ be a polygon in $\mathbb{R}^2$ with $n$ vertices
-$(v_0, v_1, \ldots, v_{n-1})$. An edge of $P$ is represented as
-$e_i = v_iv_{i+1}$.
 
 The \textit{vertex visibility graph} $G_V(P) = (V, E)$ has $V = \{v_0, v_1, \ldots, v_{n-1}\}$ and $v_iv_j\in E$ if and only if the segment connecting $v_i$ and $v_j$ is completely contained in the interior of $P$. We call $v_i, v_j$ visible to each other if $v_iv_j\in E$. By definition, the vertex visibility graph for a convex polygon with $n$ vertices is a $n-$clique. Fig
 \ref{fig:vvg} shows the visibility graph for a non-convex polygon.
@@ -583,7 +558,15 @@ The \textit{vertex visibility graph} $G_V(P) = (V, E)$ has $V = \{v_0, v_1, \ldo
     \centering
 \end{figure}
 
-We can also define the \textit{vertex-edge visibility graph} for a polygon. Using the definition in \cite{rourke_viz}, the \textit{vertex-edge visibility graph} for $P$, $G_E(P) = (V, E)$, is a bipartite graph where $V = \{\text{all vertices and edges in $P$}\}$ and $v_ie_j\in E$ if and only if $v_i$ can see the interior of $e_j$, i.e., $\exists$ point $q$ on the open edge $e_j$ such that $v_i$ and $q$ are visible. \cite{rourke_viz} established that the vertex-edge visibility graph is equivalent to the edge-edge visibility graph.
+We can also define the \textit{vertex-edge visibility graph} for a polygon.
+Using the definition in \cite{rourke_viz}, the
+\textit{vertex-edge visibility graph} for $P$, $G_E(P) = (V, E)$, is a bipartite
+graph where $V = \{\text{all vertices and edges in $P$}\}$ and $v_ie_j\in E$ if
+and only if $v_i$ can see the interior of $e_j$, i.e., $\exists$ point $q$ on
+the open edge $e_j$ such that $v_i$ and $q$ are visible. \cite{rourke_viz}
+established that the vertex-edge visibility graph is equivalent to the edge-edge
+visibility graph.
+
 Fig \ref{fig:veg} shows an example for vertex-edge visibility graph.
 
 \begin{figure}
@@ -600,7 +583,6 @@ Fig \ref{fig:veg} shows an example for vertex-edge visibility graph.
 \end{figure}
 
 
-\subsection{Partial local sequence}
 
 The partial local sequence, defined in \cite{rourke_viz}, 
 for a vertex $v_0$ in polygon $P$ is constructed 
@@ -688,10 +670,24 @@ Fig \ref{fig:bvd} shows an example of the bounce visibility diagram.
 
 
 \subsection{Properties of BVD}
-The bounce visibility diagram can generate the vertex visibility graph by construction. In \cite{rourke_viz}, the authors point out that if the robot can see a vertex, then it can see the two edges connected to that vertex if the vertex is convex; otherwise, it can see one of the edges connected to that vertex. As the robot moves along an edge in the original $P$, its vertex visibility view changes, as shown for $x\in (3, 6)$ in Fig~\ref{fig:bvd}. The region between curve 2 (blue) and curve 7 (red) is subdivided as the $x$ increases, which corresponds to the robot has increasing knowledge about things behind the gap between vertices $v_2$ and $v_7$ as it moves along the edge $v_3v_6$: the appearance of gap between vertices $v_1$ and $v_8$, and the appearance of vertex $v_0$. For $x\in (6, 9]$, the diagram shows a reverse process of disappearance of gaps. By incorporating the information of the appearance and disappearance of gaps, we can also generate the vertex-edge visibility graph from the bounce visibility diagram. 
+The bounce visibility diagram can generate the vertex visibility graph by
+construction. In \cite{rourke_viz}, the authors point out that if the robot can
+see a vertex, then it can see the two edges connected to that vertex if the
+vertex is convex; otherwise, it can see one of the edges connected to that
+vertex. As the robot moves along an edge in the original $P$, its vertex
+visibility view changes, as shown for $x\in (3, 6)$ in Fig\~\ref{fig:bvd}. The
+region between curve 2 (blue) and curve 7 (red) is subdivided as the $x$
+increases, which corresponds to the robot has increasing knowledge about things
+behind the gap between vertices $v_2$ and $v_7$ as it moves along the edge
+$v_3v_6$: the appearance of gap between vertices $v_1$ and $v_8$, and the
+appearance of vertex $v_0$. For $x\in (6, 9]$, the diagram shows a reverse
+process of disappearance of gaps. By incorporating the information of the
+appearance and disappearance of gaps, we can also generate the vertex-edge
+visibility graph from the bounce visibility diagram.
 % (\textcolor{red}{I don't have proof yet but I think there are enough info to do that. We can also shift this part about gap navigation into later sections.})
 
-Circular symmetries in a polygon can be reflected in the periodic structure of the corresponding BVD, as shown in Fig~\ref{fig:regular_pent_bvd}.
+Circular symmetries in a polygon can be reflected in the periodic structure of
+the corresponding BVD, as shown in Fig\~\ref{fig:regular_pent_bvd}.
 
 \begin{figure}
 % \makebox[\linewidth][c]{%
