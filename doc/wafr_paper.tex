@@ -265,10 +265,22 @@ robotic tasks, such as navigation, patrolling, and localization.
 equivalence classes.}
 \label{algo:insert}
 \begin{algorithmic}
-\State \Call{ShootRay}{v1, v2}
+\Procedure{PartitionPoly}{$poly$}
+\State $reflex\_verts \gets$ \Call{GetReflexVerts}{$poly$}
+\For{$v_r$ in $reflex\_verts$}
+    \State $v_{new} \gets$ \Call{ShootRay}{$v_{r-1}, v_r$} \Comment{edges
+adjacent to reflex vertex induce transitions}
+    \State $v_{new} \gets$ \Call{ShootRay}{$v_{r+1}, v_r$}
+    \For{$v_{vis}$ in \Call{VisibleVerts}{$poly, v_r$}} \Comment{vertices
+visible from reflex induce transitions}
+        \State $v_{new} \gets$ \Call{ShootRay}{$v_{vis}, v_r$}
+    \EndFor
+\EndFor
+\State $partitioned\_poly \gets$ \Call{InsertVerts}{$v_{new}, poly$}
+\State \textbf{return} $partitioned\_poly$
+\EndProcedure
 \end{algorithmic}
 \end{algorithm}
-
 
 \begin{proposition} The bounce transition graph for a polygon with $n$ vertices has 
 $\mathcal{O}(n^2)$ vertices and $\mathcal{O}(n^4)$ edges.
@@ -397,7 +409,7 @@ graph contains at least one cycle
 \end{lemma}
 
 \begin{lemma}
-cycles can contain non-contracting bounces
+cycles can contain non-contracting bounces - there are lots of cycles
 \end{lemma}
 
 \begin{lemma}
@@ -407,6 +419,11 @@ characterize limit cycles in convex polygons
 \begin{theorem}
 cycle-finding is sound, complete up to bounded length
 \end{theorem}
+
+\begin{lemma}
+localization is finding a nondeterministic strategy that produces paths all
+ending at the same node
+\end{lemma}
 
 \begin{theorem}
 localization is correct and complete up to symmetry ("splitting" angle ranges
@@ -421,11 +438,12 @@ will always exist iff symmetry is broken)
 reachability of graph gives ordering on the power of bounce laws
 \end{theorem}
 
-\section{Algorithms}
+\section{Extensions}
 
 \subsection{Navigation}
 
 \subsubsection{Constant Angle Controllers}
+\subsubsection{Relative Angle Bouncing}
 
 \subsection{Localization}
 
@@ -433,9 +451,9 @@ reachability of graph gives ordering on the power of bounce laws
 
 \section{Examples}
 
-1. office space w/ long hallway
-2. "almost symmetric" environment
-3. worst case complexity
+\subsection{office space w/ long hallway}
+\subsection{``almost symmetric" environment}
+\subsection{worst case complexity}
 
 \iffalse
 
