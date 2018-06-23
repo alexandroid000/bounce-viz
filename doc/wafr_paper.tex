@@ -482,16 +482,90 @@ by these families can be composed together under normal function composition.
 {\color{red} describe how domain/range overlap is computed - interval propagation}
 \end{proof}
 
+\begin{definition}
+Two line segements $i$ and $j$ are \emph{entirely visible} to each other iff
+every pair of points $x \in i$ and $y \in j$ are visible.
+\end{definition}
+
+\begin{proposition}
+Given two entirely visible line segments $i$ and $j$, and a connected subset
+$i_{sub} \subseteq i$, it is possible to compute the maximum range of angles 
+$[\theta_{min}, \theta_{max}]$ such that $f(s, \theta) \in j$, for all $s \in
+i_{sub}$ and for all $\theta \in [\theta_{min}, \theta_{max}]$, or we may
+compute that no such range exists.
+\end{proposition}
+
+\begin{proof}
+Let segment $i$ be aligned with the $x$ axis, without loss of generality.
+
+Take the quadrilateral formed by segments $i$, $j$, and the non-crossing line
+segments connecting their endpoints (the convex hull of the segment endpoints).
+Call the left-hand segment $l$ and the right-hand segment $r$.
+
+Let $\theta_{l}$ be
+the angle between $l$ the positive $x$ axis ($0 < \theta_l < \pi$); similarly
+for $r$ and $\theta_r$. Let $\theta_{min} = \min(\theta_r, \theta_l)$ and
+$\theta_{max}$ be the larger of the two.
+
+There are three cases to consider: if $l$ and $r$ are extended to infinity,
+they cross either above or below segment $i$, or they are parallel.
+
+\emph{Case 1:} $l$ and $r$ would meet below segment $i$. Let 
+Then, if a ray is cast from any point on $i$ at angle $\theta$ such that $\theta_{min} <
+\theta < \theta_{max}$, the ray is guaranteed to intersect $j$ in its interior.
+
+\emph{Case 2:} $l$ and $r$ would meet above segment $i$. There is no angle
+$\theta$ such that a ray shot from \emph{any} point on $i$ will intersect $j$.
+
+\emph{Case 3:} $l$ and $r$ are parallel. This implies that $\theta_{min} =
+\theta_{max} = \theta$, which is the only angle for which a transition from any
+point on $i$ is guaranteed to intersect $j$.
+
+Thus, for each case, we can either compute the maximum angle range or determine
+that no such angle range exists.
+
+\end{proof}
+
+
+
 \begin{theorem}
 Navigation is sound and complete
 \end{theorem}
 
+
+
 \begin{proof}
-preimage backchaining
+
+We would like to chain together nondeterministic transitions such that each
+transition is guaranteed to land in the "basin" of the next.
+
+given start interval, compute maximum-angle interval transitions to all visible
+edges
+
+do BFS this way until goal set is found - could be multiple paths with same num
+ber of bounces that get to goal set
+
+Then, trim backwards from goal set (how?)
+
+But how do we find the subinterval of $i$ for which such a transition is
+guaranteed?
+
+There are two natural quantities we may wish to maximize for such a transition -
+the size of the subinterval, or the size of the angle interval.
+The maximum angle interval will always be a point. Imagine an interval on $i$
+which allowed for a maximal angle range $[\theta_{min}, \theta_{max}]$ that
+guaranteed a transition from any point in the interval to $j$. By
+shrinking this interval to a point, we must increase the size of the angle
+interval, creating a contradiction. The maximum size subinterval will always correspond to a singleton angle range,
+$\theta$, such that $l_{sub}$ and $r_{sub}$ are parallel. The location of this
+interval will depend on the local geometry.
+
 \end{proof}
 
+\subsubsection{Constant Fixed Angle Controllers}
+\subsubsection{Constant Relative Angle Controllers}
 
-\subsection{Cycles \label{sec:cycles}}
+\subsection{Patrolling \label{sec:cycles}}
 
 \begin{lemma}
 graph contains at least one cycle
@@ -501,19 +575,35 @@ graph contains at least one cycle
 cycles can contain non-contracting bounces - there are lots of cycles
 \end{lemma}
 
-\begin{lemma}
-characterize limit cycles in convex polygons
-\end{lemma}
+\begin{proposition}
+Every convex polygon admits a limit cycle, under a fixed-angle bounce law, 
+which visits each edge in cyclic order.
+\end{proposition}
 
 \begin{theorem}
-cycle-finding is sound, complete up to bounded length
+cycle-finding algorithm is sound, complete up to bounded length
 \end{theorem}
+
+\begin{proof}
+make graph, quotient so that non-contraction edges are removed / edge conditions
+are modified appropriately
+
+then find cycle basis
+\end{proof}
+
+Example: using cycles to arbitrarily control uncertainty
+
+
+Patrolling synthesis algorithm: given periodic sequence of edges, return a controller that
+results in a stable limit cycle that visits those edges in that sequence.
+
+What if we can insert edges into the sequence?
 
 \subsection{Localization}
 
 \begin{definition}
-localization is finding a nondeterministic strategy that produces paths all
-ending at the same node
+A localization strategy is a nondeterministic strategy that produces paths all
+ending at the same node, from a starting set.
 \end{definition}
 
 \begin{theorem}
@@ -531,11 +621,6 @@ will always exist iff symmetry is broken)
 \begin{theorem}
 reachability of graph gives ordering on the power of bounce laws
 \end{theorem}
-
-\subsection{Navigation}
-
-\subsubsection{Constant Angle Controllers}
-\subsubsection{Relative Angle Bouncing}
 
 \subsection{Localization}
 
