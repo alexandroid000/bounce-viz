@@ -1,4 +1,4 @@
-\documentclass[]{article}  % Comment this line out
+\documentclass[]{styles/svproc}  % Comment this line out
 
 %\IEEEoverridecommandlockouts                              % This command is only
                                                           % needed if you want to
@@ -7,7 +7,7 @@
 
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}    % need for subequations
-\usepackage{amsthm}
+%\usepackage{amsthm}
 \usepackage{graphicx}   % need for figures
 \usepackage[font=footnotesize,labelfont=footnotesize]{caption}
 \usepackage{verbatim}   % useful for program listings
@@ -28,13 +28,13 @@
 \usepackage{sidecap}
 \usepackage{booktabs}
 
-\newtheorem{theorem}{\bf Theorem}
-\newtheorem{todo}{\bf Todo}
-\newtheorem{remark}{\bf Remark}
-\newtheorem{corollary}{\bf Corollary}
-\newtheorem{definition}{\bf Definition}
-\newtheorem{lemma}{\bf Lemma}
-\newtheorem{proposition}[theorem]{\bf Proposition}
+%\newtheorem{theorem}{\bf Theorem}
+%\newtheorem{todo}{\bf Todo}
+%\newtheorem{remark}{\bf Remark}
+%\newtheorem{corollary}{\bf Corollary}
+%\newtheorem{definition}{\bf Definition}
+%\newtheorem{lemma}{\bf Lemma}
+%\newtheorem{proposition}[theorem]{\bf Proposition}
 
 % bounce transition graph
 % visibility event graph
@@ -53,7 +53,11 @@
 
 % Minimal (Complexity | Attention) Path Synthesis with Dynamical Specifications
 
-\title{Path Synthesis from Dynamical Specifications \\ for Blind Mobile Robots in Polygons}
+%\title{Path Synthesis from Dynamical Specifications \\ for Blind Mobile Robots in Polygons}
+
+% A Toolbox for
+\title{Using Visibility Equivalence Classes for Controller Synthesis for Blind,
+Bouncing Robots}
 
 \author{Alexandra Q. Nilles, Yingying Ren, Steven M. LaValle% <-this % stops a space
 %\thanks{This work was partially supported by National Science Foundation (award numbers CMMI-1100579 and IIS-1302393).}
@@ -407,7 +411,7 @@ by rotating the source edge to the x axis without loss of generality.}
 \end{figure}
 \end{proof}
 
-\begin{lemma}
+\begin{lemma} \label{lemma:angrange}
 Given two segments, extend them to infinity, and let $\phi$ be the angle between
 the lines at their intersection. Then, the transition function $f(x, \theta)$ between
 the segments is a contraction mapping iff $\phi/2 < \theta < \pi$ or $0 < \theta
@@ -434,13 +438,13 @@ calculated. \label{fig:cont_map}}
 From Figure \ref{fig:cont_map}, we can see that
 
 \begin{equation*}
-|f(x) - f(y)| = \frac{\sin(\theta - \phi)}{\sin(\pi-\theta)} |x-y|
+|f(x) - f(y)| = \frac{\sin(\theta - \phi)}{\sin(\theta)} |x-y|
 \end{equation*}
 
 from the law of sines, where $\phi$ is the angle between the two edges if they
 are extended to their intersection point. If the edges are parallel, a
 contraction map is not possible (points will maintain their distance, not shrink
-closer together). Thus, whenever $\frac{\sin(\theta - \phi)}{\sin(\pi-\theta)}
+closer together). Thus, whenever $\frac{\sin(\theta - \phi)}{\sin(\theta)}
 < 1$, $f$ is a contraction map, and the edge from $v_i v_{i+1}$ to $v_j
 v_{j+1}$ can be labelled as such, with the range of $\theta$ which makes this
 condition true.
@@ -450,7 +454,7 @@ condition true.
 \begin{corollary}
 The contraction property of a composition of multiple bounces can
 be determined by multiplying the coefficients $\frac{\sin(\theta_i -
-\phi_i)}{\sin(\pi-\theta_i)}$, and the constraints on the angle range
+\phi_i)}{\sin(\theta_i)}$, and the constraints on the angle range
 $\tilde{\theta}$ can be propagated through the composition by intersecting the angle
 intervals.
 \end{corollary}
@@ -529,12 +533,9 @@ that no such angle range exists.
 
 
 \begin{theorem}
-Navigation is sound and complete
+Navigation algorithm is sound and complete
 \end{theorem}
 
-
-
-\begin{proof}
 
 We would like to chain together nondeterministic transitions such that each
 transition is guaranteed to land in the "basin" of the next.
@@ -542,13 +543,14 @@ transition is guaranteed to land in the "basin" of the next.
 given start interval, compute maximum-angle interval transitions to all visible
 edges
 
-do BFS this way until goal set is found - could be multiple paths with same num
-ber of bounces that get to goal set
+then do BFS from goal set in this constrained graph back to the start interval
 
-Then, trim backwards from goal set (how?)
+could be multiple paths with same number of bounces that get to goal set
 
-But how do we find the subinterval of $i$ for which such a transition is
-guaranteed?
+reachability vs. guaranteed-along-all-paths
+
+We have three degrees of freedom when computing action preimages - the angle
+interval and the size/location of the subinterval.
 
 There are two natural quantities we may wish to maximize for such a transition -
 the size of the subinterval, or the size of the angle interval.
@@ -560,25 +562,53 @@ interval, creating a contradiction. The maximum size subinterval will always cor
 $\theta$, such that $l_{sub}$ and $r_{sub}$ are parallel. The location of this
 interval will depend on the local geometry.
 
-\end{proof}
 
 \subsubsection{Constant Fixed Angle Controllers}
+
+For constant angle controllers, this
+ends up being a coupled problem - want to chain together preimages such that
+\emph{overall} angle range is as large as possible.
+
 \subsubsection{Constant Relative Angle Controllers}
 
+given initial position and orientation, can generate new visibility graph for
+all possible relative angles.
+
 \subsection{Patrolling \label{sec:cycles}}
-
-\begin{lemma}
-graph contains at least one cycle
-\end{lemma}
-
-\begin{lemma}
-cycles can contain non-contracting bounces - there are lots of cycles
-\end{lemma}
 
 \begin{proposition}
 Every convex polygon admits a limit cycle, under a fixed-angle bounce law, 
 which visits each edge in cyclic order.
 \end{proposition}
+
+\begin{proof}
+
+For each consecutive pair of edges of the polygon, $e_i$ and $e_{i+1}$, let
+$\phi_i$ be the interior angle between them. By Lemma \ref{lemma:angrange}, the
+transition function $f_i$ from edge $e_i$ to edge $e_{i+1}$ will be a
+contraction mapping for all $\theta$ such that $0 < \theta < \phi_i/2$.
+
+Thus, if
+$\phi_{min}$ is the smallest interior angle in the polygon, 
+
+\end{proof}
+
+\begin{definition}
+Call a sequence of transitions $f_1 \circ \ldots \circ f_k$ \textbf{strongly
+contracting} if $\forall i \in \{1, \ldots, k\}, f_i$ is a contraction mapping.
+\end{definition}
+
+\begin{corollary}
+Every polygon will produce a bounce visibility graph containing at least two
+strongly contracting cycles.
+\end{corollary}
+
+
+
+\begin{lemma}
+cycles can contain non-contracting bounces - there are lots of cycles
+\end{lemma}
+
 
 \begin{theorem}
 cycle-finding algorithm is sound, complete up to bounded length
