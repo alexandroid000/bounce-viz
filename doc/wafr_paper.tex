@@ -56,9 +56,8 @@
 %\title{Path Synthesis from Dynamical Specifications \\ for Blind Mobile Robots in Polygons}
 
 % A Toolbox for
-\title{Using Visibility Equivalence Classes for Controller Synthesis for Blind,
-Bouncing Robots}
-
+\title{A Visibility-Based Approach to Computing Nondeterministic Bouncing
+Strategies}
 \author{Alexandra Q. Nilles, Yingying Ren, Steven M. LaValle% <-this % stops a space
 %\thanks{This work was partially supported by National Science Foundation (award numbers CMMI-1100579 and IIS-1302393).}
 }
@@ -70,17 +69,17 @@ Bouncing Robots}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-Inspired by motion patterns of commercially available mobile robots, in this
-paper we investigate the power of robots which move forward in straight lines
+Inspired by motion patterns of commercially available mobile robots, we investigate the power of robots that 
+move forward in straight lines
 until colliding with an environment boundary, at which point they can rotate in
-place and move forward again -- we visualize this as the robot ``bouncing" off
+place and move forward again; we visualize this as the robot ``bouncing" off
 boundaries. Different boundary interaction laws can be
 defined for such robots, such as ones which orient the robot relative to its
 heading prior to collision, or relative to the normal vector of the environment
 boundary. We introduce a data structure, generated from a polygonal environment
  definition and constraints on the robot's bouncing strategy, which can be
-queried to determine the satisfiability of path-based tasks such as navigation,
-patrolling, coverage, and localization. If the task is satisfiable, this
+queried to determine the feasibility of path-based tasks such as navigation,
+patrolling, coverage, and localization. If the task is feasible, this
 approach then synthesizes a controller and calculates the maximum allowable 
 uncertainty in the robot's actuation, providing design constraints for different 
 environments and tasks.
@@ -123,7 +122,7 @@ More formally, our model of the robot includes:
 
 \begin{itemize}
 \item The \emph{configuration space} $X = P \times S^1$. $P$ is a simple polygon with 
-boundary $\partial P$, and $S^1$ is the robot's orientation in the plane. For the most part, we will ignore configurations in the interior
+piecewise linear boundary $\partial P$, and $S^1$ is the robot's orientation in the plane. For the most part, we will ignore configurations in the interior
 of the polygon and only consider transitions between points and intervals on the
 boundary.
 \item The \emph{observation space} $Y$ of sensor readings from sensors that the
@@ -173,7 +172,7 @@ perform a given task (such as navigation, patrolling, or localization).
 The constrained motion model that we use (forward motion until collision,
 followed by rotation) is inspired by commercially available robots
 for vacuuming, pool cleaning, lawn mowing, and similar applications. It is also
-unexpectedly relevant to the dynamics of some microorganisms - in \cite{microorganism2017}, the authors show that a
+ relevant to the dynamics of some microorganisms - in \cite{microorganism2017}, the authors show that a
 \textit{Chlamydomonas reinhardtii} cell would bounce off a surface with a
 monotonic fixed angle bounce. This line of work characterizes periodic and
 chaotic trajectories in regular polygons, planar curves, and other environments.
@@ -350,6 +349,36 @@ Fig \ref{fig:t4} shows the polygon for $t = 4$ with all the
 vertices in the partial local sequences. % show the diagram to edge
 
 \end{proof}
+
+\begin{figure}
+
+\centering
+\begin{subfigure}{0.35\textwidth}
+\centering
+\includegraphics[width=0.7\linewidth]{figures/color_pent.png}
+\captionof{figure}{\label{fig:color_pent}}
+\end{subfigure}%
+\begin{subfigure}{0.35\textwidth}
+\centering
+\includegraphics[width=0.8\linewidth]{figures/bvd.png}
+\end{subfigure}
+\caption{A polygon and its corresponding bounce visibility diagram.}
+\label{fig:bvd}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.35\textwidth}
+\centering
+\includegraphics[width=0.5\linewidth]{figures/regular_pent.png}
+\end{subfigure}%
+\begin{subfigure}{0.35\textwidth}
+\centering
+\includegraphics[width=0.8\linewidth]{figures/regular_pent_bvd.png}
+\end{subfigure}
+\caption{The bounce visibility diagram for the regular pentagon. }
+\label{fig:regular_pent_bvd}
+\end{figure}
 
 \section{Tasks}
 
@@ -576,6 +605,11 @@ all possible relative angles.
 
 \subsection{Patrolling \label{sec:cycles}}
 
+\begin{definition}
+$\phi_{P,min}$ is the smallest interior angle in a polygon $P$. We will omit the
+label $P$ when it is clear from context.
+\end{definition}
+
 \begin{proposition}
 Every convex polygon admits a limit cycle, under a fixed-angle bounce law, 
 which visits each edge in cyclic order.
@@ -588,8 +622,6 @@ $\phi_i$ be the interior angle between them. By Lemma \ref{lemma:angrange}, the
 transition function $f_i$ from edge $e_i$ to edge $e_{i+1}$ will be a
 contraction mapping for all $\theta$ such that $0 < \theta < \phi_i/2$.
 
-Thus, if
-$\phi_{min}$ is the smallest interior angle in the polygon, 
 
 \end{proof}
 
@@ -600,10 +632,35 @@ contracting} if $\forall i \in \{1, \ldots, k\}, f_i$ is a contraction mapping.
 
 \begin{corollary}
 Every polygon will produce a bounce visibility graph containing at least two
-strongly contracting cycles.
+strongly contracting cycles, for $\theta \in [0, \phi_{min}/2]$ and $\theta \in
+[\pi - \phi_{min}/2, \pi]$.
 \end{corollary}
 
+\begin{proof}
 
+Let the robot have a constant fixed angle bounce strategy, so it always leaves
+the boundary at angle $\theta \in [0,\phi_{min}/2]$ counterclockwise from the
+boundary.
+
+At each transition, the robot will either strike the next adjacent edge in
+$P$, or a reflex vertex will cause the robot to strike some other edge in the
+polygon. Either way, the transition is guaranteed to be a contraction mapping by
+the definition of $\phi_{min}$ and Lemma \ref{lemma:angrange}.
+
+Eventually, this strategy will produce a strongly contracting cycle. Each
+transition moves the robot from one edge to another, so at some point, the
+robot's trajectory must return to an edge it has previously visited. The series
+of transitions in this trajectory corresponds exactly to a strongly contracting
+cycle in the bounce visibility graph.
+
+\end{proof}
+
+Note that the previous proof does not guarantee a limit cycle in every polygon.
+It is possible to construct polygons such that the locations of the collision
+points in the stable limit cycle do not all fall within the edges forming the
+strongly contracting cycle. However, the only examples of such that we have been
+able to construct are in general position and are unlikely to occur in practical
+applications.
 
 \begin{lemma}
 cycles can contain non-contracting bounces - there are lots of cycles
