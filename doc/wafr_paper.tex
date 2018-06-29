@@ -401,7 +401,7 @@ such that $f(x,\theta) \in j$.
 \end{lemma}
 
 \begin{proof}
-By construction, edge $e_{ij}$ exists iff there is a point $x$ on the (open)
+By construction, edge $e_{ij}$ exists if and only if there is a point $x$ on the (open)
 segment $i$ and a point $y$ on the (open) segment $j$ such that $x$ and $y$ are
 visible to each other. Since $y$ is in the open segment, there will always be some $\epsilon$-neighborhood around
 $y$ which is also visible from $x$, and the endpoints of this
@@ -443,7 +443,7 @@ by rotating the source edge to the x axis without loss of generality.}
 \begin{lemma} \label{lemma:angrange}
 Given two segments, extend them to infinity, and let $\phi$ be the angle between
 the lines at their intersection. Then, the transition function $f(x, \theta)$ between
-the segments is a contraction mapping iff $\phi/2 < \theta < \pi$ or $0 < \theta
+the segments is a contraction mapping if and only if $\phi/2 < \theta < \pi$ or $0 < \theta
 < \phi/2$.
 \end{lemma}
 
@@ -546,6 +546,7 @@ they cross either above or below segment $i$, or they are parallel.
 \emph{Case 1:} $l$ and $r$ would meet below segment $i$. Let 
 Then, if a ray is cast from any point on $i$ at angle $\theta$ such that $\theta_{min} <
 \theta < \theta_{max}$, the ray is guaranteed to intersect $j$ in its interior.
+Also, $\theta_l = \theta_{max}$, and $\theta_r = \theta_{min}$.
 
 \emph{Case 2:} $l$ and $r$ would meet above segment $i$. There is no angle
 $\theta$ such that a ray shot from \emph{any} point on $i$ will intersect $j$.
@@ -556,10 +557,29 @@ point on $i$ is guaranteed to intersect $j$.
 
 Thus, for each case, we can either compute the maximum angle range or determine
 that no such angle range exists.
-
 \end{proof}
 
+Note that when we compute pre- and post-images of transitions under our robot
+model, only cases 1 and 3 apply: either the robot bounces at a singleton angle
+or a range of angles. 
 
+\begin{algorithm}
+\caption{Generating a nondeterministic bounce strategy for navigation from any
+point in start set $S$ to a point in goal set $G$.}
+\label{algo:nav}
+\begin{algorithmic}
+\Procedure{Navigate}{$poly$,$G$, $S$, $criterion$}
+\State $G\_nav \gets$ \Call{PartitionPoly}{$poly$}
+\State $bounce\_seq \gets$ \Call{BFS}{$G\_nav$, $criterion$}
+\For{$v_r$ in $reflex\_verts$}
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+For a sequence of transitions $f_1, \ldots, f_k$,
+
+$\max_{i \in \{1,\ldots, k\}}( \min(angle\_range(f_i) ))$
 
 \begin{theorem}
 Navigation algorithm is sound and complete
@@ -590,7 +610,6 @@ shrinking this interval to a point, we must increase the size of the angle
 interval, creating a contradiction. The maximum size subinterval will always correspond to a singleton angle range,
 $\theta$, such that $l_{sub}$ and $r_{sub}$ are parallel. The location of this
 interval will depend on the local geometry.
-
 
 \subsubsection{Constant Fixed Angle Controllers}
 
@@ -695,7 +714,7 @@ ending at the same node, from a starting set.
 
 \begin{theorem}
 localization is correct and complete up to symmetry ("splitting" angle ranges
-will always exist iff symmetry is broken)
+will always exist if and only if symmetry is broken)
 \end{theorem}
 
 
