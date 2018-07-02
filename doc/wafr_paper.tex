@@ -619,6 +619,10 @@ interval will depend on the local geometry.
 
 \subsubsection{Constant Fixed Angle Controllers}
 
+For constant angle controllers, this
+ends up being a coupled problem - want to chain together preimages such that
+\emph{overall} angle range is as large as possible.
+
 \textbf{In Convex Polygons}
 
 \textbf{Definitions.}
@@ -628,14 +632,42 @@ If a limit cycle inside a convex polygons with $n$ edges forms another convex po
 For all convex polygons with $n$ edges, there exists a range for $\theta$ such that fixed-angle bouncing strategy with $\theta$ will lead to a convex $n$-cycle regardless of the robot's start position.
 \end{theorem}
 \begin{proof}
-Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. Consider the triangle formed by two adjacent edges $e_i$, $e_{i+1}$ of $P$. The robot will bounce from $e_i$ to $e_{i+1}$ regardless of its start position if and only if $\theta \in (0, \angle v_{i+2}v_{i}v_{i+1})$. Thus, the robot will always bounce to the next adjacent edge if and only if $\theta \in (0, \min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
+Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. Consider the
+triangle formed by two adjacent edges $e_i$, $e_{i+1}$ of $P$. The robot will
+bounce from $e_i$ to $e_{i+1}$ regardless of its start position if and only if
+$\theta \in (0, \angle v_{i+2}v_{i}v_{i+1})$. Thus, the robot will always bounce
+to the next adjacent edge if and only if
+$\theta \in (0, \min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
 
-Suppose we have two start positions $x$ and $y$ on edge $e_0$ and the two corresponding trajectories under fixed angle $\theta$. Denote the robot's position on $e_k$ after bouncing $k$ consecutive edges as $b^{k}(x)$ and $b^{k}(y)$ respectively. $\triangle b^{k}(x)v_{k+1}b^{k+1}(x)$ and $\triangle b^{k}(y)v_{k+1}b^{k+1}(y)$ are similar triangles since they share a common internal angle of the polygon, $\pi - \Phi_{k+1}$, and the bouncing angle $\theta$. 
+Suppose we have two start positions $x$ and $y$ on edge $e_0$ and the two
+corresponding trajectories under fixed angle $\theta$. Denote the robot's
+position on $e_k$ after bouncing $k$ consecutive edges as $b^{k}(x)$ and
+$b^{k}(y)$ respectively. $\triangle b^{k}(x)v_{k+1}b^{k+1}(x)$ and
+$\triangle b^{k}(y)v_{k+1}b^{k+1}(y)$ are similar triangles since they share a
+common internal angle of the polygon, $\pi - \phi_{k,k+1}$, and the bouncing angle
+$\theta$.
 
-The distance between the two trajectories on $e_0$ after the robot bounces off every edge of the polygon, i.e., bounces off $n$ times, is $d(b^{n}(x)), b^{n}(y))$. Consider this as a mapping $q$ from $e_0$ to $e_0$. \textcolor{red}{(Should we have the definition for this mapping outside of the theorem?)}
+The distance between the two trajectories on $e_0$ after the robot bounces off
+every edge of the polygon, i.e., bounces off $n$ times, is
+$d(b^{n}(x), b^{n}(y))$.
 
-We can compute the ratio between $d(b^k(x), b^k(y))$ and $d(b^{k+1}(x), b^{k+1}(y))$ by the Law of Sines: $\frac{d(b^{k+1}(x), b^{k+1}(y))}{d(b^{k}(x), b^{k}(y))} = \frac{\sin(\theta)}{\sin(\Phi_{k+1}-\theta)}$.  Thus, \begin{eqnarray*}\frac{d(b^{n}(x)), b^{n}(y))}{d(b^{0}(x), b^{0}(y))} &&= \frac{d(b^{n}(x), b^{n}(y))}{d(b^{n-1}(x), b^{n-1}(y))}\times \dots \times\frac{d(b^{k+1}(x), b^{k+1}(y))}{d(b^{k}(x), b^{k}(y))}\times \dots \times\frac{d(b^{1}(x)), b^{1}(y))}{d(b^{0}(x), b^{0}(y))} \\
-&&= \frac{\sin(\theta)}{\sin(\Phi_{n}-\theta)}\dots \frac{\sin(\theta)}{\sin(\Phi_{k+1}-\theta)}\dots \frac{\sin(\theta)}{\sin(\Phi_{1}-\theta)} =\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}. \end{eqnarray*} If $|\frac{d(b^{n}(x)), b^{n}(y))}{d(b^{0}(x), b^{0}(y))}|<1$, then $q$ is \textcolor{red}{a contraction mapping, and by the Banach fixed-point theorem, it has a unique fixed point.(this was an exact copy from the IROS paper)} If  $|\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$, which is equivalent to $\theta < \frac{\Phi_{i}}{2}$, for $i = 0, 1, \dots, n-1$, then $|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and we have a contraction mapping. 
+Since function composition multiplies the coefficients $C(\theta, \phi)$, 
+the distance between $x$ and $y$ changes after one orbit of the polygon by the
+ratio
+
+\begin{eqnarray*}
+\frac{d(b^{n}(x)), b^{n}(y))}{d(b^{0}(x), b^{0}(y))} = \prod_{i = 0}^{n-1}
+C(\theta, \phi_{i}).
+\end{eqnarray*}
+
+If $\prod_{i = 0}^{n-1} C(\theta, \phi_{i}) < 1$, then $b^k(x)$ is a contraction
+mapping from $e_0$ back to iteself, and by the Banach fixed-point theorem, it
+has a unique fixed point.
+
+If $|\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$, which is equivalent to
+$\theta < \frac{\Phi_{i}}{2}$, for $i = 0, 1, \dots, n-1$, then
+$|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and we have a
+contraction mapping.
 
 Therefore, \begin{equation*}
 \forall \theta \in (0, \min(\min_{i = 0, 1, \dots, n-1}(\angle v_{i+2}v_{i}v_{i+1}), \min_{i = 0, 1, \dots, n-1}(\frac{\Phi_{i}}{2})),\end{equation*} the fixed-angle bouncing strategy with $\theta$ leads to a convex $n$-cycle regardless of the robot's start position.
@@ -643,15 +675,13 @@ Therefore, \begin{equation*}
 
 Remarks:
 \begin{enumerate}
-    \item We can analyze the case for $\theta \in [\pi/2, \pi)$ by symmetric.
+    \item We can analyze the case for $\theta \in [\pi/2, \pi)$ by symmetry.
     \item To get the range of all possible $\theta$ that will lead to a limit cycle tangent to each edge of the polygon sequentially, we can solve for $|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and then intersect the result with (0, $\min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
 \end{enumerate}
 
 
 
-For constant angle controllers, this
-ends up being a coupled problem - want to chain together preimages such that
-\emph{overall} angle range is as large as possible.
+
 
 \subsubsection{Constant Relative Angle Controllers}
 
