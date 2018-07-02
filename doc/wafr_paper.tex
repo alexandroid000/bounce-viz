@@ -392,13 +392,11 @@ Once we have partitioned the polygonal environment and constructed the resulting
 edge-edge visibility graph, we can establish relations between properties of
 paths in the graph and paths of the robot in the actual environment.
 
-\begin{lemma}\label{lemma:transition}
-Each edge $e_{ij} \in E(G)$ implies a family of bounce laws that will cause a
-robot to transition from segment $i \in \partial P$ to segment $j \in \partial
-P$. Specifically, the existence of an edge $e_{ij} \in E(G)$ implies that from any
-point $x$ in the segment $i$, there exists a range of angles $\tilde{\theta}$
-such that $f(x,\theta) \in j$.
-\end{lemma}
+\begin{definition}\label{def:transition}
+For edge $e_{ij} \in E(G)$, for each point $x$ in the segment $i$, there 
+exists a range of angles $\tilde{\theta}$ such that $f(x,\theta) \in j$ for
+some $\theta \in \tilde{\theta}$.
+\end{definition}
 
 \begin{proof}
 By construction, edge $e_{ij}$ exists if and only if there is a point $x$ on the (open)
@@ -418,18 +416,15 @@ transition, always become closer together. We will use this property to control
 uncertainty in the robot's position, and to engineer stable limit cycles in
 Section \ref{sec:cycles}.
 
-\begin{lemma} \label{lemma:angrange}
+
+\begin{definition} \label{def:angrange}
 Given two mutually visible segments $i,j \in \partial P$, there exists a range 
 of angles from which a transition from $i$ to $j$ is possible from from some
 point in $i$ to some point in $j$.
-{\color{red} does this need to be a lemma or just part of an algorithm}
-\end{lemma}
-
-\begin{proof}
-
 See Figure \ref{fig:bounce_range}. This interval, $[\theta_{min}, \theta_{max}]$, 
-is the union of the point-wise angle intervals described in Lemma
-\ref{lemma:transition}.
+is the union of the point-wise angle intervals described in Definition
+\ref{def:transition}.
+\end{definition}
 
 \begin{figure}
     \centering
@@ -438,13 +433,17 @@ is the union of the point-wise angle intervals described in Lemma
 by rotating the source edge to the x axis without loss of generality.}
 \label{fig:bounce_range}
 \end{figure}
-\end{proof}
+
+\begin{definition}
+Let $\phi_{ij}$ be the interior angle between two segments $i$ and $j \in \delta P$ if they are extended 
+to infinity. The case where the segments are parallel will be handled separately
+where necessary.
+\end{definition}
 
 \begin{lemma} \label{lemma:angrange}
-Given two segments, extend them to infinity, and let $\phi$ be the angle between
-the lines at their intersection. Then, the transition function $f(x, \theta)$ between
-the segments is a contraction mapping if and only if $\phi/2 < \theta < \pi$ or $0 < \theta
-< \phi/2$.
+The transition function $f(x, \theta)$ between
+ segments $i$ and $j$ is a contraction mapping if and only if $\phi_{ij}/2 < \theta < \pi$ or $0 < \theta
+< \phi_{ij}/2$.
 \end{lemma}
 
 \begin{proof}
@@ -473,20 +472,26 @@ From Figure \ref{fig:cont_map}, we can see that
 from the law of sines, where $\phi$ is the angle between the two edges if they
 are extended to their intersection point. If the edges are parallel, a
 contraction map is not possible (points will maintain their distance, not shrink
-closer together). Thus, whenever $\frac{\sin(\theta - \phi)}{\sin(\theta)}
-< 1$, $f$ is a contraction map, and the edge from $v_i v_{i+1}$ to $v_j
+closer together). Thus, whenever $| \frac{\sin(\theta - \phi)}{\sin(\theta)}
+| < 1$, $f$ is a contraction map, and the edge from $v_i v_{i+1}$ to $v_j
 v_{j+1}$ can be labelled as such, with the range of $\theta$ which makes this
 condition true.
 
 \end{proof}
 
-\begin{corollary}
-The contraction property of a composition of multiple bounces can
-be determined by multiplying the coefficients $\frac{\sin(\theta_i -
-\phi_i)}{\sin(\theta_i)}$, and the constraints on the angle range
-$\tilde{\theta}$ can be propagated through the composition by intersecting the angle
-intervals.
-\end{corollary}
+Let $C(\theta, \phi) = | \frac{\sin(\theta - \phi)}{\sin(\theta)} |$.
+
+For a sequence of bounces $b_1, \ldots, b_k$, we can construct the overall
+mapping from the domain of $b_1$ to the range of $b_k$ through function
+composition. Since $f$ is a linear mapping, the contraction property of a composition 
+of multiple bounces can be determined by multiplying the coefficients $C(\theta, \phi)$, 
+and the constraints on the angle range $\tilde{\theta}$ can be propagated through the 
+composition by intersecting the angle intervals.
+
+If $\prod_{i=1}^k C(\theta_i, \phi_i) < 1$, the composition of bounces $b_1, \ldots, b_k$
+is a contraction mapping. This is true even if some transition $b_i$ is not a
+contraction mapping, since the coefficient is simply the ratio of distances
+between points before and after the mapping is applied.
 
 \subsection{Navigation}
 
@@ -508,7 +513,7 @@ $y$.
 \end{lemma}
 
 \begin{proof}
-By Lemma \ref{lemma:transition}, each edge in the path from $v_x$ to $v_y$
+By Lemma \ref{def:transition}, each edge in the path from $v_x$ to $v_y$
 describes a family of bounce laws which can take a robot from any point in the
 source edge to a point in the target edge. The transition functions represented
 by these families can be composed together under normal function composition.
@@ -568,10 +573,15 @@ or a range of angles.
 point in start set $S$ to a point in goal set $G$.}
 \label{algo:nav}
 \begin{algorithmic}
-\Procedure{Navigate}{$poly$,$G$, $S$, $criterion$}
-\State $G\_nav \gets$ \Call{PartitionPoly}{$poly$}
-\State $bounce\_seq \gets$ \Call{BFS}{$G\_nav$, $criterion$}
-\For{$v_r$ in $reflex\_verts$}
+\Procedure{Navigate}{$poly$, $G$, $S$, $criterion$}
+\State $G\_nav \gets$ \Call{PartitionPoly}{$poly$, $G$, $S$}
+\Comment When we partition poly, should G and S be inserted as segments?
+\State $edge\_seq \gets$ \Call{BFS}{$G\_nav$, $G$, $criterion$}
+\State $interval\_seq \gets S$
+\For{$transition$ in $bounce\_seq$}
+\Comment If G and S aren't inserted, need to check to make sure path found
+covers all of S
+    \State \Call{Propagate}{$transition$}
 \EndFor
 \EndProcedure
 \end{algorithmic}
@@ -580,10 +590,6 @@ point in start set $S$ to a point in goal set $G$.}
 For a sequence of transitions $f_1, \ldots, f_k$,
 
 $\max_{i \in \{1,\ldots, k\}}( \min(angle\_range(f_i) ))$
-
-\begin{theorem}
-Navigation algorithm is sound and complete
-\end{theorem}
 
 
 We would like to chain together nondeterministic transitions such that each
@@ -612,6 +618,36 @@ $\theta$, such that $l_{sub}$ and $r_{sub}$ are parallel. The location of this
 interval will depend on the local geometry.
 
 \subsubsection{Constant Fixed Angle Controllers}
+
+\textbf{In Convex Polygons}
+
+\textbf{Definitions.}
+If a limit cycle inside a convex polygons with $n$ edges forms another convex polygon with $n$ edges, we call this limit cycle as convex $n$-cycle.
+
+\begin{theorem} {1}
+For all convex polygons with $n$ edges, there exists a range for $\theta$ such that fixed-angle bouncing strategy with $\theta$ will lead to a convex $n$-cycle regardless of the robot's start position.
+\end{theorem}
+\begin{proof}
+Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. Consider the triangle formed by two adjacent edges $e_i$, $e_{i+1}$ of $P$. The robot will bounce from $e_i$ to $e_{i+1}$ regardless of its start position if and only if $\theta \in (0, \angle v_{i+2}v_{i}v_{i+1})$. Thus, the robot will always bounce to the next adjacent edge if and only if $\theta \in (0, \min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
+
+Suppose we have two start positions $x$ and $y$ on edge $e_0$ and the two corresponding trajectories under fixed angle $\theta$. Denote the robot's position on $e_k$ after bouncing $k$ consecutive edges as $b^{k}(x)$ and $b^{k}(y)$ respectively. $\triangle b^{k}(x)v_{k+1}b^{k+1}(x)$ and $\triangle b^{k}(y)v_{k+1}b^{k+1}(y)$ are similar triangles since they share a common internal angle of the polygon, $\pi - \Phi_{k+1}$, and the bouncing angle $\theta$. 
+
+The distance between the two trajectories on $e_0$ after the robot bounces off every edge of the polygon, i.e., bounces off $n$ times, is $d(b^{n}(x)), b^{n}(y))$. Consider this as a mapping $q$ from $e_0$ to $e_0$. \textcolor{red}{(Should we have the definition for this mapping outside of the theorem?)}
+
+We can compute the ratio between $d(b^k(x), b^k(y))$ and $d(b^{k+1}(x), b^{k+1}(y))$ by the Law of Sines: $\frac{d(b^{k+1}(x), b^{k+1}(y))}{d(b^{k}(x), b^{k}(y))} = \frac{\sin(\theta)}{\sin(\Phi_{k+1}-\theta)}$.  Thus, \begin{eqnarray*}\frac{d(b^{n}(x)), b^{n}(y))}{d(b^{0}(x), b^{0}(y))} &&= \frac{d(b^{n}(x), b^{n}(y))}{d(b^{n-1}(x), b^{n-1}(y))}\times \dots \times\frac{d(b^{k+1}(x), b^{k+1}(y))}{d(b^{k}(x), b^{k}(y))}\times \dots \times\frac{d(b^{1}(x)), b^{1}(y))}{d(b^{0}(x), b^{0}(y))} \\
+&&= \frac{\sin(\theta)}{\sin(\Phi_{n}-\theta)}\dots \frac{\sin(\theta)}{\sin(\Phi_{k+1}-\theta)}\dots \frac{\sin(\theta)}{\sin(\Phi_{1}-\theta)} =\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}. \end{eqnarray*} If $|\frac{d(b^{n}(x)), b^{n}(y))}{d(b^{0}(x), b^{0}(y))}|<1$, then $q$ is \textcolor{red}{a contraction mapping, and by the Banach fixed-point theorem, it has a unique fixed point.(this was an exact copy from the IROS paper)} If  $|\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$, which is equivalent to $\theta < \frac{\Phi_{i}}{2}$, for $i = 0, 1, \dots, n-1$, then $|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and we have a contraction mapping. 
+
+Therefore, \begin{equation*}
+\forall \theta \in (0, \min(\min_{i = 0, 1, \dots, n-1}(\angle v_{i+2}v_{i}v_{i+1}), \min_{i = 0, 1, \dots, n-1}(\frac{\Phi_{i}}{2})),\end{equation*} the fixed-angle bouncing strategy with $\theta$ leads to a convex $n$-cycle regardless of the robot's start position.
+\end{proof}
+
+Remarks:
+\begin{enumerate}
+    \item We can analyze the case for $\theta \in [\pi/2, \pi)$ by symmetric.
+    \item To get the range of all possible $\theta$ that will lead to a limit cycle tangent to each edge of the polygon sequentially, we can solve for $|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and then intersect the result with (0, $\min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
+\end{enumerate}
+
+
 
 For constant angle controllers, this
 ends up being a coupled problem - want to chain together preimages such that
