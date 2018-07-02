@@ -229,18 +229,18 @@ Strong assumption on g.p. in O'Rourke paper}
 
 Our work is also related to lines of questions in computational geometry on what
 parts of a polygon will be illuminated by a light source after multiple
-reflections (as if the walls of the polygon are mirrors) \cite{Aronov1996,
-prasad1998visibility}.
+reflections (as if the walls of the polygon are mirrors) \cite{Aronov1996,prasad1998visibility}.
 
 
 \section{Outline of Results}
 
-First, we construct a graph representing possible transitions between points on
-the polygon boundary. Each node in this graph corresponds to a segement of the
+First, we construct a data structure representing possible transitions between points on
+the polygon boundary. This data structure can be interpreted as a diagram or graph. 
+Each node in the graph (or region in the diagram) corresponds to a segement of the
 boundary where the visibility polygon at each point is combinatorially ``the
 same."
 
-Then, we show how this graph can be augmented and queried to solve different
+Then, we show how this data structure can be augmented and queried to solve different
 robotic tasks, such as navigation, patrolling, and localization. We also begin
 extending these results to show how this graph can be used to determine the
 relative power of robots with different sensor/actuator configurations.
@@ -306,7 +306,7 @@ visible from reflex induce transitions}
 \end{algorithm}
 
 \begin{proposition} The bounce transition graph for a polygon with $n$ vertices has 
-$\mathcal{O}(n^2)$ vertices and $\mathcal{O}(n^4)$ edges.
+$O(n^2)$ vertices and $O(n^4)$ edges.
 \end{proposition}
 
 \begin{proof}
@@ -316,11 +316,11 @@ local sequence for each vertex in $P$. For a convex vertex, its partial local se
 in $P$. However, a reflex vertex can have $O(n)$ new vertices. 
 
 Up to half of the vertices in the polygon can be reflex, so $r = O(n)$; each 
-of the reflex vertices can produce $\mathcal{O}(n)$ new vertices in its partial local 
-sequence, so the number of vertices in $P'$ is $\mathcal{O}(n^2)$. 
+of the reflex vertices can produce $O(n)$ new vertices in its partial local 
+sequence, so the number of vertices in $P'$ is $O(n^2)$. 
 
 It is possible for a vertex in $P'$ to see all other vertices, so in the worst
-case, the bounce visibility graph will have $\mathcal{O}(n^4)$ edges.
+case, the bounce visibility graph will have $O(n^4)$ edges.
 
 We might hope that if $r$ is large, then not all of the reflex vertices will
 produce a large number of new vertices, or that if there are many new vertices,
@@ -330,7 +330,7 @@ complexity of the bounce visibility graph. Unfortunately, the number of reflex
 vertices, the new
 vertices produced in their partial local sequence, and the new vertices'
 visibility can be large at the same time. We will present a family of input
-polygons with bounce visibility graph edge-set size of $\mathcal{O}(n^4)$ as follows.
+polygons with bounce visibility graph edge-set size of $O(n^4)$ as follows.
 
 Let $n = 4t+2$, where $t$ is a positive integer. We design a polygon with
 $r = 2t$ reflex vertices. The polygon is symmetric with respect to its medium
@@ -344,7 +344,7 @@ vertices in the polygon after we insert all new vertices in the partial local
 sequence for all reflex vertices. Each of them can see at least $t(t-1)+n/2$
 other vertices. Thus the number of edges in the transition graph for the
 polygon with inserted vertices is
-$\mathcal{O} ((2t(t-1)+n)(t(t-1)+n/2)) = \mathcal{O}(t^4) = \mathcal{O}(n^4)$.
+$O ((2t(t-1)+n)(t(t-1)+n/2)) = O(t^4) = O(n^4)$.
 Fig \ref{fig:t4} shows the polygon for $t = 4$ with all the
 vertices in the partial local sequences. % show the diagram to edge
 
@@ -435,7 +435,7 @@ by rotating the source edge to the x axis without loss of generality.}
 \end{figure}
 
 \begin{definition}
-Let $\phi_{ij}$ be the interior angle between two segments $i$ and $j \in \delta P$ if they are extended 
+Let $\phi_{ij}$ be the interior angle between two segments $i$ and $j \in \partial P$ if they are extended 
 to infinity. The case where the segments are parallel will be handled separately
 where necessary.
 \end{definition}
@@ -628,7 +628,12 @@ ends up being a coupled problem - want to chain together preimages such that
 \textbf{Definitions.}
 If a limit cycle inside a convex polygons with $n$ edges forms another convex polygon with $n$ edges, we call this limit cycle as convex $n$-cycle.
 
-\begin{theorem} {1}
+\begin{definition}
+$\phi_{P,min}$ is the smallest interior angle in a polygon $P$. We will omit the
+label $P$ when it is clear from context.
+\end{definition}
+
+\begin{theorem} \label{thm:convex}
 For all convex polygons with $n$ edges, there exists a range for $\theta$ such that fixed-angle bouncing strategy with $\theta$ will lead to a convex $n$-cycle regardless of the robot's start position.
 \end{theorem}
 \begin{proof}
@@ -662,7 +667,7 @@ C(\theta, \phi_{i}).
 
 If $\prod_{i = 0}^{n-1} C(\theta, \phi_{i}) < 1$, then $b^k(x)$ is a contraction
 mapping from $e_0$ back to iteself, and by the Banach fixed-point theorem, it
-has a unique fixed point.
+has a unique fixed point \cite{Granas2003}.
 
 If $|\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$, which is equivalent to
 $\theta < \frac{\Phi_{i}}{2}$, for $i = 0, 1, \dots, n-1$, then
@@ -670,7 +675,8 @@ $|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and we have a
 contraction mapping.
 
 Therefore, \begin{equation*}
-\forall \theta \in (0, \min(\min_{i = 0, 1, \dots, n-1}(\angle v_{i+2}v_{i}v_{i+1}), \min_{i = 0, 1, \dots, n-1}(\frac{\Phi_{i}}{2})),\end{equation*} the fixed-angle bouncing strategy with $\theta$ leads to a convex $n$-cycle regardless of the robot's start position.
+\forall \theta \in (0, \min(\min_{i = 0, 1, \dots, n-1}(\angle v_{i+2}v_{i}v_{i+1}),
+\frac{\phi_{P,min}}{2})),\end{equation*} the fixed-angle bouncing strategy with $\theta$ leads to a convex $n$-cycle regardless of the robot's start position.
 \end{proof}
 
 Remarks:
@@ -690,10 +696,6 @@ all possible relative angles.
 
 \subsection{Patrolling \label{sec:cycles}}
 
-\begin{definition}
-$\phi_{P,min}$ is the smallest interior angle in a polygon $P$. We will omit the
-label $P$ when it is clear from context.
-\end{definition}
 
 \begin{proposition}
 Every convex polygon admits a limit cycle, under a fixed-angle bounce law, 
@@ -1104,7 +1106,7 @@ will be inserted into a corner of the polygon, and then we can bound the
 complexity of the BVD. Unfortunately, the number of reflex vertices, the new
 vertices produced in their partial local sequence, and the new vertices'
 visibility can be large at the same time. We will present a family of input
-polygons with BVD of $\mathcal{O}(n^4)$ complexity as follows.
+polygons with BVD of $O(n^4)$ complexity as follows.
 
 \begin{figure}
 %\hspace{-40px}
@@ -1428,5 +1430,5 @@ resulting trajectory
 \fi
 
 \bibliographystyle{IEEEtran}
-\bibliography{/home/alli/common/refs}
+\bibliography{refs}
 \end{document}
