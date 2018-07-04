@@ -89,18 +89,32 @@ environments and tasks.
     \includegraphics[width=0.8\linewidth]{figures/bounce_examples.pdf}
     \centering
     \caption[test]{\label{fig:bex}Examples of different ``bouncing laws" which can be implemented on
-mobile robots. In the first row, $f(v_i, \theta) = \theta$, which we refer to
+mobile robots. In the first row, $b(\alpha, \theta) = \theta$, which we refer to
 as a \textbf{fixed} bounce law. In the second row, we have a \textbf{monotonic
 fixed} bounce law, where
-$f(v_i, \theta) = \theta$ or $\pi-\theta$, depending on what is necessary to
+$b(\alpha, \theta) = \theta$ or $\pi-\theta$, depending on what is necessary to
 preserve monotonicity of travel direction along the $x$-axis. In the third
-row, $f(v_i, \theta$ rotates $v_i$ through $\theta$ in the clockwise
+row, $b(\alpha, \theta) = \alpha - \theta$, rotating $\alpha$ through $\theta$ in the clockwise
 direction. It is possible that this rotation will cause the 
 heading of the robot to still be facing into the boundary, in which case this model usually has the robot 
 perform the rotation again until its heading points into the free space. We
-refer to this as a \textbf{relative} bounce law.
+refer to this as a \textbf{relative} bounce law ($\alpha$ appears on the
+right hand side of the bounce law).
 }
 \end{figure}
+
+\section{Introduction}
+
+Mobile robots have rolled smoothly into our everyday lives, and can now be
+spotted vacuuming our floors, cleaning our pools, mowing our grass, and moving
+goods in our warehouses. 
+% two prongs: beauty of geometry and dynamical systems approach
+% and practicality of efficient navigation / patrolling / coverage with mobile
+% robots
+
+% current draw gain of regular roomba vs. SLAM- or GPS- enabled roomba?
+% would guess at least 10x improvement
+% email iRobot people for actual stats?
 
 \section{Model and Definitions}
 
@@ -108,8 +122,8 @@ We consider the movement of point robots in two dimensions, inside simple polygo
 environments. All index arithmetic for polygons with $n$ vertices is mod $n$ 
 throughout this paper.
 
-The robots we will consider can move forward in straight lines, and will stop
-when they encounter an environment boundary (such as when a bump or range
+We model robots as points which move forward in straight lines, until encountering 
+an environment boundary (such as when a bump or range
 sensor is triggered). Once at a boundary, the robot can rotate in place to some
 specified angle, either in its local frame or relative to the environment
 boundary normal vector, depending on the sensing power of the robot.
@@ -118,7 +132,7 @@ Of course, robots rarely move perfectly, so most of our analysis will be
 nondeterministic and will result in bounds on how accurate the robot's actuation
 is required to be.
 
-More formally, our model of the robot includes:
+More formally, our model includes:
 
 \begin{itemize}
 \item The \emph{configuration space} $X = P \times S^1$. $P$ is a simple polygon with 
@@ -178,8 +192,16 @@ monotonic fixed angle bounce. This line of work characterizes periodic and
 chaotic trajectories in regular polygons, planar curves, and other environments.
 They analyze dynamics of fixed bounce angles, without a focus on generating control
 strategies.
+In other dynamical systems literature, other reflection laws have been studied -
+the most common is a purely specular reflection law, but contracting laws have
+also attracted recent interested \cite{DelMagno2014,billiards,pinball} (no pun intended).
 
-In robotics, the most closely related work to ours is \cite{LewOKa13}, which addressed 
+
+In robotics, 
+{\color{red} add todd murphey ergodic paths, and that other ergodic path one steve
+found, and the chaotic controller papers}
+
+The most closely related work to ours is \cite{LewOKa13}, which addressed 
 the navigation task with a very similar robot
 model in polygons. Their robot moves in straight lines until encountering an environment
 boundary, at which point it is able to rotate in place, with some nondeterministic but
@@ -229,7 +251,13 @@ Strong assumption on g.p. in O'Rourke paper}
 
 Our work is also related to lines of questions in computational geometry on what
 parts of a polygon will be illuminated by a light source after multiple
-reflections (as if the walls of the polygon are mirrors) \cite{Aronov1996,prasad1998visibility}.
+reflections (as if the walls of the polygon are mirrors). It has been shown
+that the complexity of the region lit in an $n-$gon after $k$ bounces is
+$O(n^{2k}$ {\color{red} diffuse reflections} \cite{Aronov1996,prasad1998visibility}.
+In our notation, this
+would correspond to the bounce law $b(\alpha, \theta) = \pi - \alpha$.
+
+
 
 
 \section{Outline of Results}
@@ -250,19 +278,21 @@ relative power of robots with different sensor/actuator configurations.
 Imagine a robot sliding along the polygon boundary, calculating a visibility
 polygon as it moves. As it
 slides, its visibility polygon changes continuously (edges shrink or grow, but
-the combinatorial structure of the polygon remains the same). However, when two
-visible vertices come into alignment with the robot, two edges of the visibility polygon will
-merge. The other type of event is when a new vertex becomes visible from behind
-a reflex vertex, causing a new edge to appear in the visibility polygon.
+the combinatorial structure of the polygon remains the same). However, when
+the robot, a reflex vertex, and another vertex come into alignment, a
+combinatorial change will occur. Either the further vertex will become visible
+to the robot, adding an edge to the visibility polygon, or it will become not
+visible, removing an edge from the visibility polygon.
 
-
-The \textbf{partial local sequence}, defined in \cite{rourke_viz}, 
-for a vertex $v_0$ in polygon $P$ is constructed 
-by shooting a ray through $v_0$ from every vertex in $P$ that is visible from
-$v_0$. Each point in the partial local
-sequence defines a \emph{transition event} where the visibility polygon seen
-from points on the polygon boundary changes combinatorially. See Figure \ref{fig:pls} for an example of the vertices in the partial local
-sequence of $v_0$ (blue dots with accompanying rays).
+To compute all such points where the visibility polygon changes structure, we
+must compute the \textbf{partial local sequence}, defined in \cite{rourke_viz}.
+The partial local sequence is a sequence of vertices, associated with a vertex
+$v_0$ in $P$, such that we shoot a ray through $v_0$ from every vertex in $P$
+that is visible from $v_0$ and keep the resulting sequence of intersections with
+$\partial P$. If $v_0$ is reflex, some of the rays shot through it may intersect
+$\partial P$ in the interior of existing edges. See Figure \ref{fig:pls} for an
+example of the vertices in the partial local sequence of $v_0$ (blue dots with
+accompanying rays).
 
 Thus, once all the partial local sequences have been inserted into the original
 polygon, the resulting intervals along the boundary define a set of equivalence
@@ -435,7 +465,8 @@ by rotating the source edge to the x axis without loss of generality.}
 \end{figure}
 
 \begin{definition}
-Let $\phi_{ij}$ be the interior angle between two segments $i$ and $j \in \partial P$ if they are extended 
+Let $\phi_{ij}$ be the interior angle between two segments $i$ and $j \in
+\partial P$ if they are extended 
 to infinity. The case where the segments are parallel will be handled separately
 where necessary.
 \end{definition}
@@ -678,7 +709,8 @@ for the orbit by requiring
 \frac{\phi_{P,min}}{2})),
 \end{equation*}
 
-in which case the fixed-angle bouncing strategy with $\theta$ leads to a convex $n$-cycle regardless of the robot's start position.
+in which case the fixed-angle bouncing strategy with $\theta$ leads to a convex
+$n$-cycle regardless of the robot's start position.
 \end{proof}
 
 Remarks:
