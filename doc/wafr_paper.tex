@@ -62,6 +62,8 @@ Strategies}
 %\thanks{This work was partially supported by National Science Foundation (award numbers CMMI-1100579 and IIS-1302393).}
 }
 
+\institute{University of Illinois at Urbana-Champaign}
+
 \begin{document}
 
 
@@ -107,7 +109,21 @@ right hand side of the bounce law).
 
 Mobile robots have rolled smoothly into our everyday lives, and can now be
 spotted vacuuming our floors, cleaning our pools, mowing our grass, and moving
-goods in our warehouses. 
+goods in our warehouses. These tasks can be formulated as specifications on the
+dynamical properties of the robot's path through space: for example, a mowing or
+vacuuming robot should cover the space ergodically (informally, it should not visit 
+any particular area more frequently than others). A robot which is monitoring
+humidity levels in a warehouse, or wireless signals in an office, should follow
+a repeatable path (formally, a limit cycle) so that data can be easily compared 
+over time.
+
+Current algorithmic approaches to these tasks take two flavors: either
+maximizing the information available to the robot though high-fidelity sensors
+and map-generating algorithms such as SLAM, or minimizing the information needed
+by the robot, such as the largely random navigation strategies of the early
+iRobot vacuum models.
+
+
 % two prongs: beauty of geometry and dynamical systems approach
 % and practicality of efficient navigation / patrolling / coverage with mobile
 % robots
@@ -191,8 +207,7 @@ for vacuuming, pool cleaning, lawn mowing, and similar applications. It is also
 monotonic fixed angle bounce. This line of work characterizes periodic and
 chaotic trajectories in regular polygons, planar curves, and other environments.
 They analyze dynamics of fixed bounce angles, without a focus on generating control
-strategies.
-In other dynamical systems literature, other reflection laws have been studied -
+strategies. In other dynamical systems literature, other reflection laws have been studied -
 the most common is a purely specular reflection law, but contracting laws have
 also attracted recent interested \cite{DelMagno2014,billiards,pinball} (no pun intended).
 
@@ -222,42 +237,41 @@ approach uses a discretization of the robot configuration space and actuation
 space, then searches the discretized dynamical system for limit cycles. The
 algorithm is complete and correct up to discretization error - periodic
 trajectories may exist which require bounce angles not allowed by the
-discretization. Our work is very similar in spirit to this approach, however, we
-use a more natural discretization induced by the environment geometry and
-consider all possible bounce strategies in our combinatorial representation. Our
-representation may be reduced to one which can be used to solve the same
-problems as this work, by applying constraints on the types of bounces allowed.
+discretization. By using a discretization induced by the environment geometry, our 
+approach considers all possible bounce strategies. {\color{red} explain how to
+incorporate constraints on bounce angles here?}
 
-We are working toward a generalization and hierarchy of these robot models, in a
+The questions we pose, and our methods of attacking the problem, are related to
+work on visibility in computational geometry. Visibility graphs have been
+extensively in robotics, but usually in the context of the vertex visibility
+graph with the goal of avoiding obstacles {\color{red} add cites}. When we wish
+to intentionally use collisions strategically, we require a slightly more
+powerful data structure - the edge
+visibility graph for a partition of a polygon $P$. The edge visibility graph 
+was analyzed along with the vertex-edge visibility graph in \cite{rourke_viz}. {\color{red} they have an
+O(n+k) algo for constructing vertex-edge. But correspondence to edge
+requires $O(n^2)$ at least - confirm? Also, is this valid w/out general
+position? Strong assumption on g.p. in O'Rourke paper}
+
+Our work is also related to lines of questions in computational geometry on what
+parts of a polygon will be illuminated by a light source after multiple
+reflections (as if the walls of the polygon are mirrors). It has been shown that
+the complexity of the region lit in an $n-$gon after $k$ bounces is $O(n^{2k})$
+{\color{red} diffuse reflections} \cite{Aronov1996,prasad1998visibility}. In our
+notation, this would correspond to the bounce law
+$b(\alpha, \theta) = \pi - \alpha$.
+
+We are working toward a generalization and hierarchy of robot models, in a
 similar spirit to \cite{brunner2008simple}. Their basic robot model, the simple
 combinatorial robot, is able to scan all visible vertices and detect the
 presence of an edge between them. It is able to choose a destination vertex and
 move in a straight line to that vertex. They then augment this basic robot model
 with sensors such as pebbles, angle-measuring devices, and a reflexity detector.
 They then construct a hierarchy of these robot models, showing for instance that
-some can construct the vertex-edge visibility graph of a polygonal environment
+some can construct the vertex visibility graph of a polygonal environment
 and others cannot. Our questions are related but different - if the robot is
 given an environment representation (the vertex-edge visibility graph of a
 partitioned polygon), what tasks is it capable of accomplishing?
-
-The questions we pose, and our methods of attacking the problem, are related to
-work on visibility in computational geometry. We will construct the edge-edge 
-visibility graph for a partition of a polygon $P$, which was analyzed along with
-the vertex-edge visibility graph in \cite{rourke_viz}.
-{\color{red} they have an
-O(n+k) algo for constructing vertex-edge. But correspondence to edge-edge 
-requires $O(n^2)$ at least - confirm? Also, is this valid w/out general position?
-Strong assumption on g.p. in O'Rourke paper}
-
-Our work is also related to lines of questions in computational geometry on what
-parts of a polygon will be illuminated by a light source after multiple
-reflections (as if the walls of the polygon are mirrors). It has been shown
-that the complexity of the region lit in an $n-$gon after $k$ bounces is
-$O(n^{2k}$ {\color{red} diffuse reflections} \cite{Aronov1996,prasad1998visibility}.
-In our notation, this
-would correspond to the bounce law $b(\alpha, \theta) = \pi - \alpha$.
-
-
 
 
 \section{Outline of Results}
@@ -266,11 +280,11 @@ First, we construct a data structure representing possible transitions between p
 the polygon boundary. This data structure can be interpreted as a diagram or graph. 
 Each node in the graph (or region in the diagram) corresponds to a segement of the
 boundary where the visibility polygon at each point is combinatorially ``the
-same."
+same." This data structure also encodes information about which transitions are 
+uncertainty-reducing.
 
 Then, we show how this data structure can be augmented and queried to solve different
-robotic tasks, such as navigation, patrolling, and localization. We also begin
-extending these results to show how this graph can be used to determine the
+robotic tasks, such as navigation, patrolling, and localization. We also show how this graph can be used to determine the
 relative power of robots with different sensor/actuator configurations.
 
 \section{Partitioning Polygons}
@@ -301,6 +315,36 @@ original polygon (though they may see different portions of those edges). Thus,
 we can reason over a finite set of transitions between these intervals, instead
 of the infinite set of possible transitions between points on the boundary of
 the original polygon.
+
+We now introduce some useful definitions and notation. Let $P'$ be the polygon $P$ with all partial local sequence points inserted.
+Let the edge set of $P'$ be $E'$, with $n'$ elements.
+
+\begin{definition}
+The \textbf{edge visibility graph} of a polygon $P$ has a node for each edge of
+$P$, and has an arc between two nodes $(e_i, e_j)$ if and only if there is a
+point $s_i$ in the open edge $e_i$ and a point $s_j$ on the open edge $e_j$ such
+that $s_i$ and $s_j$ can be connected with a line segment which is entirely
+within the interior of $P$ (the points can ``see" each other).
+\end{definition}
+
+Let the \textbf{bounce visibility graph} be the directed edge visibility graph of
+$P'$. While visibility is a symmetric property, we use directed edges in this
+case so that we can augment each edge with a label function which stores
+geometrical constraints on the visibility from one edge to another. This allows
+us to make statements such as ``the robot may transition from $e_i$ to $e_j$
+from any point on $e_i$ if it departs the edge within angle range
+$\tilde{\theta}$."
+
+
+We now define the \textbf{bounce visibility diagram}. We choose an arbitrary vertex
+$v_0$ of $P$ as the origin, and parameterize points $p \in \partial P$ by the
+counterclockwise distance from $v_0$, divided by the perimeter length of
+$\partial P$. This parameterization defines a bijective function $s: [0,1) \to \partial P$.
+We can then use a labelling function $l: \partial P \to [0, \ldots, n']$ to
+label each point $p \in \partial P$ with the edge segment in $P'$ that it
+belongs to. The graph of the function $f: \partial P \times [0, \pi] \to [0,
+\ldots, n']$ is the bounce visibility diagram. See Figures \ref{fig:bvd} and
+\ref{fig:regular_pent_bvd} for examples.
 
 \begin{figure}[h]
 \centering
@@ -340,10 +384,11 @@ $O(n^2)$ vertices and $O(n^4)$ edges.
 \end{proposition}
 
 \begin{proof}
+
 Consider a polygon $P$ with $n$ vertices, $r$ of which are reflex vertices. To
 construct the bounce visibility graph, we insert the vertices of the partial
-local sequence for each vertex in $P$. For a convex vertex, its partial local sequence will not have new vertex that is not
-in $P$. However, a reflex vertex can have $O(n)$ new vertices. 
+local sequence for each vertex in $P$. For a convex vertex, its partial local sequence 
+will not add any new vertices to $P$. However, a reflex vertex can add $O(n)$ new vertices. 
 
 Up to half of the vertices in the polygon can be reflex, so $r = O(n)$; each 
 of the reflex vertices can produce $O(n)$ new vertices in its partial local 
@@ -352,11 +397,12 @@ sequence, so the number of vertices in $P'$ is $O(n^2)$.
 It is possible for a vertex in $P'$ to see all other vertices, so in the worst
 case, the bounce visibility graph will have $O(n^4)$ edges.
 
+\end{proof}
+
+\subsubsection{Worst Case Example}
+
 We might hope that if $r$ is large, then not all of the reflex vertices will
-produce a large number of new vertices, or that if there are many new vertices,
-then the new vertices will not have good visibility in $P'$ since most of them
-will be inserted into a corner of the polygon, and then we can bound the
-complexity of the bounce visibility graph. Unfortunately, the number of reflex
+produce a large number of new vertices. Unfortunately, the number of reflex
 vertices, the new vertices produced in their partial local sequence, and the new
 vertices' visibility can be large at the same time. We will present a family of
 input polygons with bounce visibility graph edge-set size of $O(n^4)$ as
@@ -368,8 +414,7 @@ horizontal line. In the top half, the reflex vertices are uniformly located on a
 circle and thus they are visible to each other; the convex vertices are chosen
 so that they are outside the circle and the line through an edge will not
 intersect other edges. Each reflex vertex will have at least $t-1$ new
-vertices in its partial local sequence. All vertices in the top half can see
-each vertex in the bottom half and vice versa. So there will be $2t(t-1)+n$
+vertices in its partial local sequence. There will be $2t(t-1)+n$
 vertices in the polygon after we insert all new vertices in the partial local
 sequence for all reflex vertices. Each of them can see at least $t(t-1)+n/2$
 other vertices. Thus the number of edges in the transition graph for the
@@ -378,7 +423,6 @@ $O ((2t(t-1)+n)(t(t-1)+n/2)) = O(t^4) = O(n^4)$.
 Fig \ref{fig:t4} shows the polygon for $t = 4$ with all the
 vertices in the partial local sequences. % show the diagram to edge
 
-\end{proof}
 
 \begin{figure}
 
@@ -419,7 +463,7 @@ path that satisfies some coverage criterion; \emph{localization} requires a path
 which reduces uncertainty in the robot's position.
 
 Once we have partitioned the polygonal environment and constructed the resulting
-edge-edge visibility graph, we can establish relations between properties of
+edge visibility graph, we can establish relations between properties of
 paths in the graph and paths of the robot in the actual environment.
 
 \begin{definition}\label{def:transition}
@@ -967,7 +1011,7 @@ Using the definition in \cite{rourke_viz}, the
 graph where $V = \{\text{all vertices and edges in $P$}\}$ and $v_ie_j\in E$ if
 and only if $v_i$ can see the interior of $e_j$, i.e., $\exists$ point $q$ on
 the open edge $e_j$ such that $v_i$ and $q$ are visible. \cite{rourke_viz}
-established that the vertex-edge visibility graph is equivalent to the edge-edge
+established that the vertex-edge visibility graph is equivalent to the edge
 visibility graph.
 
 Fig \ref{fig:veg} shows an example for vertex-edge visibility graph.

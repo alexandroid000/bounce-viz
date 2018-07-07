@@ -13,6 +13,7 @@ import visilibity as vis
 from copy import copy, deepcopy
 
 DEBUG = False
+EPSILON = 0.00000001
 
 def PolyToWindowScale(poly, ydim):
     newpoly = []
@@ -91,6 +92,7 @@ def IsThreePointsOnLine(p1, p2, p3):
     cross_prod = (p1[1] - p2[1]) * (p3[0] - p2[0]) - (p1[0] - p2[0]) * (p3[1] - p2[1])
     return abs(cross_prod)<degeneracy_error
 
+# true if p3 is in line with and in between p1 and p2
 def IsThreePointsOnLineSeg(p1, p2, p3):
     if IsThreePointsOnLine(p1, p2, p3):
         v1 = (p1[0]-p3[0], p1[1]-p3[1])
@@ -154,9 +156,8 @@ def IsInPoly(p, poly):
     return not (intersects%2 == 0)
 
 def VertexExists(v, poly):
-    epsilon = 0.00000001
     for pt in poly:
-        if PointDistance(v, pt) < epsilon:
+        if PointDistance(v, pt) < EPSILON:
             return True
     return False
 
@@ -290,7 +291,6 @@ def GetVisibleVertices(poly, j):
     # Outer boundary polygon must be COUNTER-CLOCK-WISE(ccw)
     # Create the outer boundary polygon
     # Define an epsilon value (should be != 0.0)
-    epsilon = 0.001
     vpoly = [vis.Point(*pt) for pt in poly]
     walls = vis.Polygon(vpoly)
     walls.enforce_standard_form()
@@ -303,16 +303,16 @@ def GetVisibleVertices(poly, j):
     # is the first polygon in the list. The other polygons will be holes
     env = vis.Environment([walls])
     # Necesary to generate the visibility polygon
-    vp1.snap_to_boundary_of(env, epsilon)
-    vp1.snap_to_vertices_of(env, epsilon)
-    isovist = vis.Visibility_Polygon(vp1, env, epsilon)
+    vp1.snap_to_boundary_of(env, EPSILON)
+    vp1.snap_to_vertices_of(env, EPSILON)
+    isovist = vis.Visibility_Polygon(vp1, env, EPSILON)
     vvs = [(isovist[i].x(), isovist[i].y()) for i in range(isovist.n())]
     #print(vvs)
     visibleVertexSet = []
     for i in range(psize):
         p = vis.Point(*poly[i])
         vp = copy(p).projection_onto_boundary_of(isovist)
-        if (vis.distance(vp, p) < epsilon) and i != j:
+        if (vis.distance(vp, p) < EPSILON) and i != j:
             visibleVertexSet.append(i)
     if DEBUG:
         print("vertices",visibleVertexSet,"visible from",j)
