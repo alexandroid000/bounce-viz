@@ -390,11 +390,10 @@ construct the bounce visibility graph, we insert the vertices of the partial
 local sequence for each vertex in $P$. For a convex vertex, its partial local sequence 
 will not add any new vertices to $P$. However, a reflex vertex can add $O(n)$ new vertices. 
 
-Up to half of the vertices in the polygon can be reflex, so $r = O(n)$; each 
-of the reflex vertices can produce $O(n)$ new vertices in its partial local 
-sequence, so the number of vertices in $P'$ is $O(n^2)$. 
-
-It is possible for a vertex in $P'$ to see all other vertices, so in the worst
+Up to half of the vertices in the polygon can be reflex, so the complexity of
+$r$ is $O(n)$. Therefore, the number of vertices in $P'$, returned by Algorithm
+\ref{algo:insert} is $O(n^2)$. Each vertex corresponds to an edge in $P'$, and
+thus a node in the edge visibility graph of $P'$. At most, a given vertex in $P'$ may see all other vertices, so in the worst
 case, the bounce visibility graph will have $O(n^4)$ edges.
 
 \end{proof}
@@ -402,11 +401,11 @@ case, the bounce visibility graph will have $O(n^4)$ edges.
 \subsubsection{Worst Case Example}
 
 We might hope that if $r$ is large, then not all of the reflex vertices will
-produce a large number of new vertices. Unfortunately, the number of reflex
+produce a large number of new vertices, and we may bound the size of the edge
+set in the visibility graph. Unfortunately, the number of reflex
 vertices, the new vertices produced in their partial local sequence, and the new
 vertices' visibility can be large at the same time. We will present a family of
-input polygons with bounce visibility graph edge-set size of $O(n^4)$ as
-follows.
+input polygons with bounce visibility graph edge-set size of $O(n^4)$.
 
 Let $n = 4t+2$, where $t$ is a positive integer. We design a polygon with
 $r = 2t$ reflex vertices. The polygon is symmetric with respect to its medium
@@ -643,21 +642,26 @@ Note that when we compute pre- and post-images of transitions under our robot
 model, only cases 1 and 3 apply: either the robot bounces at a singleton angle
 or a range of angles. 
 
+The crux of the algorithm is that from each arc $e_{ij}$ in $BVG$, we can compute
+intervals of departure angles $\tilde{\theta}$ under which \emph{any} point in
+$e_i$ can transition to \emph{some} point in $e_j$. Thus, a path in $BVG$
+represents the composition of such guaranteed transitions.
+
+If a robot has some guaranteed minimum uncertainty in its actuation, we may
+"trim" both ends of each angle interval in the strategy to determine if a "safe"
+strategy exists under this actuation uncertainty.
+
 \begin{algorithm}
 \caption{Generating a nondeterministic bounce strategy for navigation from any
 point in start set $S$ to a point in goal set $G$.}
 \label{algo:nav}
+
 \begin{algorithmic}
 \Procedure{Navigate}{$poly$, $G$, $S$, $criterion$}
-\State $G\_nav \gets$ \Call{PartitionPoly}{$poly$, $G$, $S$}
-\Comment When we partition poly, should G and S be inserted as segments?
-\State $edge\_seq \gets$ \Call{BFS}{$G\_nav$, $G$, $criterion$}
-\State $interval\_seq \gets S$
-\For{$transition$ in $bounce\_seq$}
-\Comment If G and S aren't inserted, need to check to make sure path found
-covers all of S
-    \State \Call{Propagate}{$transition$}
-\EndFor
+\State $BVD \gets$ \Call{PartitionPoly}{$poly$, $G$, $S$}
+\State $paths \gets$ \Call{BFS}{$BVD$, $G$, $S$}
+\State $strategies \gets$ \Call{getStrategies}{$paths$}
+\State \Return \Call{argmax}{strategies, \textsc{getAngInt}}
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
