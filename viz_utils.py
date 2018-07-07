@@ -37,7 +37,7 @@ def VizRay(poly):
 
     plt.savefig('viz_test.pdf')
 
-def VizPoly(poly):
+def VizPoly(poly, fname="inserted_poly"):
     psize = len(poly)
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
@@ -58,7 +58,7 @@ def VizPoly(poly):
         plt.annotate(str(i), (point[0]+10, point[1]+10), size = 'small')
     plt.axis('equal')
 
-    plt.savefig('inserted_poly.png', dpi = 300)
+    plt.savefig(fname+'.png', dpi = 300)
     plt.show()
 
 # Resolution is the number of sample points on each edge
@@ -88,13 +88,18 @@ def PlotGraph(G, fname = "graph"):
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
 if __name__ == '__main__':
-    poly = tworooms
+    poly = simple_bit
     VizRay(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
-    inserted_poly = InsertAllTransitionPts(poly)
-    VizPoly(inserted_poly)
-    G = mkGraph(inserted_poly)
+    p1 = InsertAllTransitionPts(poly)
+    #N = 3
+    #for i in range(N):
+    #    print(i,"th iteration")
+    #    poly = InsertAllTransitionPts(poly)
+    #    print(len(poly))
+    #VizPoly(poly, str(N)+"_iterations")
+    G = mkGraph(p1)
     PlotGraph(G)
     H = reduceGraphWrtAngle(G, 0.15, 0.19)
     PlotGraph(H, "reduced_graph")
