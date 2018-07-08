@@ -5,10 +5,9 @@
 
 from graph_utils import *
 from copy import copy
+from maps import *
 
 # a strategy should be an automata where inputs = sensor obs, and outputs = bounce angles
-
-#def propagateInterval(G, startseg, startint, strategy):
 
 def interp(p1, p2, s):
     (x1,y1) = p1
@@ -54,31 +53,30 @@ def s_inv(pt, poly):
             s += PointDistance(p1, pt)/perim_len
             return s
 
-def nodeInterval(poly, interval):
+# this needs an algebra
+def nodesCovered(poly, interval):
+    psize = len(poly)
     (s1, s2) = interval
+    s_dist = (s2-s1)%1
     s_verts = [s_inv(p, poly) for p in poly]
-    i1 = 0
-    i2 = 0
-    FOUND_S1 = False
-    FOUND_S2 = False
-    for i,s in enumerate(s_verts):
-        print(i,s)
-        if s > s1 and not FOUND_S1:
-            i1 = i-1
-            FOUND_S1 = True
-        if s > s2 and not FOUND_S2:
-            i2 = i-1
-            FOUND_S2 = True
-    return i1, i2
-
-
+    s_verts.extend([s+1.0 for s in s_verts])
+    nodes = []
+    for i,s in enumerate(s_verts[:-1]):
+        if s_verts[i+1] > s1 and (s1+s_dist) > s:
+            nodes.append(i%psize)
+    return nodes
 
 def navigate(poly, S, G):
     P = InsertAllTransitionPts(poly)
     BVD = mkGraph(P)
-    # find all paths with fewest bounces, choose the one with the widest ang
-    # interval
-    ps = findPaths(BVD, nodeContaining(BVD,G), nodeContaining(BVD,S))
-    strats = map(getStrategies(BVG, S, "const"), ps)
-    best = argmax(strats, getAngInt)
+    # find all paths with fewest bounces
+    # choose the one with the widest ang interval
+    paths = []
+    for g in nodesCovered(poly, G):
+        for s in nodesCovered(poly, S):
+            print(g,s)
+            paths.append(findPaths(BVD, g, s))
+    #strategy = getStrategies(BVG, S, "const", path)
 
+if __name__ == '__main__':
+    navigate(square, (0.1,0.2), (0.8,0.9))
