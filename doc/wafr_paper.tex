@@ -314,9 +314,10 @@ classes, where two points in the same interval can see the same edge set of the
 original polygon (though they may see different portions of those edges). Thus,
 we can reason over a finite set of transitions between these intervals, instead
 of the infinite set of possible transitions between points on the boundary of
-the original polygon.
+the original polygon. See Algorithm \ref{algo:insert} for a pseudocode
+description of this partitioning process.
 
-We now introduce some useful definitions and notation. Let $P'$ be the polygon $P$ with all partial local sequence points inserted.
+et $P'$ be the polygon $P$ with all partial local sequence points inserted.
 Let the edge set of $P'$ be $E'$, with $n'$ elements.
 
 \begin{definition}
@@ -344,7 +345,10 @@ We can then use a labelling function $l: \partial P \to [0, \ldots, n']$ to
 label each point $p \in \partial P$ with the edge segment in $P'$ that it
 belongs to. The graph of the function $f: \partial P \times [0, \pi] \to [0,
 \ldots, n']$ is the bounce visibility diagram. See Figures \ref{fig:bvd} and
-\ref{fig:regular_pent_bvd} for examples.
+\ref{fig:regular_pent_bvd} for examples. The diagram gives us
+some visual insight into the structure of the problem - for example, certain
+transitions cannot be accomplished with a single $\theta$ from anywhere on the
+originating segement.
 
 \begin{figure}[h]
 \centering
@@ -428,12 +432,12 @@ vertices in the partial local sequences. % show the diagram to edge
 \centering
 \begin{subfigure}{0.35\textwidth}
 \centering
-\includegraphics[width=0.7\linewidth]{figures/color_pent.png}
+\includegraphics[width=\linewidth]{figures/color_pent.png}
 \captionof{figure}{\label{fig:color_pent}}
 \end{subfigure}%
 \begin{subfigure}{0.35\textwidth}
 \centering
-\includegraphics[width=0.8\linewidth]{figures/bvd.png}
+\includegraphics[width=\linewidth]{figures/bvd.png}
 \end{subfigure}
 \caption{A polygon and its corresponding bounce visibility diagram.}
 \label{fig:bvd}
@@ -443,11 +447,11 @@ vertices in the partial local sequences. % show the diagram to edge
 \centering
 \begin{subfigure}{0.35\textwidth}
 \centering
-\includegraphics[width=0.5\linewidth]{figures/regular_pent.png}
+\includegraphics[width=\linewidth]{figures/regular_pent.png}
 \end{subfigure}%
 \begin{subfigure}{0.35\textwidth}
 \centering
-\includegraphics[width=0.8\linewidth]{figures/regular_pent_bvd.png}
+\includegraphics[width=\linewidth]{figures/regular_pent_bvd.png}
 \end{subfigure}
 \caption{The bounce visibility diagram for the regular pentagon. }
 \label{fig:regular_pent_bvd}
@@ -502,8 +506,17 @@ is the union of the point-wise angle intervals described in Definition
 \begin{figure}
     \centering
     \includegraphics[width=0.4\linewidth]{figures/bouncerange.png}
-    \caption{Definitions of $\theta_{max}$ and $\theta_{min}$. Can be computed
-by rotating the source edge to the x axis without loss of generality.}
+    \caption{Angle range such that a transition exists for some point on
+orginating edge.}
+\label{fig:bounce_range}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/bouncerange_min.pdf}
+    \caption{Angle range such that a transition exists for all points on
+originating edge (left: such a range exists, right: such a range does not
+exist)}
 \label{fig:bounce_range}
 \end{figure}
 
@@ -567,38 +580,6 @@ is a contraction mapping. This is true even if some transition $b_i$ is not a
 contraction mapping, since the coefficient is simply the ratio of distances
 between points before and after the mapping is applied.
 
-\subsection{Navigation}
-
-\begin{definition}
-\textbf{Navigation}:
-Given a polygonal environment $P$, a start set of possible robot positions along the
-environment boundary $S$, and a goal set $G$, determine a strategy $\pi$ which
-will be guaranteed to take the robot from any point in $S$ to a point in $G$, or
-determine that no such strategy exists.
-\end{definition}
-
-\begin{lemma}
-Given $\Pi$, a non-overlapping partition of the environment boundary $\partial P$, and the resulting edge-to-edge visibility graph
-$G$, and points $x,y \in \partial P$, let $v_x \in V(G)$ be the node representing
-the segment in $\Pi$ that contains $x$, and $v_y$ be the node corresponding to
-the segment containing $y$. Then, a path in $G$ from $v_x$ to $v_y$ corresponds
-to a family of strategies which take a robot from $x$ to the segment containing
-$y$.
-\end{lemma}
-
-\begin{proof}
-By Lemma \ref{def:transition}, each edge in the path from $v_x$ to $v_y$
-describes a family of bounce laws which can take a robot from any point in the
-source edge to a point in the target edge. The transition functions represented
-by these families can be composed together under normal function composition.
-{\color{red} describe how domain/range overlap is computed - interval propagation}
-\end{proof}
-
-\begin{definition}
-Two line segements $i$ and $j$ are \emph{entirely visible} to each other iff
-every pair of points $x \in i$ and $y \in j$ are visible.
-\end{definition}
-
 \begin{proposition}
 Given two entirely visible line segments $i$ and $j$, and a connected subset
 $i_{sub} \subseteq i$, it is possible to compute the maximum range of angles 
@@ -642,14 +623,43 @@ Note that when we compute pre- and post-images of transitions under our robot
 model, only cases 1 and 3 apply: either the robot bounces at a singleton angle
 or a range of angles. 
 
+\subsection{Navigation}
+
+\begin{definition}
+\textbf{Navigation}:
+Given a polygonal environment $P$, a start set of possible robot positions along the
+environment boundary $S$, and a goal set $G$, determine a strategy $\pi$ which
+will be guaranteed to take the robot from any point in $S$ to a point in $G$, or
+determine that no such strategy exists.
+\end{definition}
+
+\begin{lemma}
+Given $\Pi$, a non-overlapping partition of the environment boundary $\partial P$, and the resulting edge-to-edge visibility graph
+$G$, and points $x,y \in \partial P$, let $v_x \in V(G)$ be the node representing
+the segment in $\Pi$ that contains $x$, and $v_y$ be the node corresponding to
+the segment containing $y$. Then, a path in $G$ from $v_x$ to $v_y$ corresponds
+to a family of strategies which take a robot from $x$ to the segment containing
+$y$.
+\end{lemma}
+
+\begin{proof}
+By Lemma \ref{def:transition}, each edge in the path from $v_x$ to $v_y$
+describes a family of bounce laws which can take a robot from any point in the
+source edge to a point in the target edge. The transition functions represented
+by these families can be composed together under normal function composition.
+{\color{red} describe how domain/range overlap is computed - interval propagation}
+\end{proof}
+
+\begin{definition}
+Two line segements $i$ and $j$ are \emph{entirely visible} to each other iff
+every pair of points $x \in i$ and $y \in j$ are visible.
+\end{definition}
+
+
 The crux of the algorithm is that from each arc $e_{ij}$ in $BVG$, we can compute
 intervals of departure angles $\tilde{\theta}$ under which \emph{any} point in
 $e_i$ can transition to \emph{some} point in $e_j$. Thus, a path in $BVG$
 represents the composition of such guaranteed transitions.
-
-If a robot has some guaranteed minimum uncertainty in its actuation, we may
-"trim" both ends of each angle interval in the strategy to determine if a "safe"
-strategy exists under this actuation uncertainty.
 
 \begin{algorithm}
 \caption{Generating a nondeterministic bounce strategy for navigation from any
@@ -658,10 +668,11 @@ point in start set $S$ to a point in goal set $G$.}
 
 \begin{algorithmic}
 \Procedure{Navigate}{$poly$, $G$, $S$, $criterion$}
-\State $BVD \gets$ \Call{PartitionPoly}{$poly$, $G$, $S$}
-\State $paths \gets$ \Call{BFS}{$BVD$, $G$, $S$}
-\State $strategies \gets$ \Call{getStrategies}{$paths$}
-\State \Return \Call{argmax}{strategies, \textsc{getAngInt}}
+\State $BVD \gets$ \Call{PartitionPoly}{$poly$}
+\State $path \gets$ \Call{PreImageBackchain}{$BVD$, $G$, $S$}
+\State $strategy \gets$ \Call{getStrategy}{$path$, $k$}
+\Comment $k$ is an upper bound on the path length
+%\State \Return \Call{argmax}{strategies, \textsc{}}
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
@@ -674,14 +685,20 @@ $\max_{i \in \{1,\ldots, k\}}( \min(angle\_range(f_i) ))$
 We would like to chain together nondeterministic transitions such that each
 transition is guaranteed to land in the "basin" of the next.
 
-given start interval, compute maximum-angle interval transitions to all visible
-edges
+We use pre-image backchaining to determine sequences of edges which might allow
+such transitions, based on visibility properties. This is found through a simple
+breadth-first search through the graph from the goal to the start.
 
-then do BFS from goal set in this constrained graph back to the start interval
+Then, we must determine strategies which can execute these series of transitions
+from the start interval. This is done using forward projection from the start
+set. It is possible that some of these transitions may be impossible without
+more precise knowledge of the robot's position than is available (see Case 2 in
+Proposition 2).
 
-could be multiple paths with same number of bounces that get to goal set
-
-reachability vs. guaranteed-along-all-paths
+There are several methods of dealing with this. We can reduce uncertainty by
+finding a nearby limit cycle and including it in our path, allowing us to
+arbitrarily reduce uncertainty. We can use
+contraction mappings along the way to reduce uncertainty in a similar way.
 
 We have three degrees of freedom when computing action preimages - the angle
 interval and the size/location of the subinterval.
@@ -696,13 +713,52 @@ interval, creating a contradiction. The maximum size subinterval will always cor
 $\theta$, such that $l_{sub}$ and $r_{sub}$ are parallel. The location of this
 interval will depend on the local geometry.
 
+Case 1: start set is entirely contained within equivalence class
+
+Case 2: start set is split across equivalence classes (make strategies for
+subsets of start set and intersect - what kinds of strategy intersections make
+sense?)
+
+could be multiple paths with same number of bounces that get to goal set
+
+reachability vs. guaranteed-along-all-paths
+
+
 \subsubsection{Constant Fixed Angle Controllers}
 
-For constant angle controllers, this
-ends up being a coupled problem - want to chain together preimages such that
-\emph{overall} angle range is as large as possible.
+If we wish to treat the special case of a constant controller $b(\alpha, \theta)
+= \theta$, we could find a strategy as described in Algorithm \ref{algo:nav} and
+then inspect the strategy to see if it admits a constant controller. However,
+this approach is not complete, since a different bounce sequence may allow a
+constant control strategy while than the one found by preimage backchaining.
 
-\textbf{In Convex Polygons}
+For a complete (up to bounded length) algorithm, we may incorporate the
+constraint on constant $\theta$ into the search procedure. At each step in the
+backwards search from the goal set, maintain an interval of angles which allow
+all the previously found transitions.
+
+
+
+
+\subsubsection{Constant Relative Angle Controllers}
+
+given initial position and orientation, can generate new visibility graph for
+all possible relative angles.
+
+\subsection{Patrolling \label{sec:cycles}}
+
+
+\begin{proposition}
+Every convex polygon admits a limit cycle, under a fixed-angle bounce law, 
+which visits each edge in cyclic order.
+\end{proposition}
+
+\begin{proof}
+
+%For each consecutive pair of edges of the polygon, $e_i$ and $e_{i+1}$, let
+%$\phi_i$ be the interior angle between them. By Lemma \ref{lemma:angrange}, the
+%transition function $f_i$ from edge $e_i$ to edge $e_{i+1}$ will be a
+%contraction mapping for all $\theta$ such that $0 < \theta < \phi_i/2$.
 
 \textbf{Definitions.}
 If a limit cycle inside a convex polygons with $n$ edges forms another convex polygon with $n$ edges, we call this limit cycle as convex $n$-cycle.
@@ -766,30 +822,6 @@ Remarks:
     \item We can analyze the case for $\theta \in [\pi/2, \pi)$ by symmetry.
     \item To get the range of all possible $\theta$ that will lead to a limit cycle tangent to each edge of the polygon sequentially, we can solve for $|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and then intersect the result with (0, $\min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
 \end{enumerate}
-
-
-
-
-
-\subsubsection{Constant Relative Angle Controllers}
-
-given initial position and orientation, can generate new visibility graph for
-all possible relative angles.
-
-\subsection{Patrolling \label{sec:cycles}}
-
-
-\begin{proposition}
-Every convex polygon admits a limit cycle, under a fixed-angle bounce law, 
-which visits each edge in cyclic order.
-\end{proposition}
-
-\begin{proof}
-
-For each consecutive pair of edges of the polygon, $e_i$ and $e_{i+1}$, let
-$\phi_i$ be the interior angle between them. By Lemma \ref{lemma:angrange}, the
-transition function $f_i$ from edge $e_i$ to edge $e_{i+1}$ will be a
-contraction mapping for all $\theta$ such that $0 < \theta < \phi_i/2$.
 
 
 \end{proof}
@@ -1488,6 +1520,11 @@ mappings).
 
 
 \section{Open Questions and Future Work}
+
+If a robot has some guaranteed minimum uncertainty in its actuation, we may
+"trim" both ends of each angle interval in the strategy to determine if a "safe"
+strategy exists under this actuation uncertainty.
+
 
 Future work also includes:
 
