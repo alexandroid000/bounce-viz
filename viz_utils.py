@@ -88,11 +88,12 @@ def PlotGraph(G, fname = "graph"):
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
 if __name__ == '__main__':
-    poly = simple_bit
+    poly = pent
     VizRay(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
     p1 = InsertAllTransitionPts(poly)
+    VizPoly(p1)
     #N = 3
     #for i in range(N):
     #    print(i,"th iteration")
@@ -101,5 +102,5 @@ if __name__ == '__main__':
     #VizPoly(poly, str(N)+"_iterations")
     G = mkGraph(p1)
     PlotGraph(G)
-    H = reduceGraphWrtAngle(G, 0.15, 0.19)
-    PlotGraph(H, "reduced_graph")
+    H = mkSafeGraph(G, p1)
+    PlotGraph(H, "safe_graph")

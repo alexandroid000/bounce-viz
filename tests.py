@@ -4,6 +4,7 @@ import unittest
 from bounce import *
 from geom_utils import *
 from graph_utils import *
+from graph_operations import *
 from maps import *
 
 class TestGeomUtils(unittest.TestCase):
@@ -136,6 +137,11 @@ class TestGeomUtils(unittest.TestCase):
         self.assertAlmostEqual(pt3[1], 250)
         self.assertAlmostEqual(pt4[0], -250)
         self.assertAlmostEqual(pt4[1], 250)
+
+    def test_nodeParam(self):
+        self.assertEqual(nodesCovered(square,(0.1,0.6)),[0,1,2])
+        self.assertEqual(nodesCovered(square,(0.9,0.1)),[3,0])
+        self.assertEqual(nodesCovered(square,(0.1,0.2)),[0])
 
 if __name__ == '__main__':
     unittest.main()
