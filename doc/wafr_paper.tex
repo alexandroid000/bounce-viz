@@ -270,9 +270,9 @@ with sensors such as pebbles, angle-measuring devices, and a reflexity detector.
 They then construct a hierarchy of these robot models, showing for instance that
 some can construct the vertex visibility graph of a polygonal environment
 and others cannot. Our questions are related but different - if the robot is
-given an environment representation (the vertex-edge visibility graph of a
-partitioned polygon), what tasks is it capable of accomplishing?
-
+given a compact environment representation (the vertex-edge visibility graph of a
+partitioned polygon), what tasks is it capable of accomplishing with only local
+sensing?
 
 \section{Outline of Results}
 
@@ -655,11 +655,11 @@ Two line segements $i$ and $j$ are \emph{entirely visible} to each other iff
 every pair of points $x \in i$ and $y \in j$ are visible.
 \end{definition}
 
+The crux of the algorithm is that we can determine which transitions between
+edges of $P'$ admit intervals of departure angles $\tilde{\theta}$ under which
+\emph{any} point in $e_i$ can transition to \emph{some} point in $e_j$.
 
-The crux of the algorithm is that from each arc $e_{ij}$ in $BVG$, we can compute
-intervals of departure angles $\tilde{\theta}$ under which \emph{any} point in
-$e_i$ can transition to \emph{some} point in $e_j$. Thus, a path in $BVG$
-represents the composition of such guaranteed transitions.
+Thus, a path in $BVG$ represents the composition of such guaranteed transitions.
 
 \begin{algorithm}
 \caption{Generating a nondeterministic bounce strategy for navigation from any
