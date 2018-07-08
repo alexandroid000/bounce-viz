@@ -136,4 +136,17 @@ def reduceGraphWrtAngle(G, theta_min, theta_max):
         print(H.edge)
     return H
 
-
+def mkSafeGraph(G, poly):
+    psize = len(poly)
+    H = nx.DiGraph()
+    H.add_nodes_from(G.nodes())
+    new_edges = []
+    for i in H.nodes():
+        outgoing = G.edge[i]
+        for e in outgoing:
+            e1 = (poly[i], poly[(i+1)%psize])
+            e2 = (poly[e], poly[(e+1)%psize])
+            if SafeAngles(e1,e2):
+                new_edges.append((i,e))
+    H.add_edges_from(new_edges)
+    return H
