@@ -425,3 +425,26 @@ def AnglesBetweenSegs(e1, e2):
 
     return min_ang, max_ang
 
+# return angle range that allows transition from e1 to e2
+# from *anywhere* on e1
+# or return None if there is no such range
+def SafeAngles(e1, e2):
+    (p1,p2) = e1
+    (p3,p4) = e2
+    if p1 == p4:
+        theta_l = pi
+        theta_r = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+    elif p2 == p3:
+        theta_r = 0.0
+        theta_l = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
+    else:
+        theta_l = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
+        theta_r = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+    if abs(theta_l - theta_r) > 0.01: # declare lines parallel if within 1 deg
+        return theta_l, theta_r
+    else:
+        return None
+
+#def MaxPreimage(e1, e2):
+
+
