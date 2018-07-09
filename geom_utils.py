@@ -44,7 +44,7 @@ def AngleDifference(theta1,theta2):
     return d
 
 def FixAngle(theta):
-        return theta % (2.0*pi)
+    return theta % (2.0*pi)
 
 def PointDistance(p,q):
     return sqrt((p[0]-q[0])*(p[0]-q[0])+(p[1]-q[1])*(p[1]-q[1]))
@@ -202,24 +202,6 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
             # check if it's parallel and overlapping for degenerate polys
             except:
                 pass
-#                if IsThreePointsOnLine(p2, v1, v2):
-#                    d1 = PointDistance(p2, v1)
-#                    d2 = PointDistance(p2, v2)
-#                    if (d1 < closest_bounce) or (d2 < closest_bounce):
-#                        if d1 < d2:
-#                            bounce_point = v1
-#                            closest_bounce = d1
-#                            bounce_edge = j
-#                            found_coll = True
-#                        else:
-#                            bounce_point = v2
-#                            closest_bounce = d2
-#                            bounce_edge = j+1
-#                            found_coll = True
-#
-#
-#                else:
-#                    pass
     if found_coll:
         return bounce_point, bounce_edge
     else:
@@ -441,7 +423,7 @@ def SafeAngles(e1, e2):
         theta_l = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
         theta_r = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
     if abs(theta_l - theta_r) > 0.01: # declare lines parallel if within 1 deg
-        return theta_l, theta_r
+        return (theta_l, theta_r)
     else:
         return None
 
