@@ -141,12 +141,14 @@ def mkSafeGraph(G, poly):
     H = nx.DiGraph()
     H.add_nodes_from(G.nodes())
     new_edges = []
+    viz_verts = mkVizSets(poly)
     for i in H.nodes():
         outgoing = G.edge[i]
         for e in outgoing:
             e1 = (poly[i], poly[(i+1)%psize])
             e2 = (poly[e], poly[(e+1)%psize])
-            if SafeAngles(e1,e2):
-                new_edges.append((i,e))
-    H.add_edges_from(new_edges)
+            e_viz = (e in viz_verts[i]) and ((e+1)%psize in viz_verts[i])
+            if SafeAngles(e1,e2) and e_viz:
+                new_edges.append((i,e,SafeAngles(e1,e2)))
+    H.add_weighted_edges_from(new_edges)
     return H
