@@ -230,18 +230,11 @@ perform a given task (such as navigation, patrolling, or localization).
 
 The constrained motion model that we use (forward motion until collision,
 followed by rotation) is inspired by commercially available robots
-for vacuuming, pool cleaning, lawn mowing, and similar applications. It is also
- relevant to the dynamics of some microorganisms - in \cite{microorganism2017}, the authors show that a
-\textit{Chlamydomonas reinhardtii} cell would bounce off a surface with a
-monotonic fixed angle bounce. This line of work characterizes periodic and
-chaotic trajectories in regular polygons, planar curves, and other environments.
-They analyze dynamics of fixed bounce angles, without a focus on generating control
-strategies. In other dynamical systems literature, other reflection laws have been studied -
-the most common is a purely specular reflection law, but contracting laws have
-also attracted recent interested \cite{DelMagno2014,billiards,pinball} (no pun intended).
+for vacuuming, pool cleaning, lawn mowing, and similar applications. In robotics, 
 
+{\color{red} mason, erdmann, goldberg, funnelling and squeeze grasping.
+lozano-perez, mason, taylor compliant motion.}
 
-In robotics, 
 {\color{red} add todd murphey ergodic paths, and that other ergodic path one steve
 found, and the chaotic controller papers}
 
@@ -281,6 +274,18 @@ was analyzed along with the vertex-edge visibility graph in \cite{rourke_viz}. {
 O(n+k) algo for constructing vertex-edge. But correspondence to edge
 requires $O(n^2)$ at least - confirm? Also, is this valid w/out general
 position? Strong assumption on g.p. in O'Rourke paper}
+
+Our robot model is related to questions of \emph{dynamical billiards}. Many 
+possible reflection laws have been studied -
+the most common is a purely specular reflection law, but contracting laws have
+also attracted recent interested \cite{DelMagno2014,billiards,pinball} (no pun intended). 
+One very similar work was inspired by the dynamics of microorganisms - in \cite{microorganism2017}, 
+the authors show that 
+\textit{Chlamydomonas reinhardtii} bounce off a surface with a
+monotonic fixed angle bounce. They characterize periodic and
+chaotic trajectories of such agents in regular polygons, planar curves, and other environments.
+They analyze dynamics of fixed bounce angles, without a focus on generating control
+strategies.
 
 Our work is also related to lines of questions in computational geometry on what
 parts of a polygon will be illuminated by a light source after multiple
