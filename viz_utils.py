@@ -2,6 +2,7 @@
 
 from geom_utils import *
 from graph_utils import *
+from graph_operations import *
 from maps import *
 import numpy as np
 
@@ -23,9 +24,9 @@ def VizRay(poly):
     rvs = FindReflexVerts(poly)
     for p in rvs:
         plt.plot([poly[p][0]], [poly[p][1]], 'bo')
-        r1, r2 = ShootRaysFromReflex(poly, p)
+        r_children = ShootRaysFromReflex(poly, p)
         transition_pts = ShootRaysToReflexFromVerts(poly,p)
-        transition_pts.extend([r1,r2])
+        transition_pts.extend(r_children)
         for (pt,k) in transition_pts:
             plt.plot([poly[p][0], pt[0]], [poly[p][1], pt[1]], 'green')
 
@@ -87,8 +88,48 @@ def PlotGraph(G, fname = "graph"):
     nx.draw_circular(G, with_labels=True, node_color='#DA70D6')
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
+def VizPath(poly, intervals):
+    psize = len(poly)
+    jet = plt.cm.jet
+    colors = jet(np.linspace(0, 1, psize))
+
+    # plot only polygon, no axis or frame
+    fig = plt.figure(frameon=False)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.axis('off')
+
+    wall_x = [x for (x,y) in poly]
+    wall_x.append(wall_x[0])
+    wall_y = [y for (x,y) in poly]
+    wall_y.append(wall_y[0])
+    plt.plot(wall_x, wall_y, 'black')
+    for i in range(psize):
+        point = poly[i]
+        plt.scatter(point[0], point[1], color=colors[i])
+        plt.annotate(str(i), (point[0]+10, point[1]+10), size = 'small')
+    plt.axis('equal')
+
+    print(intervals)
+
+    interval_ts = list(zip(intervals, intervals[1:]))
+    for i in interval_ts:
+        print(i)
+    p1, p2 = list(interval_ts)[0][0]
+    plt.plot([p1[0],p2[0]], [p1[1], p2[1]], 'red',linewidth=5)
+
+    for ((pt1, pt2), (new_pt1, new_pt2)) in interval_ts:
+        print("plotting", ((pt1, pt2), (new_pt2, new_pt1)))
+        plt.plot([new_pt1[0],new_pt2[0]], [new_pt1[1], new_pt2[1]], 'red',linewidth=5)
+        plt.plot([pt1[0],new_pt2[0]], [pt1[1], new_pt2[1]], 'green')
+        plt.plot([pt2[0],new_pt1[0]], [pt2[1], new_pt1[1]], 'green')
+
+    plt.savefig('path.png', dpi = 300)
+    plt.show()
+
+
+
 if __name__ == '__main__':
-    poly = pent
+    poly = poly3
     VizRay(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
@@ -104,3 +145,7 @@ if __name__ == '__main__':
     PlotGraph(G)
     H = mkSafeGraph(G, p1)
     PlotGraph(H, "safe_graph")
+    S = (0.1,0.15)
+#    path = navigate(poly, S, (0.55, 0.56))
+#    intervals = PropagatePath(p1, path, S)
+#    VizPath(p1, intervals)
