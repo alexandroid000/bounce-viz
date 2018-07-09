@@ -3,6 +3,7 @@
 # graph_operations.py
 # applications of the bounce visibility graph to robotic tasks
 
+from geom_utils import *
 from graph_utils import *
 from copy import copy
 from maps import *
@@ -69,14 +70,63 @@ def nodesCovered(poly, interval):
 def navigate(poly, S, G):
     P = InsertAllTransitionPts(poly)
     BVD = mkGraph(P)
+    safe_BVD = mkSafeGraph(BVD, P)
     # find all paths with fewest bounces
     # choose the one with the widest ang interval
     paths = []
     for g in nodesCovered(poly, G):
         for s in nodesCovered(poly, S):
-            print(g,s)
-            paths.append(findPaths(BVD, g, s))
+            paths.append(findPaths(safe_BVD, g, s))
+    return path2transitions(paths[0], safe_BVD)
     #strategy = getStrategies(BVG, S, "const", path)
+
+def path2transitions(path, BVD):
+    transitions = []
+    path = list(path)[0]
+    path.reverse()
+    for (i,j) in zip(path, path[1:]):
+        ang_range = BVD.get_edge_data(i,j)['weight']
+        transitions.append((i,j,ang_range))
+    return transitions
+
+def PropagatePath(poly, path, S):
+    psize = len(poly)    
+    (s1, s2) = S
+    p1, p2 = s(s1, poly), s(s2, poly)
+    ints = [(p1,p2)]
+    print(path)
+    for (i,j, ang_range) in path:
+        theta_i = FixAngle( atan2(poly[(i+1)%psize][1]-poly[i][1],\
+                                 poly[(i+1)%psize][0]-poly[i][0]))
+        print("orientation of edge",i,"is", theta_i)
+        P1_FOUND = False
+        P2_FOUND = False
+
+        if abs(ang_range[0] - pi) < EPSILON:
+            next_p2 = poly[i]
+            P2_FOUND = True
+        if abs(ang_range[1]) < EPSILON:
+            next_p1 = poly[(i+1)%psize]
+            P1_FOUND = True
+
+
+        theta_l = FixAngle(theta_i + ang_range[0])
+        print("theta_l", theta_l)
+        theta_r = FixAngle(theta_i + ang_range[1])
+        print("theta_r", theta_r)
+        # heuristic to generate vector, hacky
+        d = 0.1*PointDistance(poly[i], poly[j])
+        (p1,p2) = ints[-1]
+        p1theta = (p1[0]+d*cos(theta_l), p1[1]+d*sin(theta_l))
+        p2theta = (p2[0]+d*cos(theta_r), p2[1]+d*sin(theta_r))
+        if not P1_FOUND:
+            print("shoot ray from",p2,"to",p2theta)
+            next_p1, k = ClosestPtAlongRay(p2,p2theta,poly,last_bounce_edge=i)
+        if not P2_FOUND:
+            print("shoot ray from",p1,"to",p1theta)
+            next_p2, k = ClosestPtAlongRay(p1,p1theta,poly,last_bounce_edge=i)
+        ints.append((next_p1, next_p2))
+    return ints
 
 if __name__ == '__main__':
     navigate(square, (0.1,0.2), (0.8,0.9))
