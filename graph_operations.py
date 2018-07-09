@@ -76,14 +76,14 @@ def navigate(poly, S, G):
     paths = []
     for g in nodesCovered(poly, G):
         for s in nodesCovered(poly, S):
-            paths.append(findPaths(safe_BVD, g, s))
+            paths.append(findPaths(safe_BVD, s, g))
     return path2transitions(paths[0], safe_BVD)
     #strategy = getStrategies(BVG, S, "const", path)
 
 def path2transitions(path, BVD):
     transitions = []
     path = list(path)[0]
-    path.reverse()
+    #path.reverse()
     for (i,j) in zip(path, path[1:]):
         ang_range = BVD.get_edge_data(i,j)['weight']
         transitions.append((i,j,ang_range))
