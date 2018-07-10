@@ -351,7 +351,7 @@ of the infinite set of possible transitions between points on the boundary of
 the original polygon. See Algorithm \ref{algo:insert} for a pseudocode
 description of this partitioning process.
 
-et $P'$ be the polygon $P$ with all partial local sequence points inserted.
+Let $P'$ be the polygon $P$ with all partial local sequence points inserted.
 Let the edge set of $P'$ be $E'$, with $n'$ elements.
 
 \begin{definition}
@@ -362,6 +362,22 @@ that $s_i$ and $s_j$ can be connected with a line segment which is entirely
 within the interior of $P$ (the points can ``see" each other).
 \end{definition}
 
+
+Define an equivalence relation $\thicksim$ such that for $s_1, s_2 \in \partial
+P$, $s_1 \thicksim s_2$ if and only if the visibility polygons of $s_1$ and $s_2$ have
+the same edge visibility graphs. This relation satisfies the necessary
+properties,
+
+\begin{itemize}
+\item reflexivity
+\item symmetry
+\item transitivity
+\end{itemize}
+
+The partition of $\partial P$ created by Algorithm \ref{algo:insert} are the
+equivalence classes induced by $\thicksim$.
+
+
 Let the \textbf{bounce visibility graph} be the directed edge visibility graph of
 $P'$. While visibility is a symmetric property, we use directed edges in this
 case so that we can augment each edge with a label function which stores
@@ -369,6 +385,10 @@ geometrical constraints on the visibility from one edge to another. This allows
 us to make statements such as ``the robot may transition from $e_i$ to $e_j$
 from any point on $e_i$ if it departs the edge within angle range
 $\tilde{\theta}$."
+
+
+
+
 
 
 We now define the \textbf{bounce visibility diagram}. We choose an arbitrary vertex
@@ -379,10 +399,22 @@ We can then use a labelling function $l: \partial P \to [0, \ldots, n']$ to
 label each point $p \in \partial P$ with the edge segment in $P'$ that it
 belongs to. The graph of the function $f: \partial P \times [0, \pi] \to [0,
 \ldots, n']$ is the bounce visibility diagram. See Figures \ref{fig:bvd} and
-\ref{fig:regular_pent_bvd} for examples. The diagram gives us
-some visual insight into the structure of the problem - for example, certain
-transitions cannot be accomplished with a single $\theta$ from anywhere on the
-originating segement.
+\ref{fig:regular_pent_bvd} for examples.
+
+{\color{red} change so regions are assigned a unique "color" or "label" based on
+destination segment, and get plots to reflect this}
+
+The bounce visibility diagram gives us some visual insight into the structure of
+the problem. For example, in Figure \ref{fig:regular_pent_bvd} we can see that
+there are intervals of $\theta$ for which we can draw lines horizontally across
+the diagram without crossing regions within segments ($0 < \theta < 0.6$ and $2.5 <
+\theta < \pi$). If we can draw such lines across the region of a single
+segment, it indicates that for that range of $\theta$, all bounces departing at
+that angle from anywhere in the segment will land on the same segment. If we can
+draw such line across the entire diagram, this indicates that this property
+holds true for the entire polygon. We call such transitions \emph{safe
+bounces}, since for a range of $\theta$, $f(s,\theta)$ maps from one equivalence
+class on the boundary to another.
 
 \begin{figure}[h]
 \centering
