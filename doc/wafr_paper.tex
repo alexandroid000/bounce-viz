@@ -891,11 +891,11 @@ $n$-cycle regardless of the robot's start position.
 \end{proof}
 
 Remarks:
+
 \begin{enumerate}
     \item We can analyze the case for $\theta \in [\pi/2, \pi)$ by symmetry.
     \item To get the range of all possible $\theta$ that will lead to a limit cycle tangent to each edge of the polygon sequentially, we can solve for $|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and then intersect the result with (0, $\min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
 \end{enumerate}
-
 
 \end{proof}
 
@@ -940,25 +940,14 @@ applications.
 cycles can contain non-contracting bounces - there are lots of cycles
 \end{lemma}
 
+Algorithm: finding limit cycles is done by finding cycles in graph with
+contraction coefficient less than 1
 
-\begin{theorem}
-cycle-finding algorithm is sound, complete up to bounded length
-\end{theorem}
 
-\begin{proof}
-make graph, quotient so that non-contraction edges are removed / edge conditions
-are modified appropriately
-
-then find cycle basis
-\end{proof}
-
-Example: using cycles to arbitrarily control uncertainty
-
+Example: using cycles to control uncertainty
 
 Patrolling synthesis algorithm: given periodic sequence of edges, return a controller that
 results in a stable limit cycle that visits those edges in that sequence.
-
-What if we can insert edges into the sequence?
 
 \subsection{Localization}
 
@@ -967,32 +956,28 @@ A localization strategy is a nondeterministic strategy that produces paths all
 ending at the same node, from a starting set.
 \end{definition}
 
-\begin{theorem}
-localization is correct and complete up to symmetry ("splitting" angle ranges
-will always exist if and only if symmetry is broken)
-\end{theorem}
-
-
-\section{Extensions}
-
-\begin{corollary} bounce angle range returned is correct, and optimal
-   (largest range)
-\end{corollary}
+Connect to Shell/Alam/Bobadilla work on limit cycles for localization.
 
 \begin{theorem}
 reachability of graph gives ordering on the power of bounce laws
 \end{theorem}
 
-\subsection{Localization}
 
-\subsubsection{Incorporating other Sensor Models}
+\section{Open Questions and Future Work}
 
-\section{Examples}
+\begin{corollary} bounce angle range returned is correct, and optimal
+   (largest range)
+\end{corollary}
 
-\subsection{office space w/ long hallway}
-\subsection{``almost symmetric" environment}
-\subsection{worst case complexity}
 
+%\subsubsection{Incorporating other Sensor Models}
+%
+%\section{Examples}
+%
+%\subsection{office space w/ long hallway}
+%\subsection{``almost symmetric" environment}
+%\subsection{worst case complexity}
+%
 \iffalse
 
 {\small
