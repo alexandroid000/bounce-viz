@@ -1,40 +1,35 @@
-\documentclass[]{styles/svproc}  % Comment this line out
+\documentclass[]{svproc}  % Comment this line out
 
 %\IEEEoverridecommandlockouts                              % This command is only
                                                           % needed if you want to
                                                           % use the \thanks command
 %\overrideIEEEmargins
 
-\usepackage[margin=1in]{geometry}
+%\usepackage[margin=1in]{geometry}
 \usepackage{amsmath}    % need for subequations
+\usepackage{amssymb}
 %\usepackage{amsthm}
 \usepackage{graphicx}   % need for figures
-\usepackage[font=footnotesize,labelfont=footnotesize]{caption}
-\usepackage{verbatim}   % useful for program listings
+%\usepackage[font=footnotesize,labelfont=footnotesize]{caption}
+%\usepackage{verbatim}   % useful for program listings
 \usepackage{color}      % use if color is used in text
-%\usepackage{begin{subfigure} % use for side-by-side figures
+%\usepackage{subfigure} % use for side-by-side figures
 \usepackage{subcaption}
-\usepackage{hyperref} % use for hypertext links, including those to external documents and URLs
-\usepackage{multirow}
-\usepackage{rotating}
-\usepackage{array}
-\usepackage{xspace}
-\usepackage{indentfirst}
-\usepackage{amssymb}
-\usepackage{float}
+%\usepackage{hyperref} % use for hypertext links, including those to external documents and URLs
+%\usepackage{multirow}
+%\usepackage{rotating}
+%\usepackage{array}
+%\usepackage{xspace}
+%\usepackage{indentfirst}
+%\usepackage{float}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-\usepackage{comment}
-\usepackage{sidecap}
-\usepackage{booktabs}
+%\usepackage{comment}
+%\usepackage{sidecap}
+%\usepackage{booktabs}
+\usepackage{url}
+\def\UrlFont{\rmfamily}
 
-%\newtheorem{theorem}{\bf Theorem}
-%\newtheorem{todo}{\bf Todo}
-%\newtheorem{remark}{\bf Remark}
-%\newtheorem{corollary}{\bf Corollary}
-%\newtheorem{definition}{\bf Definition}
-%\newtheorem{lemma}{\bf Lemma}
-%\newtheorem{proposition}[theorem]{\bf Proposition}
 
 % bounce transition graph
 % visibility event graph
@@ -55,17 +50,39 @@
 
 %\title{Path Synthesis from Dynamical Specifications \\ for Blind Mobile Robots in Polygons}
 
+%
+%
+%
+%%%% list of authors for the TOC (use if author list has to be modified)
+%\tocauthor{Ivar Ekeland, Roger Temam, Jeffrey Dean, David Grove,
+%Craig Chambers, Kim B. Bruce, and Elisa Bertino}
+%
+
+\begin{document}
+\mainmatter              % start of a contribution
+
+
 % A Toolbox for
 \title{A Visibility-Based Approach to Computing Nondeterministic Bouncing
 Strategies}
-\author{Alexandra Q. Nilles, Yingying Ren, Steven M. LaValle% <-this % stops a space
-%\thanks{This work was partially supported by National Science Foundation (award numbers CMMI-1100579 and IIS-1302393).}
+
+\titlerunning{Nondeterministic Bouncing Strategies}  % abbreviated title (for running head)
+%                                     also used for the TOC unless
+%                                     \toctitle is used
+\author{Alexandra Q. Nilles\inst{1} \and Yingying Ren\inst{1} \and Israel
+Becerra\inst{1} \and Steven M. LaValle\inst{1}% <-this % stops a space
 }
+\authorrunning{Alexandra Nilles et al.} % abbreviated author list (for running head)
+%\thanks{This work was partially supported by National Science Foundation (award numbers ).}
+%\institute{Princeton University, Princeton NJ 08544, USA,\\
+%\email{I.Ekeland@princeton.edu},\\ WWW home page:
+%\texttt{http://users/\homedir iekeland/web/welcome.html}
+%\and
+%Universit\'{e} de Paris-Sud,
+%Laboratoire d'Analyse Num\'{e}rique, B\^{a}timent 425,\\
+%F-91405 Orsay Cedex, France}
 
-\institute{University of Illinois at Urbana-Champaign}
-
-\begin{document}
-
+%\institute{University of Illinois at Urbana-Champaign}
 
 \maketitle
 
@@ -87,23 +104,6 @@ uncertainty in the robot's actuation, providing design constraints for different
 environments and tasks.
 \end{abstract}
 
-\begin{figure}
-    \includegraphics[width=0.8\linewidth]{figures/bounce_examples.pdf}
-    \centering
-    \caption[test]{\label{fig:bex}Examples of different ``bouncing laws" which can be implemented on
-mobile robots. In the first row, $b(\alpha, \theta) = \theta$, which we refer to
-as a \textbf{fixed} bounce law. In the second row, we have a \textbf{monotonic
-fixed} bounce law, where
-$b(\alpha, \theta) = \theta$ or $\pi-\theta$, depending on what is necessary to
-preserve monotonicity of travel direction along the $x$-axis. In the third
-row, $b(\alpha, \theta) = \alpha - \theta$, rotating $\alpha$ through $\theta$ in the clockwise
-direction. It is possible that this rotation will cause the 
-heading of the robot to still be facing into the boundary, in which case this model usually has the robot 
-perform the rotation again until its heading points into the free space. We
-refer to this as a \textbf{relative} bounce law ($\alpha$ appears on the
-right hand side of the bounce law).
-}
-\end{figure}
 
 \section{Introduction}
 
@@ -128,11 +128,11 @@ iRobot vacuum models. The first approach is very powerful, but also
 resource-intensive and difficult to reason about formally; the second approach 
 is more efficient but it is not as immediately clear how to accomplish tasks
 such as navigation and loop-closure. We imagine a dual
-approach, where global geometrical information is either provided \emph{a
+approach: first, global geometrical information is either provided \emph{a
 priori} to the system (for instance, from a floor plan), or calculated online by
-an algorithm such as SLAM, but then the global geometry is processed to produce
-a strategy which uses minimal processing power and only robust local
-sensors.
+an algorithm such as SLAM. Second, the global geometry is processed to produce
+a strategy with strong formal guarantees which uses minimal processing power 
+and only simple local sensors.
 
 Inspired by the motion patterns of many commercially available mobile robots, 
 we consider simple robots with ``bouncing" behaviors: robots that
@@ -202,6 +202,23 @@ is in contact with the environment boundary, executes an action $u_k$, and then
 moves forward until the next contact with the boundary at stage $u_{k+1}$.
 \end{itemize}
 
+\begin{figure}
+    \includegraphics[width=0.8\linewidth]{figures/bounce_examples.pdf}
+    \centering
+    \caption[test]{\label{fig:bex}Examples of different ``bouncing laws" which can be implemented on
+mobile robots. In the first row, $b(\alpha, \theta) = \theta$, which we refer to
+as a \textbf{fixed} bounce law. In the second row, we have a \textbf{monotonic
+fixed} bounce law, where
+$b(\alpha, \theta) = \theta$ or $\pi-\theta$, depending on what is necessary to
+preserve monotonicity of travel direction along the $x$-axis. In the third
+row, $b(\alpha, \theta) = \alpha - \theta$, rotating $\alpha$ through $\theta$ in the clockwise
+direction. It is possible that this rotation will cause the 
+heading of the robot to still be facing into the boundary, in which case this model usually has the robot 
+perform the rotation again until its heading points into the free space. We
+refer to this as a \textbf{relative} bounce law ($\alpha$ appears on the
+right hand side of the bounce law).
+}
+\end{figure}
 
 \begin{definition}
 A \textbf{bounce law} is a specific controller for the robot, which determines
@@ -230,50 +247,60 @@ perform a given task (such as navigation, patrolling, or localization).
 
 The constrained motion model that we use (forward motion until collision,
 followed by rotation) is inspired by commercially available robots
-for vacuuming, pool cleaning, lawn mowing, and similar applications. In robotics, 
+for vacuuming, pool cleaning, lawn mowing, and similar applications. It is a
+form of \emph{compliant motion}.
 
 {\color{red} mason, erdmann, goldberg, funnelling and squeeze grasping.
-lozano-perez, mason, taylor compliant motion.}
+lozano-perez, mason, taylor compliant motion. wall following.}
+
+Collisions as information sources for small, lightweight mobile robots has been
+recently explored for multi-robot systems \cite{mayya2017collisions}.
 
 {\color{red} add todd murphey ergodic paths, and that other ergodic path one steve
 found, and the chaotic controller papers}
 
+Similar motion strategies have been used in \cite{OkaLav06} to determine minimal
+information processing requirements for localization. The study of the dynamical
+properties of these motion strategies was proposed in \cite{bounce} and
+continued in \cite{NilBecLav17}. This current work represents improvements in
+formalisms, and presents our insight into the use of visibility to discretize the
+strategy space.
+
 The most closely related work to ours is \cite{LewOKa13}, which addressed 
 the navigation task with a very similar robot
 model in polygons. Their robot moves in straight lines until encountering an environment
-boundary, at which point it is able to rotate in place, with some nondeterministic but
-bounded error. They then generate a strategy as a sequence of bounce angles which can 
-navigate the robot between given start and end locations in a known environment. Their approach only allows "safe actions," which place
+boundary, at which point it is able to rotate in place, with some bounded nonzero nondeterministic
+error. They then generate a strategy as a sequence of bounce angles which can 
+navigate the robot between given start and end locations in a known environment. 
+They introduce the idea of "safe actions," which place
 the entire forward projected state of the robot within a single
 linear segment of the polygonal environment. However, this algorithm is
 not complete, due to the method used to discretize the environment boundary and
 the restriction of only allowing deterministic transitions between boundary
 segments. Their navigation graph has $O(n^4)$ nodes, while ours includes only $O(n^2)$
-nodes. This approach requires heuristics for searching the graph efficiently,
-and also requires hand-crafted local planners for navigating long hallways.
+nodes.
 
 In \cite{alam2017minimalist} and \cite{alam2018space}, the authors describe
-navigation, coverage, and localization algorithms for a robot with a clock and
-contact sensor that is capable of performing relative angle bounces. Their
-approach uses a discretization of the robot configuration space and actuation
+navigation, coverage, and localization algorithms for a robot model, focused
+on bounce laws which turn a fixed amount relative to the robot's prior heading. 
+Their approach uses a grid discretization of the robot configuration space and actuation
 space, then searches the discretized dynamical system for limit cycles. The
 algorithm is complete and correct up to discretization error - periodic
 trajectories may exist which require bounce angles not allowed by the
-discretization. By using a discretization induced by the environment geometry, our 
-approach considers all possible bounce strategies. {\color{red} explain how to
-incorporate constraints on bounce angles here?}
+discretization. By using a discretization induced by the environment geometry,
+our approach considers all possible bounce strategies.
 
 The questions we pose, and our methods of attacking the problem, are related to
 work on visibility in computational geometry. Visibility graphs have been
 extensively in robotics, but usually in the context of the vertex visibility
 graph with the goal of avoiding obstacles {\color{red} add cites}. When we wish
 to intentionally use collisions strategically, we require a slightly more
-powerful data structure - the edge
-visibility graph for a partition of a polygon $P$. The edge visibility graph 
-was analyzed along with the vertex-edge visibility graph in \cite{rourke_viz}. {\color{red} they have an
-O(n+k) algo for constructing vertex-edge. But correspondence to edge
-requires $O(n^2)$ at least - confirm? Also, is this valid w/out general
-position? Strong assumption on g.p. in O'Rourke paper}
+powerful data structure - the edge visibility graph for a partition of a polygon
+$P$. The edge visibility graph was analyzed along with the vertex-edge
+visibility graph in \cite{rourke_viz}. {\color{red} they have an O(n+k) algo for
+constructing vertex-edge. But correspondence to edge requires $O(n^2)$ at least
+- confirm? Also, is this valid w/out general position? Strong assumption on g.p.
+in O'Rourke paper}
 
 Our robot model is related to questions of \emph{dynamical billiards}. Many 
 possible reflection laws have been studied -
@@ -366,7 +393,7 @@ within the interior of $P$ (the points can ``see" each other).
 Define an equivalence relation $\thicksim$ such that for $s_1, s_2 \in \partial
 P$, $s_1 \thicksim s_2$ if and only if the visibility polygons of $s_1$ and $s_2$ have
 the same edge visibility graphs. This relation satisfies the necessary
-properties,
+properties {\color{red} todo but easy},
 
 \begin{itemize}
 \item reflexivity
@@ -375,7 +402,7 @@ properties,
 \end{itemize}
 
 The partition of $\partial P$ created by Algorithm \ref{algo:insert} are the
-equivalence classes induced by $\thicksim$.
+equivalence classes induced by $\thicksim$ {\color{red} todo but easy}.
 
 
 Let the \textbf{bounce visibility graph} be the directed edge visibility graph of
@@ -415,6 +442,9 @@ draw such line across the entire diagram, this indicates that this property
 holds true for the entire polygon. We call such transitions \emph{safe
 bounces}, since for a range of $\theta$, $f(s,\theta)$ maps from one equivalence
 class on the boundary to another.
+
+{\color{red} need nice example here, something a little more exciting than
+regular pentagon, maybe two convex shapes with hallway between}
 
 \begin{figure}[h]
 \centering
@@ -523,7 +553,22 @@ vertices in the partial local sequences. % show the diagram to edge
 \label{fig:regular_pent_bvd}
 \end{figure}
 
-\section{Tasks}
+\subsection{Path Families}
+
+One major advantage of this approach is that it allows us to characterize
+properties of families of paths the robot may take.
+
+For example, the following two paths are produced by different bounce
+strategies, but 
+
+\section{Dynamical Properties of Paths}
+
+{\color{red} Introduce running example - floor plan with three features: region
+of high symmetry (maybe a row of offices), region with nonconvexity, and long
+hallway.
+
+Show with examples how useful trajectories in example correspond to queries to
+the graph.}
 
 Many tasks required of mobile robots can be specified in terms of properties of
 the path the robot takes through space. \emph{Navigation} requires a path that
@@ -958,12 +1003,16 @@ ending at the same node, from a starting set.
 
 Connect to Shell/Alam/Bobadilla work on limit cycles for localization.
 
+\subsection{Comparing Bounce Laws}
+
 \begin{theorem}
 reachability of graph gives ordering on the power of bounce laws
 \end{theorem}
 
 
 \section{Open Questions and Future Work}
+
+{\color{red} ergodicity / chaotic trajectories}
 
 \begin{corollary} bounce angle range returned is correct, and optimal
    (largest range)
@@ -1573,6 +1622,6 @@ resulting trajectory
 
 \fi
 
-\bibliographystyle{IEEEtran}
+%\bibliographystyle{IEEEtran}
 \bibliography{refs}
 \end{document}
