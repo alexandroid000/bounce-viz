@@ -5,28 +5,13 @@
                                                           % use the \thanks command
 %\overrideIEEEmargins
 
-%\usepackage[margin=1in]{geometry}
 \usepackage{amsmath}    % need for subequations
 \usepackage{amssymb}
-%\usepackage{amsthm}
 \usepackage{graphicx}   % need for figures
-%\usepackage[font=footnotesize,labelfont=footnotesize]{caption}
-%\usepackage{verbatim}   % useful for program listings
 \usepackage{color}      % use if color is used in text
-%\usepackage{subfigure} % use for side-by-side figures
 \usepackage{subcaption}
-%\usepackage{hyperref} % use for hypertext links, including those to external documents and URLs
-%\usepackage{multirow}
-%\usepackage{rotating}
-%\usepackage{array}
-%\usepackage{xspace}
-%\usepackage{indentfirst}
-%\usepackage{float}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-%\usepackage{comment}
-%\usepackage{sidecap}
-%\usepackage{booktabs}
 \usepackage{url}
 \def\UrlFont{\rmfamily}
 
@@ -41,8 +26,6 @@
 % skeptical questions:
 
 % - what if the robot starts very near to a boundary of equivalence classes?
-% - under what conditions will an *interval* of bounce angles take a robot from
-%   one interval to another? With contraction?
 
 % Using Visibility Equivalence Classes for High-Level Dynamical Path Synthesis
 
@@ -72,7 +55,7 @@ Strategies}
 \author{Alexandra Q. Nilles\inst{1} \and Yingying Ren\inst{1} \and Israel
 Becerra\inst{1} \and Steven M. LaValle\inst{1}% <-this % stops a space
 }
-\authorrunning{A. Nilles, Y. Ren, I. Becerra, S. LaValle} % abbreviated author list (for running head)
+\authorrunning{A. Nilles, Y. Ren, I. Becerra, S. M. LaValle} % abbreviated author list (for running head)
 %\thanks{This work was partially supported by National Science Foundation (award numbers ).}
 %\institute{Princeton University, Princeton NJ 08544, USA,\\
 %\email{I.Ekeland@princeton.edu},\\ WWW home page:
@@ -698,26 +681,31 @@ uncertainty in the robot's position, and to engineer stable limit cycles in
 Section \ref{sec:cycles}.
 
 \begin{definition}
-Let $\phi_{ij}$ be the interior angle between two segments $i$ and $j \in
-\partial P$ if they are extended 
-to infinity. The case where the segments are parallel will be handled separately
-where necessary.
+Let $\phi_{ij}$ be the interior angle between two edges $i, j \in \partial P$ if
+they are extended to infinity. The case where the segments are parallel will be
+handled separately where necessary. 
+\end{definition}
+
+\begin{definition}
+
+A function $f: \mathbb{R} \to \mathbb{R}$ is a contraction mapping if
+
+\begin{equation*}
+|f(x) - f(y)| \leq c |x-y|
+\end{equation*}
+
+where $0 \leq c < 1$. In other words, points under the mapping become closer
+together.
 \end{definition}
 
 \begin{lemma} \label{lemma:angrange}
+{\color{red} wrong - samara writing up correct version}
 The transition function $f(x, \theta)$ between
  segments $i$ and $j$ is a contraction mapping if and only if $\phi_{ij}/2 < \theta < \pi$ or $0 < \theta
 < \phi_{ij}/2$.
 \end{lemma}
 
 \begin{proof}
-The necessary condition for $f$ to be a contraction mapping is:
-
-\begin{equation*}
-|f(x) - f(y)| \leq c |x-y|
-\end{equation*}
-
-such that $0 \leq c < 1$.
 
 \begin{figure}
     \includegraphics[width=0.5\linewidth]{figures/contraction_map_cond.png}
@@ -733,8 +721,7 @@ From Figure \ref{fig:cont_map}, we can see that
 |f(x) - f(y)| = \frac{\sin(\theta - \phi)}{\sin(\theta)} |x-y|
 \end{equation*}
 
-from the law of sines, where $\phi$ is the angle between the two edges if they
-are extended to their intersection point. If the edges are parallel, a
+from the law of sines. If the edges are parallel, a
 contraction map is not possible (points will maintain their distance, not shrink
 closer together). Thus, whenever $| \frac{\sin(\theta - \phi)}{\sin(\theta)}
 | < 1$, $f$ is a contraction map, and the edge from $v_i v_{i+1}$ to $v_j
@@ -743,28 +730,139 @@ condition true.
 
 \end{proof}
 
-Let $C(\theta, \phi) = | \frac{\sin(\theta - \phi)}{\sin(\theta)} |$.
+\begin{definition}
+Let $C(\theta, \phi) = | \frac{\sin(\theta - \phi)}{\sin(\theta)} |$. We will
+refer to this value as the \textbf{contraction coefficient} of a transition between two
+edges of $\partial P$.
+\end{definition}
 
 For a sequence of bounces $b_1, \ldots, b_k$, we can construct the overall
 mapping from the domain of $b_1$ to the range of $b_k$ through function
 composition. Since $f$ is a linear mapping, the contraction property of a composition 
-of multiple bounces can be determined by multiplying the coefficients $C(\theta, \phi)$, 
-and the constraints on the angle range $\tilde{\theta}$ can be propagated through the 
-composition by intersecting the angle intervals.
+of multiple bounces can be determined by multiplying the contraction
+coefficients.
 
 If $\prod_{i=1}^k C(\theta_i, \phi_i) < 1$, the composition of bounces $b_1, \ldots, b_k$
 is a contraction mapping. This is true even if some transition $b_i$ is not a
 contraction mapping, since the coefficient is simply the ratio of distances
-between points before and after the mapping is applied.
+between points before and after the mapping is applied. Furthermore, the value
+of $\prod_{i=1}^k C(\theta_i, \phi_i)$ tells us the exact amount by which the
+size of the set of possible robot states has shrunk.
 
+{\color{red} describe how to propagate angle constraints and contraction coeffs
+over intervals of theta. Connect back to funnelling, maybe with a fig if we
+have space}
+
+%and the constraints on the angle range $\tilde{\theta}$ can be propagated through the 
+%composition by intersecting the angle intervals.
 
 \subsection{Cycles}
 
-A path which undergoes
-transitions $f_1, \ldots, f_k$ can be represented as the composition of each
-individual transition.
+A very common use of contraction mappings is to prove the existence of fixed
+points, due to the power of the Banach fixed point theorem \cite{Granas2003}.
+The exact condition needed is for a contraction mapping to map an interval back
+to itself. Since the transition function of a bouncing robot path is the
+composition of the individual bounce transition functions, we can create such a
+mapping by constructing a path which returns to its originating edge. A fixed
+point of this mapping is a stable limit cycle, which can be used to reduce an
+interval of possible robot positions to a single point (in the asymptotic
+limit).
 
-\subsection{Navigation}
+Such paths
+in regular polygons were characterized in \cite{NilBecLav17}, but have been
+observed experimentally in nonregular convex and nonconvex polygons. Here, we
+present a more general proof for the existence of limit cycles in all convex
+polygons.
+
+\begin{definition}
+If a limit cycle inside a convex polygons with $n$ edges forms another convex
+polygon with $n$ edges, we call this limit cycle as convex $n$-cycle.
+\end{definition}
+
+\begin{definition}
+$\phi_{P,min}$ is the smallest interior angle in a polygon $P$. We will omit the
+label $P$ when it is clear from context.
+\end{definition}
+
+\begin{theorem} \label{thm:convex}
+For all convex polygons with $n$ edges, there exists a range for $\theta$ such that fixed-angle bouncing strategy with $\theta$ will lead to a convex $n$-cycle regardless of the robot's start position.
+\end{theorem}
+\begin{proof}
+Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. Consider the
+triangle formed by two adjacent edges $e_i$, $e_{i+1}$ of $P$. The robot will
+bounce from $e_i$ to $e_{i+1}$ regardless of its start position if and only if
+$\theta \in (0, \angle v_{i+2}v_{i}v_{i+1})$. Thus, the robot will always bounce
+to the next adjacent edge if and only if
+$\theta \in (0, \min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
+
+Suppose we have two start positions $x$ and $y$ on edge $e_0$ and the two
+corresponding trajectories under fixed angle $\theta$. Denote the robot's
+position on $e_k$ after bouncing $k$ consecutive edges as $f^{k}(x)$ and
+$f^{k}(y)$ respectively. $\triangle f^{k}(x)v_{k+1}f^{k+1}(x)$ and
+$\triangle f^{k}(y)v_{k+1}f^{k+1}(y)$ are similar triangles since they share a
+common internal angle of the polygon, $\pi - \phi_{k,k+1}$, and the bouncing angle
+$\theta$.
+
+The distance between the two trajectories on $e_0$ after the robot bounces off
+every edge of the polygon, i.e., bounces off $n$ times, is
+$d(f^{n}(x), f^{n}(y))$.
+
+Since function composition multiplies the coefficients $C(\theta, \phi)$, 
+the distance between $x$ and $y$ changes after one orbit of the polygon by the
+ratio
+
+\begin{eqnarray*}
+\frac{d(f^{n}(x)), f^{n}(y))}{d(f^{0}(x), f^{0}(y))} = \prod_{i = 0}^{n-1}
+C(\theta, \phi_{i}).
+\end{eqnarray*}
+
+If $\prod_{i = 0}^{n-1} C(\theta, \phi_{i}) < 1$, then $f^k(x)$ is a contraction
+mapping from $e_0$ back to iteself, and by the Banach fixed-point theorem, it
+has a unique fixed point \cite{Granas2003}.
+
+The constraint $C(\theta,\phi_{i})<1$ is equivalent to
+$\theta < \frac{\phi_{i}}{2}$. So we can guarantee that this condition holds
+for the orbit by requiring
+
+\begin{equation*}
+\theta \in (0, \min(\min_{i = 0, 1, \dots, n-1}(\angle v_{i+2}v_{i}v_{i+1}),
+\frac{\phi_{P,min}}{2})),
+\end{equation*}
+
+in which case the fixed-angle bouncing strategy with $\theta$ leads to a convex
+$n$-cycle regardless of the robot's start position.
+\end{proof}
+
+Remarks:
+
+\begin{enumerate}
+    \item We can analyze the case for $\theta \in [\pi/2, \pi)$ by symmetry.
+    \item To get the range of all possible $\theta$ that will lead to a limit cycle tangent to each edge of the polygon sequentially, we can solve for $|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and then intersect the result with (0, $\min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
+\end{enumerate}
+
+{\color{red} compelling example to reward people for getting through all this:
+robot starts at large interval in convex poly with small doorway, and cycles
+until it reduces uncertainty enough to transition}
+
+\begin{figure}
+    \includegraphics[width=0.6\linewidth]{figures/bounce_preimages.pdf}
+    \centering
+    \caption{An example of how contraction properties can be used to control
+robot state uncertainty enough to navigate the robot through a narrow doorway,
+even with a lower bound on angle error. The dotted lines show a 
+parameterization of preimages.}
+\label{fig:preimage_example}
+\end{figure}
+
+
+\section{Applications}
+
+We have presented data structures (the bounce visibility diagram and bounce
+visibility graph, augmented with contraction information) which can be applied
+to several different strategy synthesis problems in mobile robotics. Indeed, we
+are only scratching the surface of possible applications and extensions.
+
+\subsection{Concise Plans for Navigation}
 
 Here, we define the \emph{navigation} task. Informally, we wish to decide if
 there is a strategy which uses only nondeterministic bounce laws which can cause
@@ -889,83 +987,6 @@ all possible relative angles.
 \subsection{Patrolling \label{sec:cycles}}
 
 
-\begin{proposition}
-Every convex polygon admits a limit cycle, under a fixed-angle bounce law, 
-which visits each edge in cyclic order.
-\end{proposition}
-
-\begin{proof}
-
-%For each consecutive pair of edges of the polygon, $e_i$ and $e_{i+1}$, let
-%$\phi_i$ be the interior angle between them. By Lemma \ref{lemma:angrange}, the
-%transition function $f_i$ from edge $e_i$ to edge $e_{i+1}$ will be a
-%contraction mapping for all $\theta$ such that $0 < \theta < \phi_i/2$.
-
-\textbf{Definitions.}
-If a limit cycle inside a convex polygons with $n$ edges forms another convex polygon with $n$ edges, we call this limit cycle as convex $n$-cycle.
-
-\begin{definition}
-$\phi_{P,min}$ is the smallest interior angle in a polygon $P$. We will omit the
-label $P$ when it is clear from context.
-\end{definition}
-
-\begin{theorem} \label{thm:convex}
-For all convex polygons with $n$ edges, there exists a range for $\theta$ such that fixed-angle bouncing strategy with $\theta$ will lead to a convex $n$-cycle regardless of the robot's start position.
-\end{theorem}
-\begin{proof}
-Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. Consider the
-triangle formed by two adjacent edges $e_i$, $e_{i+1}$ of $P$. The robot will
-bounce from $e_i$ to $e_{i+1}$ regardless of its start position if and only if
-$\theta \in (0, \angle v_{i+2}v_{i}v_{i+1})$. Thus, the robot will always bounce
-to the next adjacent edge if and only if
-$\theta \in (0, \min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
-
-Suppose we have two start positions $x$ and $y$ on edge $e_0$ and the two
-corresponding trajectories under fixed angle $\theta$. Denote the robot's
-position on $e_k$ after bouncing $k$ consecutive edges as $f^{k}(x)$ and
-$f^{k}(y)$ respectively. $\triangle f^{k}(x)v_{k+1}f^{k+1}(x)$ and
-$\triangle f^{k}(y)v_{k+1}f^{k+1}(y)$ are similar triangles since they share a
-common internal angle of the polygon, $\pi - \phi_{k,k+1}$, and the bouncing angle
-$\theta$.
-
-The distance between the two trajectories on $e_0$ after the robot bounces off
-every edge of the polygon, i.e., bounces off $n$ times, is
-$d(f^{n}(x), f^{n}(y))$.
-
-Since function composition multiplies the coefficients $C(\theta, \phi)$, 
-the distance between $x$ and $y$ changes after one orbit of the polygon by the
-ratio
-
-\begin{eqnarray*}
-\frac{d(f^{n}(x)), f^{n}(y))}{d(f^{0}(x), f^{0}(y))} = \prod_{i = 0}^{n-1}
-C(\theta, \phi_{i}).
-\end{eqnarray*}
-
-If $\prod_{i = 0}^{n-1} C(\theta, \phi_{i}) < 1$, then $f^k(x)$ is a contraction
-mapping from $e_0$ back to iteself, and by the Banach fixed-point theorem, it
-has a unique fixed point \cite{Granas2003}.
-
-The constraint $C(\theta,\phi_{i})<1$ is equivalent to
-$\theta < \frac{\phi_{i}}{2}$. So we can guarantee that this condition holds
-for the orbit by requiring
-
-\begin{equation*}
-\theta \in (0, \min(\min_{i = 0, 1, \dots, n-1}(\angle v_{i+2}v_{i}v_{i+1}),
-\frac{\phi_{P,min}}{2})),
-\end{equation*}
-
-in which case the fixed-angle bouncing strategy with $\theta$ leads to a convex
-$n$-cycle regardless of the robot's start position.
-\end{proof}
-
-Remarks:
-
-\begin{enumerate}
-    \item We can analyze the case for $\theta \in [\pi/2, \pi)$ by symmetry.
-    \item To get the range of all possible $\theta$ that will lead to a limit cycle tangent to each edge of the polygon sequentially, we can solve for $|\Pi_{i = 0}^{n-1}\frac{\sin(\theta)}{\sin(\Phi_{i}-\theta)}|<1$ and then intersect the result with (0, $\min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
-\end{enumerate}
-
-\end{proof}
 
 \begin{definition}
 A sequence of transitions $f_1 \circ \ldots \circ f_k$ is \textbf{strongly
@@ -1037,7 +1058,13 @@ reachability of graph gives ordering on the power of bounce laws
 
 
 
-{\color{red} ergodicity / chaotic trajectories}
+{\color{red} 
+\begin{itemize}
+\item efficient synthesis for navigation and localization - optimization formulation?
+\item characterization of swaths of bounce laws
+\item ergodicity / chaotic trajectories
+\end{itemize}
+}
 
 \begin{corollary} bounce angle range returned is correct, and optimal
    (largest range)
