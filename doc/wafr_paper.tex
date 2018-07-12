@@ -72,7 +72,7 @@ Strategies}
 \author{Alexandra Q. Nilles\inst{1} \and Yingying Ren\inst{1} \and Israel
 Becerra\inst{1} \and Steven M. LaValle\inst{1}% <-this % stops a space
 }
-\authorrunning{Alexandra Nilles et al.} % abbreviated author list (for running head)
+\authorrunning{A. Nilles, Y. Ren, I. Becerra, S. LaValle} % abbreviated author list (for running head)
 %\thanks{This work was partially supported by National Science Foundation (award numbers ).}
 %\institute{Princeton University, Princeton NJ 08544, USA,\\
 %\email{I.Ekeland@princeton.edu},\\ WWW home page:
@@ -112,8 +112,8 @@ spotted vacuuming our floors, cleaning our pools, mowing our grass, and moving
 goods in our warehouses. These tasks require certain properties of
 the robot's path through space: for example, a mowing or
 vacuuming robot should cover the whole space while not visiting 
-any particular area more frequently than others. A robot which is collecting
-data to monitor a space (such as humidity, wireless signal, radioactivity levels) may be
+any particular area more frequently than others. A robot that is monitoring a space 
+(such as humidity, wireless signal, radioactivity levels) may be
 required to follow a repeatable path so that data can be easily compared 
 over time. In all these examples, the strategies for controlling the robot's
 path may be decoupled from the specific tasks, and we can imagine building a
@@ -124,13 +124,14 @@ Current algorithmic approaches to these tasks take two flavors: either
 maximizing the information available to the robot though high-fidelity sensors
 and map-generating algorithms such as SLAM, or minimizing the information needed
 by the robot, such as the largely random navigation strategies of the early
-iRobot vacuum models. The first approach is very powerful, but also
+iRobot vacuum models. The first approach is very powerful and useful in
+dynamic environments, but also
 resource-intensive and difficult to reason about formally; the second approach 
-is more efficient but it is not as immediately clear how to accomplish tasks
-such as navigation and loop-closure. We imagine a dual
+is more efficient but makes it more difficult to develop general-purpose strategies 
+for navigation and loop-closure. We imagine a dual
 approach: first, global geometrical information is either provided \emph{a
 priori} to the system (for instance, from a floor plan), or calculated online by
-an algorithm such as SLAM. Second, the global geometry is processed to produce
+an algorithm such as SLAM. This global geometry is then processed to produce
 a strategy with strong formal guarantees which uses minimal processing power 
 and only simple local sensors.
 
@@ -190,8 +191,9 @@ specified angle, either in its local frame or relative to the environment
 boundary normal vector, depending on the sensing power of the robot.
 
 Of course, robots rarely move perfectly, so most of our analysis will be
-nondeterministic and will result in bounds on how accurate the robot's actuation
-is required to be.
+nondeterministic (actions have some bounded error, with an unknown
+distribution) and will result in bounds on necessary accuracy for task
+feasibility.
 
 More formally, our model includes:
 
@@ -199,7 +201,8 @@ More formally, our model includes:
 \item The \emph{configuration space} $X = P \times S^1$. $P$ is a simple polygon with 
 piecewise linear boundary $\partial P$, and $S^1$ is the robot's orientation in the plane. For the most part, we will ignore configurations in the interior
 of the polygon and only consider transitions between points and intervals on the
-boundary.
+boundary. We will generally use the variable $s$ to refer to points on
+the boundary of $\partial P$ without an associated robot orientation.
 \item The \emph{observation space} $Y$ of sensor readings from sensors that the
 robot is equipped with, and the \emph{sensor mapping} $h: X \to Y$ which maps
 the robot state to sensor readings. All robot designs in this paper will have at
@@ -419,7 +422,7 @@ $\tilde{\theta}$."
 
 We now define the \textbf{bounce visibility diagram}, which is a
 representation of the edge-edge visibility of a polygon $P'$. This representation
-was inspired by link diagrams {\color{red} cite}.
+was inspired by link diagrams \cite{tan_sweep}{\color{red} cite sariel}.
 %We choose an arbitrary vertex
 %$v_0$ of $P$ as the origin, and parameterize points $p \in \partial P$ by the
 %counterclockwise distance from $v_0$, divided by the perimeter length of
@@ -428,6 +431,7 @@ If $|\partial P'|$ is the perimeter length of $\partial P'$, let the $x-$axis of
 bounce visibility diagram be the interval $[0, |\partial P'|)$, where the
 endpoints of the interval are identified. Let the $y-$axis of the diagram be a
 parameter $\theta$ which is an angle between $0$ and $\pi$.
+We define $\theta = 0$ as the vector from $s$ to the next counterclockwise vertex.
 We can then use a labelling function $\ell: \partial P' \to [0, \ldots, n']$ to
 label each point $p \in \partial P'$ with the edge segment in $P'$ that it
 belongs to. The graph of $\ell$ composed with the transition function $f$, $f \circ
@@ -530,35 +534,35 @@ Fig \ref{fig:t4} shows the polygon for $t = 4$ with all the
 vertices in the partial local sequences. % show the diagram to edge
 
 
-\begin{figure}
-
-\centering
-\begin{subfigure}{0.35\textwidth}
-\centering
-\includegraphics[width=\linewidth]{figures/color_pent.png}
-\captionof{figure}{\label{fig:color_pent}}
-\end{subfigure}%
-\begin{subfigure}{0.35\textwidth}
-\centering
-\includegraphics[width=\linewidth]{figures/bvd.png}
-\end{subfigure}
-\caption{A polygon and its corresponding bounce visibility diagram.}
-\label{fig:bvd}
-\end{figure}
-
-\begin{figure}
-\centering
-\begin{subfigure}{0.35\textwidth}
-\centering
-\includegraphics[width=\linewidth]{figures/regular_pent.png}
-\end{subfigure}%
-\begin{subfigure}{0.35\textwidth}
-\centering
-\includegraphics[width=\linewidth]{figures/regular_pent_bvd.png}
-\end{subfigure}
-\caption{The bounce visibility diagram for the regular pentagon. }
-\label{fig:regular_pent_bvd}
-\end{figure}
+%\begin{figure}
+%
+%\centering
+%\begin{subfigure}{0.35\textwidth}
+%\centering
+%\includegraphics[width=\linewidth]{figures/color_pent.png}
+%\captionof{figure}{\label{fig:color_pent}}
+%\end{subfigure}%
+%\begin{subfigure}{0.35\textwidth}
+%\centering
+%\includegraphics[width=\linewidth]{figures/bvd.png}
+%\end{subfigure}
+%\caption{A polygon and its corresponding bounce visibility diagram.}
+%\label{fig:bvd}
+%\end{figure}
+%
+%\begin{figure}
+%\centering
+%\begin{subfigure}{0.35\textwidth}
+%\centering
+%\includegraphics[width=\linewidth]{figures/regular_pent.png}
+%\end{subfigure}%
+%\begin{subfigure}{0.35\textwidth}
+%\centering
+%\includegraphics[width=\linewidth]{figures/regular_pent_bvd.png}
+%\end{subfigure}
+%\caption{The bounce visibility diagram for the regular pentagon. }
+%\label{fig:regular_pent_bvd}
+%\end{figure}
 
 \section{Bounce Preimages and Safe Paths}
 
@@ -574,34 +578,87 @@ properties of families of paths the robot may take. For example, the following t
 strategies, but can be deformed into each other by sliding collision points
 without crossing a vertex of $P$.
 
-
-
-\begin{definition}\label{def:transition}
-For edge $e_{ij} \in E(G)$, for each point $x$ in the segment $i$, there 
-exists a range of angles $\tilde{\theta}$ such that $f(x,\theta) \in j$ for
-some $\theta \in \tilde{\theta}$.
+\begin{definition}
+Two edges $i,j \in \partial P$ are \textbf{entirely visible} to each other if
+and only if every pair of points $x \in i$ and $y \in j$ are visible (the
+shortest path between $x$ and $y$ in entirely within $P$).
 \end{definition}
+
+\begin{proposition}
+Given two entirely visible line segments $i$ and $j$, it is possible to compute
+the maximum range of angles $\tilde{\theta}_{max} = [\theta_r, \theta_l]$ such
+that $f(s, \theta) \in j$, for all $s \in i$ and for all
+$\theta \in \tilde{\theta_{max}}$, or we may compute that no such range exists.
+\end{proposition}
 
 \begin{proof}
-By construction, edge $e_{ij}$ exists if and only if there is a point $x$ on the (open)
-segment $i$ and a point $y$ on the (open) segment $j$ such that $x$ and $y$ are
-visible to each other. Since $y$ is in the open segment, there will always be some $\epsilon$-neighborhood around
-$y$ which is also visible from $x$, and the endpoints of this
-$\epsilon$-neighborhood define a range of angles at which the robot may leave
-$x$ and arrive on segment $j$.
 
-This angle range can be constructed through simple trigonometry for a
-given point and target segment.
+Let edge $i = (v_i, v_{i+1})$ be aligned with the positive $x$ axis with the clockwise
+endpoint at the origin, without loss of generality. Due to the edges being
+entirely visible, $j = (v_j, v_{j+1})$ must be in the top half of the plane, above $i$.
+
+Take the quadrilateral formed by the convex hull of the edge endpoints.
+Let the edges between $i$ and $j$ be $l = (v_i, v_{j+1})$ and the right-hand edge 
+$r = (v_{i+1}, v_j)$. Let $\theta_{l}$ be
+the angle between $l$ and the positive $x$ axis ($0 < \theta_l < \pi$); similarly
+for $r$ and $\theta_r$. See Figure \ref{fig:bounce_range} for an illustration of
+the setup. 
+
+There are three cases to consider: if $l$ and $r$ are extended to infinity,
+they cross either above or below edge $i$, or they are parallel.
+
+\emph{Case 1:} $l$ and $r$ would meet below edge $i$. Then,
+$\theta_l > \theta_r$ and if a ray is cast from any point on $i$ at angle
+$\theta \in [\theta_r, \theta_l]$, the ray is guaranteed to intersect $j$ in its
+interior.
+
+\emph{Case 2:} $l$ and $r$ would meet above edge $i$. Then, $\theta_l <
+\theta_r$, and there is no angle
+$\theta$ such that a ray shot from \emph{any} point on $i$ will intersect $j$.
+To see this, imagine sliding a ray at angle $\theta_l$ across the quadrilateral
+- at some point before reaching $v_{i+1}$, the ray must stop intersecting $j$,
+else we would have $\theta_l > \theta_r$.
+
+\emph{Case 3:} $l$ and $r$ are parallel. This implies that $\theta_{l} =
+\theta_{r}$, which is the only angle for which a transition from any
+point on $i$ is guaranteed to intersect $j$, and $\tilde{\theta}_{max}$ is a
+singleton set.
+
+Thus, for each case, we can either compute the maximum angle range or determine
+that no such angle range exists.
 \end{proof}
 
-\begin{definition} \label{def:angrange}
-Given two mutually visible segments $i,j \in \partial P$, there exists a range 
-of angles from which a transition from $i$ to $j$ is possible from from some
-point in $i$ to some point in $j$.
-See Figure \ref{fig:bounce_range}. This interval, $[\theta_{min}, \theta_{max}]$, 
-is the union of the point-wise angle intervals described in Definition
-\ref{def:transition}.
-\end{definition}
+Note that when we compute pre- and post-images of transitions under our robot
+model, only cases 1 and 3 apply: either the robot bounces at a singleton angle
+or a range of angles.
+
+
+%\begin{definition}\label{def:transition}
+%For edge $e_{ij} \in E(G)$, for each point $x$ in the edge $i$, there 
+%exists a range of angles $\tilde{\theta}$ such that $f(x,\theta) \in j$ for
+%some $\theta \in \tilde{\theta}$.
+%\end{definition}
+%
+%\begin{proof}
+%By construction, edge $e_{ij}$ exists if and only if there is a point $x$ on the (open)
+%segment $i$ and a point $y$ on the (open) segment $j$ such that $x$ and $y$ are
+%visible to each other. Since $y$ is in the open segment, there will always be some $\epsilon$-neighborhood around
+%$y$ which is also visible from $x$, and the endpoints of this
+%$\epsilon$-neighborhood define a range of angles at which the robot may leave
+%$x$ and arrive on segment $j$.
+%
+%This angle range can be constructed through simple trigonometry for a
+%given point and target segment.
+%\end{proof}
+
+%\begin{definition} \label{def:angrange}
+%Given two mutually visible segments $i,j \in \partial P$, there exists a range 
+%of angles from which a transition from $i$ to $j$ is possible from from some
+%point in $i$ to some point in $j$.
+%See Figure \ref{fig:bounce_range}. This interval, $[\theta_{min}, \theta_{max}]$, 
+%is the union of the point-wise angle intervals described in Definition
+%\ref{def:transition}.
+%\end{definition}
 
 \begin{figure}
 %    \centering
@@ -632,7 +689,7 @@ which reduces uncertainty in the robot's position.
 Our motion strategy allows us to disregard the robot's motion in the interior of
 $P$. Instead, the robot's state is an interval (or possibly, set of intervals)
 along the boundary $\partial P$, and we can formulate transitions as a discrete
-dynamical system under the transition function $f$.
+dynamical system under the transition function $f$. 
 
 A generally useful property of transitions between boundary segments is when the
 transition is a \emph{contraction mapping}: two points, when mapped through the
@@ -700,48 +757,12 @@ is a contraction mapping. This is true even if some transition $b_i$ is not a
 contraction mapping, since the coefficient is simply the ratio of distances
 between points before and after the mapping is applied.
 
-\begin{proposition}
-Given two entirely visible line segments $i$ and $j$, and a connected subset
-$i_{sub} \subseteq i$, it is possible to compute the maximum range of angles 
-$[\theta_{min}, \theta_{max}]$ such that $f(s, \theta) \in j$, for all $s \in
-i_{sub}$ and for all $\theta \in [\theta_{min}, \theta_{max}]$, or we may
-compute that no such range exists.
-\end{proposition}
 
-\begin{proof}
-Let segment $i$ be aligned with the $x$ axis, without loss of generality.
+\subsection{Cycles}
 
-Take the quadrilateral formed by segments $i$, $j$, and the non-crossing line
-segments connecting their endpoints (the convex hull of the segment endpoints).
-Call the left-hand segment $l$ and the right-hand segment $r$.
-
-Let $\theta_{l}$ be
-the angle between $l$ the positive $x$ axis ($0 < \theta_l < \pi$); similarly
-for $r$ and $\theta_r$. Let $\theta_{min} = \min(\theta_r, \theta_l)$ and
-$\theta_{max}$ be the larger of the two.
-
-There are three cases to consider: if $l$ and $r$ are extended to infinity,
-they cross either above or below segment $i$, or they are parallel.
-
-\emph{Case 1:} $l$ and $r$ would meet below segment $i$. Let 
-Then, if a ray is cast from any point on $i$ at angle $\theta$ such that $\theta_{min} <
-\theta < \theta_{max}$, the ray is guaranteed to intersect $j$ in its interior.
-Also, $\theta_l = \theta_{max}$, and $\theta_r = \theta_{min}$.
-
-\emph{Case 2:} $l$ and $r$ would meet above segment $i$. There is no angle
-$\theta$ such that a ray shot from \emph{any} point on $i$ will intersect $j$.
-
-\emph{Case 3:} $l$ and $r$ are parallel. This implies that $\theta_{min} =
-\theta_{max} = \theta$, which is the only angle for which a transition from any
-point on $i$ is guaranteed to intersect $j$.
-
-Thus, for each case, we can either compute the maximum angle range or determine
-that no such angle range exists.
-\end{proof}
-
-Note that when we compute pre- and post-images of transitions under our robot
-model, only cases 1 and 3 apply: either the robot bounces at a singleton angle
-or a range of angles. 
+A path which undergoes
+transitions $f_1, \ldots, f_k$ can be represented as the composition of each
+individual transition.
 
 \subsection{Navigation}
 
@@ -777,10 +798,6 @@ by these families can be composed together {\color{red} how exactly to do this
 is not clear}
 \end{proof}
 
-\begin{definition}
-Two line segements $i$ and $j$ are \textbf{entirely visible} to each other iff
-every pair of points $x \in i$ and $y \in j$ are visible.
-\end{definition}
 
 The crux of the algorithm is that we can determine which transitions between
 edges of $P'$ admit intervals of departure angles $\tilde{\theta}$ under which
@@ -863,9 +880,6 @@ For a complete (up to bounded length) algorithm, we may incorporate the
 constraint on constant $\theta$ into the search procedure. At each step in the
 backwards search from the goal set, maintain an interval of angles which allow
 all the previously found transitions.
-
-
-
 
 \subsubsection{Constant Relative Angle Controllers}
 
@@ -954,7 +968,7 @@ Remarks:
 \end{proof}
 
 \begin{definition}
-Call a sequence of transitions $f_1 \circ \ldots \circ f_k$ \textbf{strongly
+A sequence of transitions $f_1 \circ \ldots \circ f_k$ is \textbf{strongly
 contracting} if $\forall i \in \{1, \ldots, k\}, f_i$ is a contraction mapping.
 \end{definition}
 
@@ -1146,45 +1160,6 @@ angle and optionally an angle $\theta$.
 
 % all bounces are some function of incoming angle and wall normal
 
-\subsection{Related Work}
-
-
-The \textit{vertex visibility graph} $G_V(P) = (V, E)$ has $V = \{v_0, v_1, \ldots, v_{n-1}\}$ and $v_iv_j\in E$ if and only if the segment connecting $v_i$ and $v_j$ is completely contained in the interior of $P$. We call $v_i, v_j$ visible to each other if $v_iv_j\in E$. By definition, the vertex visibility graph for a convex polygon with $n$ vertices is a $n-$clique. Fig
-\ref{fig:vvg} shows the visibility graph for a non-convex polygon.
-
-\begin{figure}
-    \includegraphics[width=0.8\linewidth]{figures/viz_graph.png}
-    \centering
-    \caption{The vertex visibility graph}\label{fig:vvg}
-    \centering
-\end{figure}
-
-We can also define the \textit{vertex-edge visibility graph} for a polygon.
-Using the definition in \cite{rourke_viz}, the
-\textit{vertex-edge visibility graph} for $P$, $G_E(P) = (V, E)$, is a bipartite
-graph where $V = \{\text{all vertices and edges in $P$}\}$ and $v_ie_j\in E$ if
-and only if $v_i$ can see the interior of $e_j$, i.e., $\exists$ point $q$ on
-the open edge $e_j$ such that $v_i$ and $q$ are visible. \cite{rourke_viz}
-established that the vertex-edge visibility graph is equivalent to the edge
-visibility graph.
-
-Fig \ref{fig:veg} shows an example for vertex-edge visibility graph.
-
-\begin{figure}
-\centering
-\begin{subfigure}{0.25\textwidth}
-  \includegraphics[width=0.6\linewidth]{figures/concave_pent.png}
-  \label{fig:c_p}
-\end{subfigure}%
-\begin{subfigure}{0.25\textwidth}
-  \includegraphics[width=0.8\linewidth]{figures/viz_edge_graph.png}
-\end{subfigure}
-\caption{A polygon and its corresponding vertex-edge visibility graph.\label{fig:veg}}
-
-\end{figure}
-
-
-
 
 \subsection{Link diagram}
 
@@ -1234,154 +1209,22 @@ robot has different vertex visibility view around those vertices, which
 motivates us to compute the partial local sequences in the first place.
 Fig \ref{fig:bvd} shows an example of the bounce visibility diagram.
 
-\begin{figure}
+%\begin{figure}
+%
+%\centering
+%\begin{subfigure}{0.25\textwidth}
+%\centering
+%\includegraphics[width=0.7\linewidth]{figures/color_pent.png}
+%\captionof{figure}{\label{fig:color_pent}}
+%\end{subfigure}%
+%\begin{subfigure}{0.25\textwidth}
+%\centering
+%\includegraphics[width=0.8\linewidth]{figures/bvd.png}
+%\end{subfigure}
+%\caption{A polygon and its corresponding bounce visibility diagram.}
+%\label{fig:bvd}
+%\end{figure}
 
-\centering
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.7\linewidth]{figures/color_pent.png}
-\captionof{figure}{\label{fig:color_pent}}
-\end{subfigure}%
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.8\linewidth]{figures/bvd.png}
-\end{subfigure}
-\caption{A polygon and its corresponding bounce visibility diagram.}
-\label{fig:bvd}
-\end{figure}
-
-
-\subsection{Properties of BVD}
-The bounce visibility diagram can generate the vertex visibility graph by
-construction. In \cite{rourke_viz}, the authors point out that if the robot can
-see a vertex, then it can see the two edges connected to that vertex if the
-vertex is convex; otherwise, it can see one of the edges connected to that
-vertex. As the robot moves along an edge in the original $P$, its vertex
-visibility view changes, as shown for $x\in (3, 6)$ in Fig\~\ref{fig:bvd}. The
-region between curve 2 (blue) and curve 7 (red) is subdivided as the $x$
-increases, which corresponds to the robot has increasing knowledge about things
-behind the gap between vertices $v_2$ and $v_7$ as it moves along the edge
-$v_3v_6$: the appearance of gap between vertices $v_1$ and $v_8$, and the
-appearance of vertex $v_0$. For $x\in (6, 9]$, the diagram shows a reverse
-process of disappearance of gaps. By incorporating the information of the
-appearance and disappearance of gaps, we can also generate the vertex-edge
-visibility graph from the bounce visibility diagram.
-% (\textcolor{red}{I don't have proof yet but I think there are enough info to do that. We can also shift this part about gap navigation into later sections.})
-
-Circular symmetries in a polygon can be reflected in the periodic structure of
-the corresponding BVD, as shown in Fig\~\ref{fig:regular_pent_bvd}.
-
-\begin{figure}
-% \makebox[\linewidth][c]{%
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.5\linewidth]{figures/regular_pent.png}
-\end{subfigure}%
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.8\linewidth]{figures/regular_pent_bvd.png}
-\end{subfigure}
-% }\\
-\caption{The bounce visibility diagram for the regular pentagon. }
-\label{fig:regular_pent_bvd}
-\end{figure}
-
-
-
-\begin{figure}
-\centering
-\makebox[\linewidth][c]{%
-
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.45\linewidth]{figures/limit_cycle_concave_quad.png}
-\captionof{figure}{\label{fig:limit_cycle}}
-\end{subfigure}
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.52\linewidth]{figures/concave_quad.png}
-\captionof{figure}{\label{fig:color_concave_quad}}
-\end{subfigure}
-}
-
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.8\linewidth]{figures/limit_cycle_bvd.png}
-\captionof{figure}{\label{fig:concave_quad_bvd}}
-\end{subfigure}%
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.8\linewidth]{figures/limit_cycle_graph.png}
-\captionof{figure}{\label{fig:limit_cycle_diagram}}
-\end{subfigure}
-\caption{The bounce visibility diagram with limit cycle information}
-\label{fig:limit_cycle_bvd}
-\end{figure}
-
-\subsection{Combinatorial Complexity of BVD}
-
-To consider the size of the bounce visibility diagram for an input polygon $P$
-with $n$ vertices, we let $r$ be the number of reflex vertices in the polygon,
-and $m$ be the average number of visible vertices to a vertex in $P'$. For a
-convex vertex, its partial local sequence will not have new vertex that is not
-in $P$, while for a reflex vertex, we can have $O(n)$ new vertices. We can have
-as many as half of the vertices to be reflex, so $r = O(n)$; each of the reflex
-vertices can produce $O(n)$ new vertices in its partial local sequence, so the
-size of $P'$ is $O(n^2)$. It is possible for a vertex in $P'$ to see all other
-vertex, so, in the worse case, $m = O(n^2)$. Therefore, the complexity of the
-bounce visibility diagram is $O(n\cdot r\cdot m) = O(n^4)$.
-
-We might hope that if $r$ is large, then not all of the reflex vertices will
-produce a large number of new vertices, or that if there are many new vertices,
-then the new vertices will not have good visibility in $P'$ since most of them
-will be inserted into a corner of the polygon, and then we can bound the
-complexity of the BVD. Unfortunately, the number of reflex vertices, the new
-vertices produced in their partial local sequence, and the new vertices'
-visibility can be large at the same time. We will present a family of input
-polygons with BVD of $O(n^4)$ complexity as follows.
-
-\begin{figure}
-%\hspace{-40px}
-\centering
-%\makebox[\linewidth][c]{%
-%\hspace{30px}
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.7\linewidth]{figures/chestnut_5.png}
-\label{fig:t4}
-\end{subfigure}
-%\hspace{-40px}
-
-\begin{subfigure}{0.25\textwidth}
-\centering
-\includegraphics[width=0.7\linewidth]{figures/chestnut_7.png}
-\label{fig:t6}
-\end{subfigure}\\
-\caption{The worse case polygon for $t = 4$ and $t = 6$ 
-\label{fig:chestnut}}
-\end{figure}
-
-Let $n = 4t+2$, where $t$ is a positive integer. We design a polygon with
-$r = 2t$ reflex vertices. The polygon is symmetric with respect to its medium
-horizontal line. In the top half, the reflex vertices are uniformly located on a
-circle and thus they are visible to each other; the convex vertices are chosen
-so that they are outside the circle and the line through an edge will not
-intersect other edges. Each reflex vertices will have at least $t-1$ new
-vertices in its partial local sequence. All vertices in the top half can see
-each vertex in the bottom half and vice versa. So there will be $2t(t-1)+n$
-vertices in the polygon after we insert all new vertices in the partial local
-sequence for all reflex vertices. Each of them can see at least $t(t-1)+n/2$
-other vertices. The final complexity for the bounce visibility diagram is
-$\Theta ((2t(t-1)+n)(t(t-1)+n/2)) = \Theta (t^4) = \Theta(n^4)$.
-Fig \ref{fig:chestnut} shows the polygons for $t = 4$ and $t=6$ with all the
-vertices in the partial local sequences. % show the diagram to edge
-
-% show the fix bounce
-% show the periodic behavior
-% show the gap navigation
-% show we could find equivalent class on theta
-% \begin{itemize}
-% \item Big O complexity of construction, and size of resulting graph
 
 
 \section{BVD as an Information Space \label{bvd_info}}
@@ -1634,4 +1477,5 @@ resulting trajectory
 
 \bibliographystyle{spmpsci}
 \bibliography{refs}
+
 \end{document}
