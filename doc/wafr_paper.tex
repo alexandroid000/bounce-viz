@@ -140,7 +140,12 @@ travel in straight lines in the plane, until encountering an environment
 boundary, at which point they rotate in place and set off again. A growing line
 of work is considering the computational power of individual bouncing strategies
 and their applications to robotic tasks and applications in biological, micro-s
-cale, and dynamical contexts.
+cale, and dynamical contexts. The environment interactions may be mechanical,
+with the robot actually making contact with a surface, or may be simulated with
+virtual walls such as the wire-in-ground systems used by lawn mowing robots
+{\color{red} cite?}. Physical implementations of these bouncing behaviors have
+been validated experimentally, for example in \cite{LewOKa13} and
+\cite{alam2018space}.
 
 This paper presents two ideas for simplifying the characterization and
 generation of paths of such mobile robots: first, that by using the geometrical
@@ -151,6 +156,17 @@ Second, that we can take advantage of the fact that functions which map points
 between linear segments are often \emph{contracting}: two points under the
 mapping function become closer together. We are able to use this property to
 control uncertainty and synthesize strategies that lead to stable trajectories.
+
+First, we construct a data structure representing possible transitions between points on
+the polygon boundary. This data structure can be interpreted as a diagram or graph. 
+Each node in the graph (or region in the diagram) corresponds to a segement of the
+boundary where the visibility polygon at each point is combinatorially ``the
+same." This data structure also encodes information about which transitions are 
+uncertainty-reducing.
+
+Then, we show how this data structure can be augmented and queried to solve different
+robotic tasks, such as navigation, patrolling, and localization. We also show how this graph can be used to determine the
+relative power of robots with different sensor/actuator configurations.
 
 
 % two prongs: beauty of geometry and dynamical systems approach
@@ -248,7 +264,9 @@ perform a given task (such as navigation, patrolling, or localization).
 The constrained motion model that we use (forward motion until collision,
 followed by rotation) is inspired by commercially available robots
 for vacuuming, pool cleaning, lawn mowing, and similar applications. It is a
-form of \emph{compliant motion}.
+form of \emph{compliant motion}, where task constraints are used to guide task
+completion, even when the exact constraints or system state are not known
+exactly {\color{red} cite mason compliant motion 1982}.
 
 {\color{red} mason, erdmann, goldberg, funnelling and squeeze grasping.
 lozano-perez, mason, taylor compliant motion. wall following.}
@@ -266,19 +284,18 @@ continued in \cite{NilBecLav17}. This current work represents improvements in
 formalisms, and presents our insight into the use of visibility to discretize the
 strategy space.
 
-The most closely related work to ours is \cite{LewOKa13}, which addressed 
-the navigation task with a very similar robot
-model in polygons. Their robot moves in straight lines until encountering an environment
-boundary, at which point it is able to rotate in place, with some bounded nonzero nondeterministic
-error. They then generate a strategy as a sequence of bounce angles which can 
-navigate the robot between given start and end locations in a known environment. 
-They introduce the idea of "safe actions," which place
-the entire forward projected state of the robot within a single
-linear segment of the polygonal environment. However, this algorithm is
-not complete, due to the method used to discretize the environment boundary and
-the restriction of only allowing deterministic transitions between boundary
-segments. Their navigation graph has $O(n^4)$ nodes, while ours includes only $O(n^2)$
-nodes.
+The most closely related work to ours is \cite{LewOKa13}, which addressed the
+navigation task with a very similar robot model in polygons. Their robot moves
+in straight lines until encountering an environment boundary, at which point it
+is able to rotate in place, with some bounded nonzero nondeterministic error.
+They then generate a strategy as a sequence of bounce angles which can navigate
+the robot between given start and end locations in a known environment. They
+introduce the idea of "safe actions," which place the entire forward projected
+state of the robot within a single linear segment of the polygonal environment.
+However, this algorithm is not complete, due to the method used to discretize
+the environment boundary and the restriction of only allowing deterministic
+transitions between boundary segments. Their navigation graph has $O(n^4)$
+nodes, while ours includes only $O(n^2)$ nodes.
 
 In \cite{alam2017minimalist} and \cite{alam2018space}, the authors describe
 navigation, coverage, and localization algorithms for a robot model, focused
@@ -335,29 +352,15 @@ given a compact environment representation (the vertex-edge visibility graph of 
 partitioned polygon), what tasks is it capable of accomplishing with only local
 sensing?
 
-\section{Outline of Results}
-
-First, we construct a data structure representing possible transitions between points on
-the polygon boundary. This data structure can be interpreted as a diagram or graph. 
-Each node in the graph (or region in the diagram) corresponds to a segement of the
-boundary where the visibility polygon at each point is combinatorially ``the
-same." This data structure also encodes information about which transitions are 
-uncertainty-reducing.
-
-Then, we show how this data structure can be augmented and queried to solve different
-robotic tasks, such as navigation, patrolling, and localization. We also show how this graph can be used to determine the
-relative power of robots with different sensor/actuator configurations.
-
-\section{Partitioning Polygons}
+\section{Visibility-Based Boundary Partitioning}
 
 Imagine a robot sliding along the polygon boundary, calculating a visibility
-polygon as it moves. As it
-slides, its visibility polygon changes continuously (edges shrink or grow, but
-the combinatorial structure of the polygon remains the same). However, when
-the robot, a reflex vertex, and another vertex come into alignment, a
-combinatorial change will occur. Either the further vertex will become visible
-to the robot, adding an edge to the visibility polygon, or it will become not
-visible, removing an edge from the visibility polygon.
+polygon as it moves. As it slides, its visibility polygon changes continuously
+(edges shrink or grow, but the combinatorial structure of the polygon remains
+the same). However, when the robot, a reflex vertex, and another vertex come
+into alignment, a combinatorial change will occur. Either the further vertex
+will become visible to the robot, adding an edge to the visibility polygon, or
+it will become not visible, removing an edge from the visibility polygon.
 
 To compute all such points where the visibility polygon changes structure, we
 must compute the \textbf{partial local sequence}, defined in \cite{rourke_viz}.
@@ -414,19 +417,23 @@ from any point on $e_i$ if it departs the edge within angle range
 $\tilde{\theta}$."
 
 
-
-
-
-
-We now define the \textbf{bounce visibility diagram}. We choose an arbitrary vertex
-$v_0$ of $P$ as the origin, and parameterize points $p \in \partial P$ by the
-counterclockwise distance from $v_0$, divided by the perimeter length of
-$\partial P$. This parameterization defines a bijective function $s: [0,1) \to \partial P$.
-We can then use a labelling function $l: \partial P \to [0, \ldots, n']$ to
-label each point $p \in \partial P$ with the edge segment in $P'$ that it
-belongs to. The graph of the function $f: \partial P \times [0, \pi] \to [0,
-\ldots, n']$ is the bounce visibility diagram. See Figures \ref{fig:bvd} and
-\ref{fig:regular_pent_bvd} for examples.
+We now define the \textbf{bounce visibility diagram}, which is a
+representation of the edge-edge visibility of a polygon $P'$. This representation
+was inspired by link diagrams {\color{red} cite}.
+%We choose an arbitrary vertex
+%$v_0$ of $P$ as the origin, and parameterize points $p \in \partial P$ by the
+%counterclockwise distance from $v_0$, divided by the perimeter length of
+%$\partial P$. This parameterization defines a bijective function $s: [0,1) \to \partial P$.
+If $|\partial P'|$ is the perimeter length of $\partial P'$, let the $x-$axis of the
+bounce visibility diagram be the interval $[0, |\partial P'|)$, where the
+endpoints of the interval are identified. Let the $y-$axis of the diagram be a
+parameter $\theta$ which is an angle between $0$ and $\pi$.
+We can then use a labelling function $\ell: \partial P' \to [0, \ldots, n']$ to
+label each point $p \in \partial P'$ with the edge segment in $P'$ that it
+belongs to. The graph of $\ell$ composed with the transition function $f$, $f \circ
+\ell: \partial P' \times [0, \pi] \to [0, \ldots, n']$, is the bounce visibility diagram: the diagram indicates which edge
+of $\partial P'$ is visible from point $s \in \partial P'$ at angle $\theta$ from the
+boundary at $s$.
 
 {\color{red} change so regions are assigned a unique "color" or "label" based on
 destination segment, and get plots to reflect this}
@@ -434,14 +441,14 @@ destination segment, and get plots to reflect this}
 The bounce visibility diagram gives us some visual insight into the structure of
 the problem. For example, in Figure \ref{fig:regular_pent_bvd} we can see that
 there are intervals of $\theta$ for which we can draw lines horizontally across
-the diagram without crossing regions within segments ($0 < \theta < 0.6$ and $2.5 <
-\theta < \pi$). If we can draw such lines across the region of a single
+the diagram while only crossing vertical lines (indicating changes in visibilit
+y at a vertex). If we can draw such lines across the region of a single
 segment, it indicates that for that range of $\theta$, all bounces departing at
 that angle from anywhere in the segment will land on the same segment. If we can
-draw such line across the entire diagram, this indicates that this property
+draw such lines across the entire diagram, this indicates that this property
 holds true for the entire polygon. We call such transitions \emph{safe
 bounces}, since for a range of $\theta$, $f(s,\theta)$ maps from one equivalence
-class on the boundary to another.
+class on the boundary to another without splitting the $s$-interval.
 
 {\color{red} need nice example here, something a little more exciting than
 regular pentagon, maybe two convex shapes with hallway between}
@@ -553,15 +560,7 @@ vertices in the partial local sequences. % show the diagram to edge
 \label{fig:regular_pent_bvd}
 \end{figure}
 
-\subsection{Path Families}
-
-One major advantage of this approach is that it allows us to characterize
-properties of families of paths the robot may take.
-
-For example, the following two paths are produced by different bounce
-strategies, but 
-
-\section{Dynamical Properties of Paths}
+\section{Bounce Preimages and Safe Paths}
 
 {\color{red} Introduce running example - floor plan with three features: region
 of high symmetry (maybe a row of offices), region with nonconvexity, and long
@@ -570,15 +569,12 @@ hallway.
 Show with examples how useful trajectories in example correspond to queries to
 the graph.}
 
-Many tasks required of mobile robots can be specified in terms of properties of
-the path the robot takes through space. \emph{Navigation} requires a path that
-begins and ends in specified regions; \emph{patrolling} requires a repeatable
-path that satisfies some coverage criterion; \emph{localization} requires a path
-which reduces uncertainty in the robot's position.
+One major advantage of this approach is that it allows us to characterize
+properties of families of paths the robot may take. For example, the following two paths are produced by different bounce
+strategies, but can be deformed into each other by sliding collision points
+without crossing a vertex of $P$.
 
-Once we have partitioned the polygonal environment and constructed the resulting
-edge visibility graph, we can establish relations between properties of
-paths in the graph and paths of the robot in the actual environment.
+
 
 \begin{definition}\label{def:transition}
 For edge $e_{ij} \in E(G)$, for each point $x$ in the segment $i$, there 
@@ -598,13 +594,6 @@ This angle range can be constructed through simple trigonometry for a
 given point and target segment.
 \end{proof}
 
-A generally useful property of transitions between boundary segments is when the
-transition is a \emph{contraction mapping}: two points, when mapped through the
-transition, always become closer together. We will use this property to control
-uncertainty in the robot's position, and to engineer stable limit cycles in
-Section \ref{sec:cycles}.
-
-
 \begin{definition} \label{def:angrange}
 Given two mutually visible segments $i,j \in \partial P$, there exists a range 
 of angles from which a transition from $i$ to $j$ is possible from from some
@@ -615,21 +604,41 @@ is the union of the point-wise angle intervals described in Definition
 \end{definition}
 
 \begin{figure}
+%    \centering
+%    \begin{subfigure}{0.5\textwidth}
+%    \includegraphics[width=0.4\linewidth]{figures/bouncerange.png}
+%    \caption{Angle range such that a transition exists for some point on
+%orginating edge.}
+%\label{fig:bounce_range}
+%    \end{subfigure}%
+%    \begin{subfigure}{0.5\textwidth}
     \centering
-    \includegraphics[width=0.4\linewidth]{figures/bouncerange.png}
-    \caption{Angle range such that a transition exists for some point on
-orginating edge.}
-\label{fig:bounce_range}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\linewidth]{figures/bouncerange_min.pdf}
+    \includegraphics[width=0.7\linewidth]{figures/bouncerange_min.pdf}
     \caption{Angle range such that a transition exists for all points on
 originating edge (left: such a range exists, right: such a range does not
 exist)}
 \label{fig:bounce_range}
+%    \end{subfigure}
 \end{figure}
+
+\section{Dynamical Properties of Paths}
+
+Many tasks required of mobile robots can be specified in terms of properties of
+the path the robot takes through space. \emph{Navigation} requires a path that
+begins and ends in specified regions; \emph{patrolling} requires a repeatable
+path that satisfies some coverage criterion; \emph{localization} requires a path
+which reduces uncertainty in the robot's position.
+
+Our motion strategy allows us to disregard the robot's motion in the interior of
+$P$. Instead, the robot's state is an interval (or possibly, set of intervals)
+along the boundary $\partial P$, and we can formulate transitions as a discrete
+dynamical system under the transition function $f$.
+
+A generally useful property of transitions between boundary segments is when the
+transition is a \emph{contraction mapping}: two points, when mapped through the
+transition, always become closer together. We can use this property to control
+uncertainty in the robot's position, and to engineer stable limit cycles in
+Section \ref{sec:cycles}.
 
 \begin{definition}
 Let $\phi_{ij}$ be the interior angle between two segments $i$ and $j \in
@@ -1011,6 +1020,8 @@ reachability of graph gives ordering on the power of bounce laws
 
 
 \section{Open Questions and Future Work}
+
+
 
 {\color{red} ergodicity / chaotic trajectories}
 
@@ -1619,9 +1630,8 @@ resulting trajectory
 
 
 
-
 \fi
 
-%\bibliographystyle{IEEEtran}
+\bibliographystyle{spmpsci}
 \bibliography{refs}
 \end{document}
