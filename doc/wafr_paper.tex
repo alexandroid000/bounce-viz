@@ -325,9 +325,8 @@ $b(\alpha) = \pi - \alpha$. See Figure \ref{fig:bex} for more
 example bounce laws. 
 
 \begin{definition}
-A \textbf{bounce strategy} is a deterministic finite state machine where each
-state indicates a certain (possibly nondeterministic) bounce law, and the input language is that of the
-robot's sensor readings.
+A \textbf{bounce strategy} is a sequence of (possibly nondeterministic) bounce
+laws.
 \end{definition}
 
 Given a polygonal environment (such as the floor plan of a warehouse or office
@@ -566,12 +565,9 @@ vertices in the partial local sequences. % show the diagram to edge
 
 \section{Combinatorial Path Families}
 
-{\color{red} Introduce running example - floor plan with three features: region
-of high symmetry (maybe a row of offices), region with nonconvexity, and long
-hallway.
-
+{\color{red}
 Show with examples how useful trajectories in example correspond to queries to
-the graph.}
+the graph or diagram.}
 
 One major advantage of this approach is that it allows us to characterize
 properties of families of paths the robot may take. For example, the  
@@ -652,7 +648,7 @@ that no such angle range exists.
 
 Cases 1 and 3 correspond to our definition of a \emph{safe actions}.
 
-\begin{definition}
+\begin{definition} \label{def:sa}
 A \textbf{safe action} between segments $i$ and $j$ is an action $u \in \tilde{\theta}_{max}$
 , which requires $\tilde{\theta}_{max}$ for transition $i$ to $j$ is nonempty.
 The resulting transition $f(s, \theta)$ is guaranteed to
@@ -762,11 +758,19 @@ where $0 \leq c < 1$. In other words, points under the mapping become closer
 together.
 \end{definition}
 \begin{definition}
-Suppose segment $i$ is aligned with $x$ axis with its normal pointing up and segment $j$ is above segment $i$. If the intersection of segment $i$ and $j$ is on the left of segment $i$, then call the transition from $i$ to $j$ a left transition; if the intersection is on the right of segment $i$, then call the transition a right transition.
+Suppose segment $i$ is aligned with $x$ axis with its normal pointing up and
+segment $j$ is above segment $i$. If the intersection of segment $i$ and $j$ is
+on the left of segment $i$, then call the transition from $i$ to $j$ a left
+transition; if the intersection is on the right of segment $i$, then call the
+transition a right transition.
 \end{definition}
 
 \begin{lemma} \label{lemma:angrange}
-If the transition from segment $i$ to segment $j$ is a left transition, then the transition function $f(x, \theta)$ between segments $i$ and $j$ is a contraction mapping if and only if $\theta > \frac{\pi}{2}+\frac{\phi_{i, j}}{2}$; otherwise, the transition function $f(x, \theta)$ is a contraction mapping if and only if $\theta < \frac{\pi}{2}-\frac{\phi_{i, j}}{2}$.
+If the transition from segment $i$ to segment $j$ is a left transition, then the
+transition function $f(x, \theta)$ between segments $i$ and $j$ is a contraction
+mapping if and only if $\theta > \frac{\pi}{2}+\frac{\phi_{i, j}}{2}$;
+otherwise, the transition function $f(x, \theta)$ is a contraction mapping if
+and only if $\theta < \frac{\pi}{2}-\frac{\phi_{i, j}}{2}$.
 \end{lemma}
 \begin{proof}
 
@@ -779,7 +783,8 @@ If the transition from segment $i$ to segment $j$ is a left transition, then the
 
 We consider the two cases of transition separately:
 \begin{enumerate}
-    \item For a left transition shown in the left diagram of figure~\ref{fig:cont_map}, \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\theta - \phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta-\phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta-\phi_{i, j})$. If $\theta < \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta-\phi_{i, j})$. Thus we need $\theta>\frac{\pi}{2}$. If $\theta-\phi_{i, j} > \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta-\phi_{i, j})$ and we are done; otherwise we need $\pi - \theta < \theta-\phi_{i, j} \Rightarrow \theta - \frac{\phi_{i, j}}{2} > \frac{\pi}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta >\frac{\pi}{2} + \frac{\phi_{i, j}}{2}$.
+    \item For the transition shown in the left hand side of Figure~\ref{fig:cont_map}, 
+          \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\theta - \phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta-\phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta-\phi_{i, j})$. If $\theta < \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta-\phi_{i, j})$. Thus we need $\theta>\frac{\pi}{2}$. If $\theta-\phi_{i, j} > \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta-\phi_{i, j})$ and we are done; otherwise we need $\pi - \theta < \theta-\phi_{i, j} \Rightarrow \theta - \frac{\phi_{i, j}}{2} > \frac{\pi}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta >\frac{\pi}{2} + \frac{\phi_{i, j}}{2}$.
     \item Similarly, for a right transiton shown in the right diagram of figure~\ref{fig:cont_map}, \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\pi -\theta-\phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta + \phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta+\phi_{i, j})$. If $\theta  > \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta + \phi_{i, j})$. Thus we need $\theta<\frac{\pi}{2}$. If $\theta+\phi_{i, j} < \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta+\phi_{i, j})$ and we are done; otherwise we need $\theta < \pi-\theta-\phi_{i, j} \Rightarrow \theta < \frac{\pi}{2} - \frac{\phi_{i, j}}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta <\frac{\pi}{2} - \frac{\phi_{i, j}}{2}$.
 \end{enumerate}
 \qed
@@ -798,16 +803,23 @@ composition. Since $f$ is a linear mapping, the contraction property of a compos
 of multiple bounces can be determined by multiplying the contraction
 coefficients.
 
-If $\prod_{i=1}^k C(\theta_i, \phi_i) < 1$, the composition of bounces $b_1, \ldots, b_k$
-is a contraction mapping. This is true even if some transition $b_i$ is not a
-contraction mapping, since the coefficient is simply the ratio of distances
-between points before and after the mapping is applied. Furthermore, the value
-of $\prod_{i=1}^k C(\theta_i, \phi_i)$ tells us the exact amount by which the
-size of the set of possible robot states has shrunk.
+\begin{definition}
+Given a sequence of $m$ transitions $F = \{f_0, f_1, \ldots, f_{m-1}\}$, at stage $k$ the robot 
+will be located on edge $e_k$ and will depart the edge with
+action $\theta_k$. Then, the contraction coefficient of the overall robot
+trajectory $f_{m_1} \circ \ldots \circ f_0$ is
 
-{\color{red} describe how to propagate angle constraints and contraction coeffs
-over intervals of theta. Connect back to funnelling, maybe with a fig if we
-have space}
+$$ C(F) = \prod_{k=0}^m C(\theta_{e(k)}, \phi_{e(k), e(k+1)}) $$.
+\end{definition}
+
+If $C(F) < 1$, the strategy $b_1, \ldots, b_k$ along that sequence of edges
+results in a contraction mapping. This is true even if some transition along
+the way is not a
+contraction mapping, since $C(F)$ is simply the ratio of distances
+between points before and after the mapping is applied. Furthermore, the value
+of $C(F)$ tells us the exact ratio by which the
+size of the set of possible robot states has grown or shrank after $F$ is
+executed.
 
 %and the constraints on the angle range $\tilde{\theta}$ can be propagated through the 
 %composition by intersecting the angle intervals.
@@ -858,7 +870,7 @@ to the next adjacent edge if and only if
 $\theta \in (0, \min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
 
 Suppose we have two start positions $x$ and $y$ on edge $e_0$ and the two
-corresponding trajectories under fixed angle $\theta$. Denote the robot's
+corresponding trajectories under a constant fixed bounce law $b(\alpha) = \theta$. Denote the robot's
 position on $e_k$ after bouncing $k$ consecutive edges as $f^{k}(x)$ and
 $f^{k}(y)$ respectively. $\triangle f^{k}(x)v_{k+1}f^{k+1}(x)$ and
 $\triangle f^{k}(y)v_{k+1}f^{k+1}(y)$ are similar triangles since they share a
@@ -915,17 +927,15 @@ parameterization of preimages.}
 
 We have presented data structures (the bounce visibility diagram and bounce
 visibility graph, augmented with contraction information) which can be applied
-to several different strategy synthesis problems in mobile robotics. Indeed, we
-are only scratching the surface of possible applications and extensions.
+to several different strategy synthesis problems in mobile robotics.
 
-\subsection{Concise Strategies for Navigation}
+\subsection{Navigation}
 
 Here, we define the \emph{navigation} task. Informally, we wish to decide if
 there is a strategy which uses only nondeterministic bounce laws which can cause
 the robot to move from any point in a given set of starting points in $\partial P$ to
 another given goal set. We require that the start and goal sets are
 convex (a single interval $[s_1, s_2] \in \partial P$).
-
 
 \begin{definition}
 \textbf{Navigation}:
@@ -935,33 +945,49 @@ will be guaranteed to take the robot from any point in $S$ to a point in $G$, or
 determine that no such strategy exists.
 \end{definition}
 
-\subsubsection{Navigation with Safe Actions} \label{sec:safe}
-
-We can create a \emph{safe roadmap} out of the bounce visibility graph by
-traversing all edges and removing edges with an empty $\tilde{\theta}_{max}$,
-and labelling the remaining edges with the interval of safe actions.
+Using Definition \ref{def:sa}, we can create a \emph{safe roadmap} out of the 
+bounce visibility graph by traversing all edges and removing edges with an 
+empty $\tilde{\theta}_{max}$, and labelling the remaining edges with the interval 
+of safe actions. The edges in the safe roadmap are a subset of all the possible
+preimages of nondeterministic transitions.
 
 The resulting graph, $G_{safe}$, can be used to generate strategies for the
 robot which take it from segment $i_{start}$ to segment $i_{end}$: each path in
 $G_{safe}$ from the node corresponding to $i_{start}$ to $i_{end}$ represents
-such a strategy.
+such a strategy. In general, one can find all paths (up to a bounded length)
+between a start and goal set and then use different techniques to transform this
+path set into a strategy. See Algorithm \ref{algo:nav} for a pseudocode
+description of this process. The definition of \textsc{getStrategy} can vary;
+here we detail a few options.
 
-Moreover, the edge
+\subsubsection{Making Concise Strategies}
+
+The edge
 information along the path can be used to create more concise strategies: to
 determine if a path can be executed using a constant controller $b(\alpha,
 \theta) = \theta$, intersect all the intervals along the path and check if the
 resulting interval is nonempty. If it is, the path may be executed with any
-$\theta$ in that interval. In general, deciding whether a given path may be
+$\theta$ in that interval. Indeed, this execution operation gives us the exact
+accuracy range needed to successfully execute a trajectory in the family defined
+by the path in $G_{safe}$.
+
+
+In general, deciding whether a given path may be
 executed with $k$ constant fixed bounce law controllers is the interval
 hitting-set problem, which is NP-hard, though in practice we are mostly
 interested in small $k$ {\color{red} more caveats about why this is not so bad}.
 
+\subsubsection{Branching Strategies}
+
 Given two or more paths of the same length, we may intersect their angle
 constraints at each respective step, and create a strategy which is capable of
-executing both paths (or determine that no such strategy exists).
+executing both paths (or determine that no such strategy exists). This would be
+useful for extending the navigation algorithm to allow unsafe actions. 
 
-However, navigation with safe actions is not complete. {\color{red} example,
-characterization}
+\subsubsection{Completeness}
+
+However, navigation with safe actions is not complete.
+
 
 %\begin{lemma}
 %Given points $x,y \in \partial P$, let $v_x \in V(BVG)$ be the node representing
@@ -1027,30 +1053,6 @@ point in start set $S$ to a point in goal set $G$.}
 %arbitrarily reduce uncertainty. We can use
 %contraction mappings along the way to reduce uncertainty in a similar way.
 
-\subsection{Backprojections for Navigation}
-
-We have three degrees of freedom when computing action preimages - the angle
-interval and the size/location of the subinterval.
-
-There are two natural quantities we may wish to maximize for such a transition -
-the size of the subinterval, or the size of the angle interval.
-The maximum angle interval will always be a point. Imagine an interval on $i$
-which allowed for a maximal angle range $[\theta_{min}, \theta_{max}]$ that
-guaranteed a transition from any point in the interval to $j$. By
-shrinking this interval to a point, we must increase the size of the angle
-interval, creating a contradiction. The maximum size subinterval will always correspond to a singleton angle range,
-$\theta$, such that $l_{sub}$ and $r_{sub}$ are parallel. The location of this
-interval will depend on the local geometry.
-
-Case 1: start set is entirely contained within equivalence class
-
-Case 2: start set is split across equivalence classes (make strategies for
-subsets of start set and intersect - what kinds of strategy intersections make
-sense?)
-
-could be multiple paths with same number of bounces that get to goal set
-
-reachability vs. guaranteed-along-all-paths
 
 
 %\subsubsection{Constant Fixed Angle Controllers}
@@ -1065,11 +1067,6 @@ reachability vs. guaranteed-along-all-paths
 %constraint on constant $\theta$ into the search procedure. At each step in the
 %backwards search from the goal set, maintain an interval of angles which allow
 %all the previously found transitions.
-
-\subsection{Relative Bounce Law Analysis}
-
-given initial position and orientation, can generate new visibility graph for
-all possible relative angles.
 
 
 \subsection{Patrolling}
@@ -1139,6 +1136,17 @@ cycles can contain non-contracting bounces - there are lots of cycles
 Algorithm: finding limit cycles is done by finding cycles in graph with
 contraction coefficient less than 1
 
+\subsection{Relative Bounce Law Analysis}
+
+given initial position and orientation, can generate new visibility graph for
+all possible relative angles.
+
+\subsection{Comparing Bounce Laws}
+
+\begin{theorem}
+reachability of graph gives ordering on the power of bounce laws
+\end{theorem}
+
 \subsection{Localization}
 
 \begin{definition}
@@ -1148,15 +1156,36 @@ ending at the same node, from a starting set.
 
 Connect to Shell/Alam/Bobadilla work on limit cycles for localization.
 
-\subsection{Comparing Bounce Laws}
-
-\begin{theorem}
-reachability of graph gives ordering on the power of bounce laws
-\end{theorem}
 
 
 \section{Open Questions and Future Work}
 
+\subsection{Optimal Backprojections for Navigation}
+
+To create a complete navigation algorithm, we 
+
+We have three degrees of freedom when computing action preimages - the angle
+interval and the size/location of the subinterval.
+
+There are two natural quantities we may wish to maximize for such a transition -
+the size of the subinterval, or the size of the angle interval.
+The maximum angle interval will always be a point. Imagine an interval on $i$
+which allowed for a maximal angle range $[\theta_{min}, \theta_{max}]$ that
+guaranteed a transition from any point in the interval to $j$. By
+shrinking this interval to a point, we must increase the size of the angle
+interval, creating a contradiction. The maximum size subinterval will always correspond to a singleton angle range,
+$\theta$, such that $l_{sub}$ and $r_{sub}$ are parallel. The location of this
+interval will depend on the local geometry.
+
+Case 1: start set is entirely contained within equivalence class
+
+Case 2: start set is split across equivalence classes (make strategies for
+subsets of start set and intersect - what kinds of strategy intersections make
+sense?)
+
+could be multiple paths with same number of bounces that get to goal set
+
+reachability vs. guaranteed-along-all-paths
 
 
 {\color{red} 
