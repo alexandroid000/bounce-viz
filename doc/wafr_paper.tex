@@ -1,4 +1,4 @@
-\documentclass[]{svproc}  % Comment this line out
+\documentclass[]{styles/svproc}  % Comment this line out
 
 %\IEEEoverridecommandlockouts                              % This command is only
                                                           % needed if you want to
@@ -757,43 +757,34 @@ A function $f: \mathbb{R} \to \mathbb{R}$ is a contraction mapping if
 where $0 \leq c < 1$. In other words, points under the mapping become closer
 together.
 \end{definition}
+\begin{definition}
+Suppose segment $i$ is aligned with $x$ axis with its normal pointing up and segment $j$ is above segment $i$. If the intersection of segment $i$ and $j$ is on the left of segment $i$, then call the transition from $i$ to $j$ a left transition; if the intersection is on the right of segment $i$, then call the transition a right transition.
+\end{definition}
 
 \begin{lemma} \label{lemma:angrange}
-{\color{red} wrong - samara writing up correct version}
-The transition function $f(x, \theta)$ between
- segments $i$ and $j$ is a contraction mapping if and only if $\phi_{ij}/2 < \theta < \pi$ or $0 < \theta
-< \phi_{ij}/2$.
+If the transition from segment $i$ to segment $j$ is a left transition, then the transition function $f(x, \theta)$ between segments $i$ and $j$ is a contraction mapping if and only if $\theta > \frac{\pi}{2}+\frac{\phi_{i, j}}{2}$; otherwise, the transition function $f(x, \theta)$ is a contraction mapping if and only if $\theta < \frac{\pi}{2}-\frac{\phi_{i, j}}{2}$.
 \end{lemma}
-
 \begin{proof}
 
 \begin{figure}
-    \includegraphics[width=0.5\linewidth]{figures/contraction_map_cond.png}
+    \includegraphics[width=1\linewidth]{figures/contraction_map_cond.png}
     \centering
-    \caption{A diagram showing how the condition for a contraction mapping is
+    \caption{Two diagrams showing how the condition for a contraction mapping is
 calculated. \label{fig:cont_map}}
     \centering
 \end{figure}
 
-From Figure \ref{fig:cont_map}, we can see that
-
-\begin{equation*}
-|f(x) - f(y)| = \frac{\sin(\theta - \phi)}{\sin(\theta)} |x-y|
-\end{equation*}
-
-from the law of sines. If the edges are parallel, a
-contraction map is not possible (points will maintain their distance, not shrink
-closer together). Thus, whenever $| \frac{\sin(\theta - \phi)}{\sin(\theta)}
-| < 1$, $f$ is a contraction map, and the edge from $v_i v_{i+1}$ to $v_j
-v_{j+1}$ can be labelled as such, with the range of $\theta$ which makes this
-condition true.
-
+We consider the two cases of transition separately:
+\begin{enumerate}
+    \item For a left transition shown in the left diagram of figure~\ref{fig:cont_map}, \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\theta - \phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta-\phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta-\phi_{i, j})$. If $\theta < \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta-\phi_{i, j})$. Thus we need $\theta>\frac{\pi}{2}$. If $\theta-\phi_{i, j} > \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta-\phi_{i, j})$ and we are done; otherwise we need $\pi - \theta < \theta-\phi_{i, j} \Rightarrow \theta - \frac{\phi_{i, j}}{2} > \frac{\pi}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta >\frac{\pi}{2} + \frac{\phi_{i, j}}{2}$.
+    \item Similarly, for a right transiton shown in the right diagram of figure~\ref{fig:cont_map}, \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\pi -\theta-\phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta + \phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta+\phi_{i, j})$. If $\theta  > \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta + \phi_{i, j})$. Thus we need $\theta<\frac{\pi}{2}$. If $\theta+\phi_{i, j} < \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta+\phi_{i, j})$ and we are done; otherwise we need $\theta < \pi-\theta-\phi_{i, j} \Rightarrow \theta < \frac{\pi}{2} - \frac{\phi_{i, j}}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta <\frac{\pi}{2} - \frac{\phi_{i, j}}{2}$.
+\end{enumerate}
 \end{proof}
 
+
 \begin{definition}
-Let $C(\theta, \phi) = | \frac{\sin(\theta - \phi)}{\sin(\theta)} |$. We will
-refer to this value as the \textbf{contraction coefficient} of a transition between two
-edges of $\partial P$.
+Define $C(\theta, \phi_{i, j})$ as the \textbf{contraction coefficient} of a transition between two
+edges $i$ and $j$ of $\partial P$. For a left transition, $C(\theta, \phi_{i, j}) = | \frac{\sin(\theta)}{\sin(\theta - \phi_{i, j})} |$; for a right transition,  $C(\theta, \phi_{i, j}) = | \frac{\sin(\theta)}{\sin(\theta + \phi_{i, j})} |$.
 \end{definition}
 
 For a sequence of bounces $b_1, \ldots, b_k$, we can construct the overall
@@ -848,6 +839,12 @@ label $P$ when it is clear from context.
 For all convex polygons with $n$ edges, there exists a range for $\theta$ such that fixed-angle bouncing strategy with $\theta$ will lead to a convex $n$-cycle regardless of the robot's start position.
 \end{theorem}
 \begin{proof}
+\begin{figure}
+    \includegraphics[width=0.6\linewidth]{figures/convex_cycle.png}
+    \centering
+    \caption{The contracting cycle in a convex polygon.\label{fig:conv_cycle}}
+    \centering
+\end{figure}
 Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. Consider the
 triangle formed by two adjacent edges $e_i$, $e_{i+1}$ of $P$. The robot will
 bounce from $e_i$ to $e_{i+1}$ regardless of its start position if and only if
@@ -873,20 +870,18 @@ ratio
 
 \begin{eqnarray*}
 \frac{d(f^{n}(x)), f^{n}(y))}{d(f^{0}(x), f^{0}(y))} = \prod_{i = 0}^{n-1}
-C(\theta, \phi_{i}).
+C(\theta, \phi_{i-1, i}).
 \end{eqnarray*}
 
 If $\prod_{i = 0}^{n-1} C(\theta, \phi_{i}) < 1$, then $f^k(x)$ is a contraction
 mapping from $e_0$ back to iteself, and by the Banach fixed-point theorem, it
 has a unique fixed point \cite{Granas2003}.
 
-The constraint $C(\theta,\phi_{i})<1$ is equivalent to
-$\theta < \frac{\phi_{i}}{2}$. So we can guarantee that this condition holds
-for the orbit by requiring
+Since all transition in this example are right transitions, the constraint $C(\theta,\phi_{i-1, i})<1$ is equivalent to $\theta < \frac{\pi}{2}-\frac{\phi_{i-1, i}}{2}$. So we can guarantee that this condition holds for the orbit by requiring
 
 \begin{equation*}
 \theta \in (0, \min(\min_{i = 0, 1, \dots, n-1}(\angle v_{i+2}v_{i}v_{i+1}),
-\frac{\phi_{P,min}}{2})),
+\frac{\pi}{2}-\frac{\phi_{i-1, i}}{2})),
 \end{equation*}
 
 in which case the fixed-angle bouncing strategy with $\theta$ leads to a convex
