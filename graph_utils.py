@@ -5,6 +5,8 @@
 
 from geom_utils import *
 
+DEBUG = False
+
 # the coefficent of "contraction" for the mapping from edge i to edge j
 # |f(x) - f(y)| = |x - y| * sin(theta) / sin (theta-phi)
 # -1 < |f(x) - f(y)| < 1 leads to
@@ -56,7 +58,7 @@ def validAnglesForContract(poly, i, j):
 
 # creates directed edge-to-edge visibility graph
 # edge information is angle ranges which create contraction mapping
-def mkGraph(poly):
+def mkGraph(poly, requireContract = False):
     G = nx.DiGraph()
     r_vs = FindReflexVerts(poly)
     psize = len(poly)
@@ -81,11 +83,11 @@ def mkGraph(poly):
                                     and v != (start+1) % psize)
                         )
                ]
-        if DEBUG:
-            print("Raw edges")
-            for i,v,a in edges:
-                print("Can see ", v, " from ", i, " with angle bound ", a)
-        G.add_weighted_edges_from(edges)
+        if requireContract:
+            c_edges = [(i,j, angs) for (i,j,angs) in edges if angs != []]
+            G.add_weighted_edges_from(c_edges)
+        else:
+            G.add_weighted_edges_from(edges)
     if DEBUG:
         print("Graph data:")
         print(G.edge)
@@ -144,11 +146,17 @@ def mkSafeGraph(G, poly):
     viz_verts = mkVizSets(poly)
     for i in H.nodes():
         outgoing = G.edge[i]
+        vset = viz_verts[i]+[i]
         for e in outgoing:
             e1 = (poly[i], poly[(i+1)%psize])
             e2 = (poly[e], poly[(e+1)%psize])
-            e_viz = (e in viz_verts[i]) and ((e+1)%psize in viz_verts[i])
+            e_viz = (e in vset) and ((e+1)%psize in vset)
             if SafeAngles(e1,e2) and e_viz:
                 new_edges.append((i,e,SafeAngles(e1,e2)))
     H.add_weighted_edges_from(new_edges)
+    if DEBUG:
+        print("Safe graph data:")
+        for i in range(psize):
+            print("Node",i)
+            print(H.edge[i])
     return H
