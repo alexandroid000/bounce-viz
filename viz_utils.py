@@ -129,14 +129,14 @@ def VizPath(poly, intervals):
 
 
 if __name__ == '__main__':
-    poly = two_conv
+    poly = simple_bit
     VizRay(poly)
     VizPoly(poly)
     link_diagram = GetLinkDiagram(poly)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
     p1 = InsertAllTransitionPts(poly)
     VizPoly(p1)
-    G = mkGraph(p1)
+    G = mkGraph(p1, requireContract = True)
     PlotGraph(G)
     H = mkSafeGraph(G, p1)
     PlotGraph(H, "safe_graph")

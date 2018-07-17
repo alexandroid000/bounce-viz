@@ -5,6 +5,8 @@ from env_gen import *
 # Some initial polygons
 # Use these below (inside main() to set the initial shape poly
 square = [(250,250),(-250,250),(-250,-250),(250,-250)]
+shelf = [(250,250),(-250,250),(-250,-250), (-5,-250), (-100, -50), (100,
+-50), (5,-250), (250,-250)]
 rm = rooms(5,200,0,0)
 simple_nonconv = [(250,250),(0,100),(-250,250),(-250,-250),(250,-250)]
 simple_nonconv_deep = [(250,250),(0,-100),(-250,250),(-250,-250),(250,-250)]
