@@ -363,19 +363,18 @@ def mkVizSets(poly):
 
 # Resolution is the number of sample points on each edge
 def GetLinkDiagram(poly, resolution = 15):
-    t_pts = InsertAllTransitionPts(poly)
-    psize = len(t_pts)
+    psize = len(poly)
     link_diagram = np.nan*np.ones((psize, resolution*psize))
-    vizSets = mkVizSets(t_pts)
+    vizSets = mkVizSets(poly)
     for i in range(psize):
         # for each visible vertex, we need to calculate:
         #  (1) the view angle at the current vertex w.r.t the current edge and
         #  (2) the view angle at the sample points on the edge and the next vertex w.r.t the current edge
         #  (3) insert a np.nan for discontinuity otherwise matplotlib will try to connect them together
         for vx in vizSets[i]:
-            curr_p = t_pts[i]
-            next_p = t_pts[(i+1)%psize]
-            interest_p = t_pts[vx]
+            curr_p = poly[i]
+            next_p = poly[(i+1)%psize]
+            interest_p = poly[vx]
 
             link_diagram[vx][resolution*i] = GetAngleFromThreePoint(next_p, interest_p, curr_p)
             # the if case is for when we are considering the "next vertex"
