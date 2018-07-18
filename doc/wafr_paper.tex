@@ -699,11 +699,10 @@ holds, there is a safe action both directions but $\tilde{\theta}_{max}$ is a
 singleton set.
 \end{proof}
 
-\begin{corollary}
+\begin{corollary} \label{coro:neighbor}
 If two segments share a vertex which is not reflex, there exist safe actions
 from one to the other in both directions.
 \end{corollary}
-
 
 
 \begin{definition}
@@ -833,6 +832,12 @@ We consider the two cases of transition separately:
 
 \end{proof}
 
+
+\begin{corollary} \label{coro:existcontract}
+There exists a range of angles which result in contracting transitions for transitions between two adjacent 
+segments $e_i$ and $e_{i+1}$ where the vertex angle between them is less than $\pi$ (a non-reflex
+angle).
+\end{corollary}
 
 \begin{definition}
 The \textbf{contraction coefficient} of a transition between two
@@ -1038,9 +1043,53 @@ bad, add cite}.
 
 \subsubsection{Incorporating Contraction Mappings}
 
+Say we are given a path in the bounce visibility graph which contains an unsafe
+transition (perhaps the robot must visit a sequence of boundary segments in a
+specific order, or perhaps there is no safe path between two segments). We may
+use limit cycles to reduce the uncertainty in the robot's position enough to
+transform the unsafe transition into a safe transition.
+
+
 
 
 \subsubsection{Completeness}
+
+To understand how much of the environment the robot may reach with only safe
+transitions, first we observe that for every segment, safe transitions always exist
+for two angles ranges. These ranges are the ones bordering the segment itself:
+by staying close enough to the boundary, the robot may guarantee a safe
+transition (as well as a contraction mapping).
+
+\begin{lemma}
+Each segment $e$ in the partitioned polygon $\partial P'$ has at least two safe transitions
+leaving $e$.
+\end{lemma}
+
+\begin{proof}
+
+{\color{red} clean up explanation}
+
+By Corollary \ref{coro:existcontract}, if a segment $e_i$ has an adjacent segment
+where the internal angle between the segments is less than $\pi$, a contracting
+transition exists between the segments: all actions where $\theta < \pi/2 -
+\phi_{i,i+1}/2$ or $\theta > \pi/2 + \phi_{i-1,i}/2$, depending on the direction
+of the transition.
+
+The other case to consider is if one of the adjacent edges to $e_i$ is
+separated by a reflex angle. If so, by Algorithm \ref{algo:insert} a vertex
+will be inserted in line with $e_i$ on the closest visible edge. Call the
+segment counterclockwise from this inserted vertex $e_j$. 
+By Lemma
+\ref{lemma:angrange}, there must be a contraction mapping from $e_i$ to $e_j$.
+The transition must also be safe, by the same argument as Corollary
+\ref{coro:neighbor}. The same argument holds for left transitions.
+\qed
+\end{proof}
+
+\begin{conjecture}
+Every segment in $\partial P'$ is part of a safe, contracting cycle.
+\end{conjecture}
+
 
 \begin{conjecture}
 All segments in the partitioned polygon $P'$ are reachable by a safe action from
