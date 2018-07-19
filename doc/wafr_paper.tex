@@ -13,6 +13,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{url}
+\usepackage{bm}
 \usepackage{tikz}
 \usepackage[outdir=./figures/]{epstopdf}
 \def\UrlFont{\rmfamily}
@@ -95,10 +96,10 @@ environments and tasks.
 
 Mobile robots have rolled smoothly into our everyday lives, and can now be
 spotted vacuuming our floors, cleaning our pools, mowing our grass, and moving
-goods in our warehouses. These tasks require that the robot's path achieve certain properties; for example, a mowing or
+goods in our warehouses. These tasks require that the robot's path achieve certain properties; for example, a 
 vacuuming robot should cover the whole space while not visiting 
-any particular area more frequently than others. A robot that is monitoring a space 
-(such as humidity, wireless signal, radioactivity levels) may be
+any particular area more frequently than others. A robot that is monitoring
+humidity or temperature in a warehouse may be
 required to follow a repeatable path so that data can be easily compared 
 over time. In these examples and more, the strategies for controlling the robot's
 path may be decoupled from the specific tasks, and we envision building a
@@ -109,23 +110,22 @@ Current algorithmic approaches to these tasks take two flavors: 1)
 maximizing the information available to the robot though high-fidelity sensors
 and map-generating algorithms such as SLAM, or 2) minimizing the information needed
 by the robot, such as the largely random navigation strategies of the early
-iRobot vacuum models. The first approach is very powerful and useful in
+iRobot vacuum models. The first approach is very powerful and well-suited to 
 dynamic environments, but also
-resource-intensive.  The second approach 
+resource-intensive (in terms of required energy, computation, and storage
+space).  The second approach 
 is more efficient but makes it more difficult to develop general-purpose strategies 
 for navigation and loop-closure. We propose a dual
-approach: first, global geometric information is either provided \emph{a
-priori} to the system (for instance, from a floor plan), or calculated online by
+approach. First, global geometric information about environment boundaries is provided 
+to the system, either \emph{a priori} or calculated online by
 an algorithm such as SLAM. This global geometry is then processed to produce
-a strategy with strong formal guarantees and uses minimal processing power 
-and only simple local sensors.
+a strategy providing strong formal guarantees and which can be executed with minimal 
+processing power and only simple local sensors.
 
-%Inspired by the motion patterns of many commercially available mobile robots, 
-%we consider simple robots with ``bouncing" behaviors: robots that
-%travel in straight lines in the plane, until encountering an environment
-%boundary, at which point they rotate in place and set off again. 
-%%S Maybe too redundant after abstract?
-
+Inspired by the motion patterns of some commercially available mobile robots, 
+we consider simple robots with ``bouncing" behaviors: robots that
+travel in straight lines in the plane, until encountering an environment
+boundary, at which point they rotate in place and set off again. 
 A growing line of work is considering the computational power of individual bouncing strategies
 and their applications to robotic tasks and applications in biological, microscale, 
 and dynamical contexts. The environment interactions may be mechanical,
@@ -133,7 +133,10 @@ with the robot actually making contact with a surface, or may be simulated with
 virtual boundariess such as the wire-in-ground systems used by lawn mowing robots
 {\color{red} cite?}. Physical implementations of these bouncing behaviors have
 been validated experimentally, for example in \cite{LewOKa13} and
-\cite{alam2018space}.
+\cite{alam2018space}. However, often these lines of work consider only a small
+part of the strategy space, such as robot models which only allow $90^{\circ}$
+turns. In this work, we present a tractable approach to reasoning over the entire
+strategy space of all possible bounce strategies.
 
 This paper presents two ideas for simplifying the characterization and
 generation of paths of such mobile robots.  First, that by using the geometric
@@ -143,7 +146,8 @@ families of paths, instead of the infinite collection of all possible paths.
 Second, we can take advantage of the fact that functions which map points
 between linear segments are often \emph{contracting}: two points under the
 bounce mapping function become closer together.  We use this property to
-control uncertainty and synthesize strategies that lead to stable trajectories.
+control uncertainty and synthesize strategies with explicit descriptions of the
+amount of allowable uncertainty for successful execution of the strategy.
 
 %%S I am not sure why there is another first, second below.  There are a lot of first-seconds, BTW
 %%S Maybe you need a  transition sentence here.  I tried one.
@@ -168,8 +172,8 @@ control uncertainty and synthesize strategies that lead to stable trajectories.
 The constrained motion model that we use (forward motion until collision,
 followed by rotation) is a
 form of \emph{compliant motion}, where task constraints are used to guide task
-completion, even when the exact constraints or system state are not known
-exactly. Our approach leverages the idea of funnelling: using
+completion, even when the exact system state is not known. Our approach is
+related to the idea of funnelling: using
 the attraction regions of a dynamical system to guide states into a goal region.
 Funnelling and similar ideas have been developed in the context of manipulation and fine motion control by Whitney
 \cite{Whi77}, Mason \cite{Mas85}, Erdmann
@@ -177,25 +181,35 @@ Funnelling and similar ideas have been developed in the context of manipulation 
 \cite{LozMasTay84}, Lynch and Mason \cite{LynMas95}, and Burridge, Rizzi, and Koditschek \cite{BurRizKod99}.
 
 
-
-Similar motion strategies have been used in \cite{OkaLav06} to determine minimal
-information processing requirements for localization. The study of the dynamical
-properties of these motion strategies was proposed in \cite{bounce} and
-continued in \cite{NilBecLav17}. The current work extends and improves the analysis tools, and presents new insights from the use of visibility to discretize the
-strategy space.
+A key aspect of our robot model is the intentional use of collisions with
+environment boundaries, enabled by the advent of more robust, lightweight mobile
+robots. Collisions as information sources for such mobile robots have also been
+recently explored for multi-robot systems \cite{mayya2017collisions}. Our
+specific motion model has been used in works such as \cite{OkaLav06} to
+determine minimal information processing requirements for mobile robot tasks.
+The first-class study of the motion model's dynamical properties was proposed in
+\cite{bounce} and continued in \cite{NilBecLav17}. Our work extends and improves
+these analysis tools, and presents new insights from the use of visibility to
+discretize the strategy space.
 
 The most closely related work to ours is \cite{LewOKa13}, which addressed the
 navigation task with a very similar robot model in polygons. Their robot moves
 in a straight line until encountering an environment boundary, at which point it
-is able to rotate in place, with some bounded nonzero nondeterministic error.
+is able to rotate in place, with some bounded nonzero nondeterministic error
+cone.
 They then generate a strategy as a sequence of bounce angles that navigate
 the robot between given start and end locations in a known environment. They
 introduce the idea of ``safe actions,'' which place the entire forward projected
 state of the robot within a single linear segment of the polygonal environment.
-However, this algorithm is not complete, due to the method used to discretize
-the environment boundary and the restriction of only allowing deterministic
-transitions between boundary segments. Their navigation graph has $O(n^4)$
-nodes, while ours includes only $O(n^2)$ nodes.
+However, this algorithm is not complete, due to the problem formulation taking
+the robot's motion uncertainty as a fixed input. Our approach is to consider all
+possible error cones, and return bounds on the required accuracy of movement as
+an output of the algorithm.
+
+%due to the method used to discretize
+%the environment boundary and the restriction of only allowing deterministic
+%transitions between boundary segments. Their navigation graph has $O(n^4)$
+%nodes, while ours includes only $O(n^2)$ nodes.
 
 %%S Be careful with this `` and '' and that other one.  Make sure it turns out OK each time in the pdf outpout.  I prefer `` and '' to the single-character quotes.  I can't recall why any more.
 
@@ -210,8 +224,6 @@ trajectories may exist which require bounce angles not allowed by the
 discretization. By using a discretization induced by the environment geometry,
 our approach considers all possible bounce strategies.
 
-Collisions as information sources for small, lightweight mobile robots have also been
-recently explored for multi-robot systems \cite{mayya2017collisions}.
 
 
 The questions we pose, and our methods of attacking the problem, are related to
@@ -229,24 +241,23 @@ in O'Rourke paper}.
 %%S Hmm..this could have said all of combinatorial motion planning is devoted to obstacle avoidance, whereas here we use it to study how to hit obstacles!
 
 %%S I think you do not use - properly.  Try to avoid.  Most of the time is should be ; or sometimes : .   
-Our robot model is related to those in the context of \emph{dynamical billiards}. Many 
+The dynamical system defined by our robot model is related to \emph{dynamical billiards}. Many 
 possible reflection laws have been studied;
-the most common is purely specular reflection, but contracting laws have
+the most common is purely specular reflection, but slightly modified laws have
 also attracted recent interest \cite{DelMagno2014,billiards,pinball}. 
 One very similar work was inspired by the dynamics of microorganisms; in \cite{microorganism2017}, 
 the authors show that 
-\textit{Chlamydomonas reinhardtii} bounce off a surface with a
-monotonic fixed angle. They characterize periodic and
-chaotic trajectories of such agents in regular polygons, planar curves, and other environments.
-They analyze dynamics of fixed bounce angles, without a focus on generating control
-strategies.
-%%S Above, how can an angle be fixed and monotonic?  Fixed means contant, so sure it is monotonic!
+\textit{Chlamydomonas reinhardtii} ``bounce'' off boundaries at a specific
+angle depending on their body morphology. They characterize periodic and
+chaotic trajectories of such agents in regular polygons, planar curves, and other environments, 
+without a focus on generating control strategies.
 
-Our work is also related to works in computational geometry that consider what
+Our work is also related to problems in computational geometry that consider what
 parts of a polygon will be illuminated by a light source after multiple
 reflections (as if the edges of the polygon are mirrors). It has been shown that
 the complexity of the region lit in an $n-$gon after $k$ bounces is $O(n^{2k})$
-{\color{red} diffuse reflections} \cite{Aronov1996,prasad1998visibility}.
+\cite{Aronov1996}. Another interesting line of work considers \emph{diffuse}
+reflections \cite{prasad1998visibility}, which are related to our nondeterministic bounces.
 
 We are working toward a generalization and hierarchy of robot models, in a
 similar spirit to \cite{brunner2008simple}. Their basic robot model, the simple
@@ -266,7 +277,7 @@ it capable of accomplishing with only local sensing?
 %%S Using singular rather than plural often makes life better in definitions.
 We consider the movement of a point robots in simple 
 polygonal environments\footnote{All index arithmetic for polygons with $n$ vertices is mod $n$ 
-throughout this paper.}. We define our robots to move forward in straight lines, until
+throughout this paper. We do not require polygons in general position.}. We define our robot to move forward in a straight line, until
 encountering an environment boundary (such as when a bump or range sensor is
 triggered). Once at a boundary, the robot is able to rotate in place.
 Of course, robots rarely move perfectly, so our analysis will assume the
@@ -288,7 +299,7 @@ the boundary of without an associated robot orientation.
 %otherwise.
 \item The \emph{action space} $U = [0,\pi]$, in which $u \in U$ is executed when
 the robot is in contact with an environment boundary; $u$ is measured counterclockwise
-relative to the boundary. The action of departing the boundary at the boundary
+relative to the boundary. The action of departing the boundary while oriented at the boundary
 normal corresponds to $u = \pi/2$.
 \item The \emph{state transition function} $f: X \times U \to X$, which
 describes how the state of the robot changes according to which action is
@@ -303,7 +314,7 @@ moves forward until the next contact with the boundary at stage $u_{k+1}$.
 \begin{figure}
     \includegraphics[width=0.8\linewidth]{figures/bounce_examples.pdf}
     \centering
-    \caption[test]{\label{fig:bex}Examples of different ``bouncing laws'' which can be implemented on
+    \caption[test]{\label{fig:bex}Examples of different ``bounce laws'' which can be implemented on
 mobile robots. In the first row, $b(\alpha, \theta) = \theta$, which we refer to
 as a \textbf{fixed} bounce law. In the second row, we have a \textbf{monotonic
 fixed} bounce law, where
@@ -311,8 +322,8 @@ $b(\alpha, \theta) = \theta$ or $\pi-\theta$, depending on what is necessary to
 preserve monotonicity of travel direction along the $x$-axis. In the third
 row, $b(\alpha, \theta) = \alpha - \theta$, rotating $\alpha$ through $\theta$ in the clockwise
 direction. It is possible that this rotation will cause the 
-heading of the robot to still be facing into the boundary, in which case this model usually has the robot 
-perform the rotation again until its heading points into the free space. We
+heading of the robot to still be facing into the boundary, in which case the robot 
+performs the rotation again until its heading points into the free space. We
 refer to this as a \textbf{relative} bounce law ($\alpha$ appears on the
 right hand side of the bounce law).
 }
@@ -324,15 +335,19 @@ environment boundary. A \textbf{bounce law} $b$ maps $\alpha$ to an action
 $u$, and determines how the robot will reorient itself when it collides with a
 boundary. Bounce laws are defined in the
 frame where the environment normal is aligned with the positive $y$ axis and the
-robot's point of contact with the boundary is the origin. 
+robot's point of contact with the boundary is the origin.
+
+A \textbf{nondeterministic bounce law} is one which returns a set of actions
+instead of a singleton. In this paper, we will restrict such bounce laws to
+return a convex set of actions (a single interval in $(0, \pi)$).
 \end{definition}
 
 For example, a specular bounce (laser beams, billiard balls) has bounce law
 $b(\alpha) = \pi - \alpha$. See Figure \ref{fig:bex} for more
-example bounce laws. 
+examples of bounce laws. 
 
 \begin{definition}
-A \textbf{bounce strategy} is a sequence of (possibly nondeterministic) bounce
+A \textbf{bounce strategy} is a sequence of bounce
 laws.
 \end{definition}
 
@@ -347,6 +362,11 @@ perform a given task (in our case, navigation or patrolling).
 
 
 \section{Visibility-Based Boundary Partitioning} \label{sec:partition}
+
+First, we must find a way to discretize the continuous space of all possible
+transitions between points on $\partial P$. We find a visibility-based partition
+which encodes the idea of some points on $\partial P$ having different
+available transitions.
 
 \begin{definition}
 The \textbf{visibility polygon} of a point $s$ in a polygon $P$ is the polygon
@@ -369,17 +389,17 @@ polygon, or $v$ will disappear behind $r$, removing an edge from the visibility 
 
 To compute all such points where the visibility polygon changes structure, we
 must compute the \textbf{partial local sequence}, defined in \cite{rourke_viz}.
-The partial local sequence is a sequence of vertices, associated with a vertex
-$v_0$ in $P$, such that we shoot a ray through $v_0$ from every vertex in $P$
-that is visible from $v_0$ and keep the resulting sequence of intersections with
+The partial local sequence is a sequence of points on $\partial P$, associated with 
+a vertex $v_0$ in $P$, constructed by shooting a ray through $v_0$ from every vertex in $P$
+that is visible from $v_0$ and keeping the resulting sequence of intersections with
 $\partial P$. If $v_0$ is reflex, some of the rays shot through it may intersect
 $\partial P$ in the interior of existing edges. See Figure \ref{fig:pls} for an
 example of the vertices in the partial local sequence of $v_0$ (blue dots with
-accompanying rays).
+accompanying rays). Each point in the partial local sequence marks the point
+where a visible vertex appears or disappears behind a reflex vertex.
 
 Thus, once all the partial local sequences have been inserted into the original
-polygon, the resulting intervals along the boundary define a set of equivalence
-classes, where two points in the same interval can see the same edge set of the
+polygon, the resulting points along the boundary define segments where two points in the same interval can see the same edge set of the
 original polygon (though they may see different portions of those edges). Thus,
 we can reason over a finite set of transitions between these intervals, instead
 of the infinite set of possible transitions between points on the boundary of
@@ -387,7 +407,6 @@ the original polygon. See Algorithm \ref{algo:insert} for a pseudocode
 description of this partitioning process.
 
 Let $P'$ be the polygon $P$ with all partial local sequence points inserted.
-Let the edge set of $P'$ be $E'$, with $n'$ elements.
 
 \begin{definition}
 The \textbf{edge visibility graph} of a polygon $P$ has a node for each edge of
@@ -437,11 +456,12 @@ $P'$.
 \end{definition}
 
 %%S Be careful.  While is not although or whereas.  Not referring to time here.
-Although visibility is a symmetric property, we use directed edges so that 
+Although visibility is a symmetric property, we use directed edges in the
+bounce visibility graph so that 
 we can augment each edge with a label function which stores
 geometric constraints on the visibility from one edge to another, which are
-not symmetric and govern what actions the robot can take from one edge to
-reach another. See Section \ref{sec:safe} for further exploration of this idea.
+not symmetric and govern what actions the robot can take to accomplish that
+transition. See Section \ref{sec:safe} for further exploration of this idea.
 %%S I hope you are checking for missing section references!
 
 We now define the \textbf{bounce visibility diagram}, which is a
@@ -512,7 +532,7 @@ equivalence classes.}
 \Procedure{PartitionPoly}{$poly$}
 \State $v_{new} \gets \{\}$
 \State $reflex\_verts \gets$ \Call{GetReflexVerts}{$poly$}
-\For{$v_r$ in $reflex\_verts$} \Comment{visible vertices from reflex vertex induce transitions}
+\For{$v_r$ in $reflex\_verts$}
     \For{$v_{vis}$ in \Call{VisibleVerts}{$poly, v_r$}} 
         \State $v_{new} \gets$ $v_{new} \cup$ \Call{ShootRay}{$v_{vis}, v_r$}
     \EndFor
@@ -536,38 +556,15 @@ will not add any new vertices to $P$. However, a reflex vertex can add $O(n)$ ne
 
 Up to half of the vertices in the polygon can be reflex, so the complexity of
 $r$ is $O(n)$. Therefore, the number of vertices in $P'$, returned by Algorithm
-\ref{algo:insert} is $O(n^2)$. Each vertex corresponds to an edge in $P'$, and
+\ref{algo:insert} is $O(n^2)$. Each vertex indexes an edge in $P'$, and
 thus a node in the edge visibility graph of $P'$. At most, a given vertex in $P'$ may see all other vertices, so in the worst
 case, the bounce visibility graph will have $O(n^4)$ edges. See Figure
-\ref{fig:t4} for an example of such a polygon.
+\ref{fig:t4} for an example of such a polygon, and the Appendix for a proof of
+its complexity.
 \qed
 
 \end{proof}
 
-\subsubsection{Worst Case Example}
-{\color{red} to appendix?}
-
-We might hope that if $r$ is large, then not all of the reflex vertices will
-produce a large number of new vertices, and we may bound the size of the edge
-set in the visibility graph. Unfortunately, the number of reflex
-vertices, the new vertices produced in their partial local sequence, and the new
-vertices' visibility can be large at the same time. We will present a family of
-input polygons with bounce visibility graph edge-set size of $O(n^4)$.
-
-Let $n = 4t+2$, where $t$ is a positive integer. We design a polygon with
-$r = 2t$ reflex vertices. The polygon is symmetric with respect to its medium
-horizontal line. In the top half, the reflex vertices are uniformly located on a
-circle and thus they are visible to each other; the convex vertices are chosen
-so that they are outside the circle and the line through an edge will not
-intersect other edges. Each reflex vertex will have at least $t-1$ new
-vertices in its partial local sequence. There will be $2t(t-1)+n$
-vertices in the polygon after we insert all new vertices in the partial local
-sequence for all reflex vertices. Each of them can see at least $t(t-1)+n/2$
-other vertices. Thus the number of edges in the transition graph for the
-polygon with inserted vertices is
-$O ((2t(t-1)+n)(t(t-1)+n/2)) = O(t^4) = O(n^4)$.
-Fig \ref{fig:t4} shows the polygon for $t = 4$ with all the
-vertices in the partial local sequences. % show the diagram to edge
 
 
 %\begin{figure}
@@ -596,7 +593,7 @@ the graph or diagram.}
 One major advantage of this approach is that it allows us to characterize
 properties of families of paths the robot may take. For example, the  
 two paths in Figure \ref{fig:twopaths} are produced by different sequences of
-bounces, but have the same sequence of edge collisions and have the same overall
+bounce laws and visit different points of $\partial P$, but have the same sequence of edge collisions and have the same overall
 dynamical behavior (escape the room on the left, travel through hallway, then
 patrol the room on the right in a periodic orbit).
 
@@ -608,7 +605,8 @@ patrol the room on the right in a periodic orbit).
 \begin{subfigure}{0.5\textwidth}
 \includegraphics[width=\linewidth]{figures/twoc_b}
 \end{subfigure}
-\caption{Two paths belonging to the same combinatorial family.}
+\caption{Two paths demonstrating similar high-level properties with different
+collision points and bounce strategies.}
 \label{fig:twopaths}
 \end{figure}
 
@@ -620,15 +618,15 @@ interval of bounce angles.
 
 \begin{definition}
 Two edges $e_i,e_j \in \partial P$ are \textbf{entirely visible} to each other if
-and only if every pair of points $x \in e_i$ and $y \in e_j$ are visible (the
-shortest path between $x$ and $y$ in entirely within $P$).
+and only if every pair of points $s_i \in e_i$ and $s_j \in e_j$ are visible (the
+shortest path between $s_i$ and $s_j$ lies entirely within $P$).
 \end{definition}
 
 \begin{proposition} \label{prop:saferange}
 Given two entirely visible line segments $e_i$ and $e_j$, it is possible to compute
-the maximum range of angles $\tilde{\theta}_{max} = [\theta_r, \theta_l]$ such
+the maximum range of angles $\bm{\tilde{\theta}_{max} = [\theta_r, \theta_l]}$ such
 that $f(s, \theta) \in e_j$, for all $s \in e_i$ and for all
-$\theta \in \tilde{\theta_{max}}$, or we may compute that no such range exists.
+$\theta \in \tilde{\theta}_{max}$, or we may compute that no such range exists.
 \end{proposition}
 
 \begin{proof}
@@ -645,7 +643,7 @@ the angle between $e_l$ and the positive $x$ axis ($0 < \theta_l < \pi$); simila
 for $e_r$ and $\theta_r$. See Figure \ref{fig:bounce_range} for an illustration of
 the setup. 
 
-There are three cases to consider: if $e_l$ and $e_r$ are extended to infinity,
+Note that if $e_l$ and $e_r$ are extended to infinity,
 they cross either above or below edge $e_i$, or they are parallel.
 
 \emph{Case 1:} $e_l$ and $e_r$ would meet below edge $e_i$. Then,
@@ -683,8 +681,10 @@ transition $e_i$ to $e_j$.
 A safe action from $e_i$ to $e_j$ is guaranteed to
 have $f(s,u) \in e_j$ for any $s \in e_i$ and $u \in \tilde{\theta}_{max}$.
 Note that this definition is very similar to the definition of an interval of
-safe actions from \cite{LewOKa13}; the main difference in approach is the
-generation of boundary segments and methods of searching the resulting graph.
+safe actions from \cite{LewOKa13}; the main differences in approach are the
+generation of boundary segments, methods of searching the resulting graph, and
+how we generate constraints on robot uncertainty instead of assuming uncertainty
+bounds are an input to the algorithm.
 
 \begin{lemma}
 If two segments are entirely visible to each other, there will be at least one safe
@@ -705,12 +705,12 @@ from one to the other in both directions.
 \end{corollary}
 
 
-\begin{definition}
-We say that two robot trajectories are in the same \textbf{combinatorial family}
-if they have the same number of collisions, and the collisions at stage $k$
-occur in the same segment of $P'$, for all $k$. Additionally, each transition in
-the trajectory must be performed by a safe action.
-\end{definition}
+%\begin{definition}
+%We say that two robot trajectories are in the same \textbf{combinatorial family}
+%if they have the same number of collisions, and the collisions at stage $k$
+%occur in the same segment of $P'$, for all $k$. Additionally, each transition in
+%the trajectory must be performed by a safe action.
+%\end{definition}
 
 
 %\begin{definition}\label{def:transition}
@@ -760,19 +760,21 @@ exist)}
 
 \section{Dynamical Properties of Paths}
 
-Many tasks required of mobile robots can be specified in terms of properties of
-the path the robot takes through space. \emph{Navigation} requires a path that
-begins and ends in specified regions; \emph{patrolling} requires a repeatable
-path that satisfies some coverage criterion; \emph{localization} requires a path
-which reduces uncertainty in the robot's position.
+%Many tasks required of mobile robots can be specified in terms of properties of
+%the path the robot takes through space. \emph{Navigation} requires a path that
+%begins and ends in specified regions; \emph{patrolling} requires a repeatable
+%path that satisfies some coverage criterion; \emph{localization} requires a path
+%which reduces uncertainty in the robot's position.
 
 Our motion strategy allows us to disregard the robot's motion in the interior of
 $P$. Instead, the robot's state is an interval 
 along the boundary $\partial P$, and we can formulate transitions as a discrete
-dynamical system under the transition function $f$. 
+dynamical system under the transition function $f$. The properties of this
+dynamical system can be used to engineer paths corresponding to different robot
+task requirements.
 
-A generally useful property of transitions between boundary segments is when the
-transition is a \emph{contraction mapping}: two points, when mapped through the
+One such generally useful property of mapping functions is being a \emph{contraction mapping}: 
+two points, when mapped through the
 transition, always become closer together. We can use this property to control
 uncertainty in the robot's position, and to engineer stable limit cycles in
 Section \ref{sec:cycles}.
@@ -793,8 +795,7 @@ A function $g: \mathbb{R} \to \mathbb{R}$ is a contraction mapping if
 |g(x) - g(y)| \leq c |x-y|
 \end{equation*}
 
-where $0 \leq c < 1$. In other words, points under the mapping become closer
-together.
+where $0 \leq c < 1$.
 \end{definition}
 
 \begin{definition}
@@ -813,52 +814,38 @@ mapping if and only if $\theta > \frac{\pi}{2}+\frac{\phi_{i, j}}{2}$;
 otherwise, the transition function $f(x, \theta)$ is a contraction mapping if
 and only if $\theta < \frac{\pi}{2}-\frac{\phi_{i, j}}{2}$.
 \end{lemma}
-\begin{proof}
 
-\begin{figure}
-    \includegraphics[width=1\linewidth]{figures/contraction_map_cond.png}
-    \centering
-    \caption{The two cases for computing contraction mapping conditions. \label{fig:cont_map}}
-    \centering
-\end{figure}
-
-We consider the two cases of transition separately:
-\begin{enumerate}
-    \item For the transition shown in the left hand side of Figure~\ref{fig:cont_map}, 
-          \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\theta - \phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta-\phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta-\phi_{i, j})$. If $\theta < \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta-\phi_{i, j})$. Thus we need $\theta>\frac{\pi}{2}$. If $\theta-\phi_{i, j} > \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta-\phi_{i, j})$ and we are done; otherwise we need $\pi - \theta < \theta-\phi_{i, j} \Rightarrow \theta - \frac{\phi_{i, j}}{2} > \frac{\pi}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta >\frac{\pi}{2} + \frac{\phi_{i, j}}{2}$.
-    \item Similarly, for a right transiton shown in the right diagram of figure~\ref{fig:cont_map}, \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\pi -\theta-\phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta + \phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta+\phi_{i, j})$. If $\theta  > \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta + \phi_{i, j})$. Thus we need $\theta<\frac{\pi}{2}$. If $\theta+\phi_{i, j} < \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta+\phi_{i, j})$ and we are done; otherwise we need $\theta < \pi-\theta-\phi_{i, j} \Rightarrow \theta < \frac{\pi}{2} - \frac{\phi_{i, j}}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta <\frac{\pi}{2} - \frac{\phi_{i, j}}{2}$.
-\end{enumerate}
-\qed
-
-\end{proof}
-
+The proof is a straightforward application of the law of sines, and is included
+in the appendix.
 
 \begin{corollary} \label{coro:existcontract}
-There exists a range of angles which result in contracting transitions for transitions between two adjacent 
-segments $e_i$ and $e_{i+1}$ where the vertex angle between them is less than $\pi$ (a non-reflex
-angle).
+There exists a range of angles for which $f$ is a contraction mapping for transitions between two adjacent 
+segments with an internal angle less than $\pi$ (pairs of adjacent non-reflex
+segments along $\partial P'$).
 \end{corollary}
 
 \begin{definition}
 The \textbf{contraction coefficient} of a transition between two
-edges $e_i$ and $e_j$ in $\partial P$ is $C(\theta, \phi_{i, j})$. 
+line segments is the ratio of the absolute distance between points before and after.
+For a transition from $e_i$ to $e_j$ in $\partial P$, let the contraction
+coefficient be denoted as $C(\theta, \phi_{i, j})$. 
 For a left transition, $C(\theta, \phi_{i, j}) = | \frac{\sin(\theta)}{\sin(\theta - \phi_{i, j})} |$; 
 for a right transition,  $C(\theta, \phi_{i, j}) = | \frac{\sin(\theta)}{\sin(\theta + \phi_{i, j})} |$.
 \end{definition}
 
-For a sequence of bounces $b_1, \ldots, b_k$, we can construct the overall
-mapping from the domain of $b_1$ to the range of $b_k$ through function
+For a sequence of transitions $f_0, \ldots, f_k$, we can construct the overall
+mapping from the domain of $f_0$ to the range of $f_k$ through function
 composition. Since $f$ is a linear mapping, the contraction property of a composition 
 of multiple bounces can be determined by multiplying the contraction
 coefficients.
 
 \begin{definition}
 Given a sequence of $m$ transitions $F = \{f_0, f_1, \ldots, f_{m-1}\}$, at stage $k$ the robot 
-will be located on edge $e_k$ and will depart the edge with
+will be located on edge $e(k)$ and will depart the edge with
 action $\theta_k$. Then, the contraction coefficient of the overall robot
 trajectory $f_{m_1} \circ \ldots \circ f_0$ is
 
-$$ C(F) = \prod_{k=0}^m C(\theta_{e(k)}, \phi_{e(k), e(k+1)}) $$.
+$$ C(F) = \prod_{k=0}^{m-1} C(\theta_{e(k)}, \phi_{e(k), e(k+1)}) $$.
 \end{definition}
 
 If $C(F) < 1$, the strategy $b_1, \ldots, b_k$ along that sequence of edges
@@ -876,17 +863,17 @@ executed.
 \subsection{Cycles} \label{sec:cycles}
 
 A very common use of contraction mappings is to prove the existence of fixed
-points, due to the power of the Banach fixed point theorem \cite{Granas2003}.
+points, due to the power of the Banach fixed point theorem \cite{Granas2003}
+{\color{red} state exactly the theorem}.
 The exact condition needed is for a contraction mapping to map an interval back
-to itself. Since the transition function of a bouncing robot path is the
-composition of the individual bounce transition functions, we can create such a
-mapping by constructing a path which returns to its originating edge. A fixed
+to itself. Since the transition function of a path is the
+composition of the individual transition functions, we can create a self-mapping 
+by constructing a path which returns to its originating edge. A fixed
 point of this mapping is a stable limit cycle, which can be used to reduce an
 interval of possible robot positions to an arbitrarily small set under enough
 iterations.
 
-Such paths in regular polygons were characterized in \cite{NilBecLav17}, but
-have been observed experimentally in nonregular convex and nonconvex polygons.
+Such paths in regular polygons were characterized in \cite{NilBecLav17}.
 Here, we present a more general proof for the existence of limit cycles in all
 convex polygons.
 
@@ -904,12 +891,7 @@ For all convex polygons with $n$ edges, there exist fixed-angle bouncing
 strategies which result in a period $n$ limit cycle regardless of the robot's start position.
 \end{theorem}
 \begin{proof}
-\begin{figure}
-    \includegraphics[width=0.6\linewidth]{figures/convex_cycle.png}
-    \centering
-    \caption{The contracting cycle in a convex polygon.\label{fig:conv_cycle}}
-    \centering
-\end{figure}
+
 Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. Consider the
 triangle formed by two adjacent edges $e_i$, $e_{i+1}$ of $P$. The robot will
 bounce from $e_i$ to $e_{i+1}$ regardless of its start position if and only if
@@ -954,19 +936,6 @@ cycle which visits each edge of $P$ sequentially, regardless of the robot's star
 \qed
 
 \end{proof}
-
-{\color{red} add result on number of iterations necessary to make distance from
-limit cycle less than $\delta$?}
-
-\begin{figure}
-    \includegraphics[width=0.6\linewidth]{figures/bounce_preimages.pdf}
-    \centering
-    \caption{An example of how contraction properties can be used to control
-robot state uncertainty enough to navigate the robot through a narrow doorway,
-even with a lower bound on angle error. The dotted lines show a 
-parameterization of preimages.}
-\label{fig:preimage_example}
-\end{figure}
 
 
 \section{Applications}
@@ -1049,8 +1018,8 @@ specific order, or perhaps there is no safe path between two segments). We may
 use limit cycles to reduce the uncertainty in the robot's position enough to
 transform the unsafe transition into a safe transition.
 
-
-
+{\color{red} add Israel's result on number of iterations necessary to make distance from
+limit cycle less than $\delta$}
 
 \subsubsection{Completeness}
 
@@ -1089,7 +1058,6 @@ The transition must also be safe, by the same argument as Corollary
 \begin{conjecture}
 Every segment in $\partial P'$ is part of a safe, contracting cycle.
 \end{conjecture}
-
 
 \begin{conjecture}
 All segments in the partitioned polygon $P'$ are reachable by a safe action from
@@ -1702,5 +1670,79 @@ resulting trajectory
 
 \bibliographystyle{spmpsci}
 \bibliography{refs}
+
+\newpage
+\section{Appendix}
+
+\begin{appendix}
+
+\subsubsection{Worst Case Example for Algorithm \ref{algo:insert}}
+
+We might hope that if $r$ is large, then not all of the reflex vertices will
+produce a large number of new vertices, and we may bound the size of the edge
+set in the visibility graph. Unfortunately, the number of reflex
+vertices, the new vertices produced in their partial local sequence, and the new
+vertices' visibility can be large at the same time. We will present a family of
+input polygons with bounce visibility graph edge-set size of $O(n^4)$.
+
+Let $n = 4t+2$, where $t$ is a positive integer. We design a polygon with
+$r = 2t$ reflex vertices. The polygon is symmetric with respect to its medium
+horizontal line. In the top half, the reflex vertices are uniformly located on a
+circle and thus they are visible to each other; the convex vertices are chosen
+so that they are outside the circle and the line through an edge will not
+intersect other edges. Each reflex vertex will have at least $t-1$ new
+vertices in its partial local sequence. There will be $2t(t-1)+n$
+vertices in the polygon after we insert all new vertices in the partial local
+sequence for all reflex vertices. Each of them can see at least $t(t-1)+n/2$
+other vertices. Thus the number of edges in the transition graph for the
+polygon with inserted vertices is
+$O ((2t(t-1)+n)(t(t-1)+n/2)) = O(t^4) = O(n^4)$.
+Fig \ref{fig:t4} shows the polygon for $t = 4$ with all the
+vertices in the partial local sequences. % show the diagram to edge
+
+\begin{lemma} \label{lemma:angrange}
+If the transition from segment $e_i$ to segment $e_j$ is a left transition, then the
+transition function $f(x, \theta)$ between segments $e_i$ and $e_j$ is a contraction
+mapping if and only if $\theta > \frac{\pi}{2}+\frac{\phi_{i, j}}{2}$;
+otherwise, the transition function $f(x, \theta)$ is a contraction mapping if
+and only if $\theta < \frac{\pi}{2}-\frac{\phi_{i, j}}{2}$.
+\end{lemma}
+\begin{proof}
+
+\begin{figure}
+    \includegraphics[width=1\linewidth]{figures/contraction_map_cond.png}
+    \centering
+    \caption{The two cases for computing contraction mapping conditions. \label{fig:cont_map}}
+    \centering
+\end{figure}
+
+We consider the two cases of transition separately:
+\begin{enumerate}
+    \item For the transition shown in the left hand side of Figure~\ref{fig:cont_map}, 
+          \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\theta - \phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta-\phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta-\phi_{i, j})$. If $\theta < \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta-\phi_{i, j})$. Thus we need $\theta>\frac{\pi}{2}$. If $\theta-\phi_{i, j} > \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta-\phi_{i, j})$ and we are done; otherwise we need $\pi - \theta < \theta-\phi_{i, j} \Rightarrow \theta - \frac{\phi_{i, j}}{2} > \frac{\pi}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta >\frac{\pi}{2} + \frac{\phi_{i, j}}{2}$.
+    \item Similarly, for a right transiton shown in the right diagram of figure~\ref{fig:cont_map}, \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\pi -\theta-\phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta + \phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta+\phi_{i, j})$. If $\theta  > \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta + \phi_{i, j})$. Thus we need $\theta<\frac{\pi}{2}$. If $\theta+\phi_{i, j} < \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta+\phi_{i, j})$ and we are done; otherwise we need $\theta < \pi-\theta-\phi_{i, j} \Rightarrow \theta < \frac{\pi}{2} - \frac{\phi_{i, j}}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta <\frac{\pi}{2} - \frac{\phi_{i, j}}{2}$.
+\end{enumerate}
+\qed
+
+\begin{figure}
+    \includegraphics[width=0.6\linewidth]{figures/convex_cycle.png}
+    \centering
+    \caption{A supplemental figure to understand the proof of contracting cycle in a convex polygon.\label{fig:conv_cycle}}
+    \centering
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=0.6\linewidth]{figures/bounce_preimages.pdf}
+    \centering
+    \caption{An example of how contraction properties can be used to control
+robot state uncertainty enough to navigate the robot through a narrow doorway,
+even with a lower bound on angle error.}
+\label{fig:preimage_example}
+\end{figure}
+
+
+\end{proof}
+
+\end{appendix}
 
 \end{document}
