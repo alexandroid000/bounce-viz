@@ -55,11 +55,11 @@ def VizPoly(poly, fname="inserted_poly"):
     plt.plot(wall_x, wall_y, 'black')
     for i in range(psize):
         point = poly[i]
-        plt.scatter(point[0], point[1], color=colors[i])
-        plt.annotate(str(i), (point[0]+10, point[1]+10), size = 'small')
+        plt.scatter(point[0], point[1], color=colors[i], s=100)
+        plt.annotate(str(i), (point[0]+5, point[1]+20), size = 20)
     plt.axis('equal')
 
-    plt.savefig(fname+'.png', dpi = 300)
+    plt.savefig(fname+'.png', dpi = 300, bbox_inches="tight")
     plt.show()
 
 # Resolution is the number of sample points on each edge
@@ -85,7 +85,11 @@ def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_d
 
 def PlotGraph(G, fname = "graph"):
     plt.clf()
-    nx.draw_circular(G, with_labels=True, node_color='#DA70D6')
+    nx.draw_circular(G, with_labels=True,
+        node_color='#DA70D6',
+        arrowsize=20, arrowstyle='fancy',
+        width=1.2,
+        node_size = 1200, font_size=20)
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
 def VizPath(poly, intervals):
@@ -137,7 +141,7 @@ if __name__ == '__main__':
     PlotLinkDiagram(link_diagram, hline = 1.4707)
     print("inserted all transition pts")
     VizPoly(p1)
-    G = mkGraph(p1, requireContract = True)
+    G = mkGraph(p1, requireContract = False)
     print("made graph")
     PlotGraph(G)
     H = mkSafeGraph(G, p1)
