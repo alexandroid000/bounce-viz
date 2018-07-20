@@ -897,43 +897,25 @@ strategies which result in a period $n$ limit cycle regardless of the robot's st
 {\color{red} shorten, make notation consistent with rest of paper}
 See Figure \ref{fig:conv_cycle} in the Appendix for the geometric setup.
 
-Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. Consider the
-triangle formed by two adjacent edges $e_i$, $e_{i+1}$ of $P$. The robot will
-bounce from $e_i$ to $e_{i+1}$ regardless of its start position if and only if
-$\theta \in (0, \angle v_{i+2}v_{i}v_{i+1})$. Thus, the robot will always bounce
+Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. The robot will always bounce
 to the next adjacent edge if and only if
 $\theta \in (0, \min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
 
 Suppose we have two start positions $x$ and $y$ on edge $e_0$ and the two
-corresponding trajectories under a constant fixed bounce law $b(\alpha) = \theta$. Denote the robot's
-position on $e_k$ after bouncing $k$ consecutive edges as $f^{k}(x)$ and
-$f^{k}(y)$ respectively. $\triangle f^{k}(x)v_{k+1}f^{k+1}(x)$ and
-$\triangle f^{k}(y)v_{k+1}f^{k+1}(y)$ are similar triangles since they share a
-common internal angle of the polygon, $\phi_{k,k+1}$, and the bouncing angle
-$\theta$.
-
-The distance between the two trajectories on $e_0$ after the robot bounces off
-every edge of the polygon, i.e., bounces off $n$ times, is
-$d(f^{n}(x), f^{n}(y))$.
-
-Since function composition multiplies the coefficients $C(\theta, \phi)$, 
+corresponding trajectories under a constant fixed bounce law $b(\alpha) = \theta$. Denote the positions of the two trajectories on $e_k$ as $f^{k}(x)$ and
+$f^{k}(y)$ and the distance between them as $d(f^{k}(x), f^{k}(y))$. Since function composition multiplies the coefficients $C(\theta, \phi)$, 
 the distance between $x$ and $y$ changes after one orbit of the polygon by the
-ratio
-
-\begin{eqnarray*}
-\frac{d(f^{n}(x)), f^{n}(y))}{d(f^{0}(x), f^{0}(y))} = \prod_{i = 0}^{n-1}
-C(\theta, \phi_{i-1, i}).
-\end{eqnarray*}
+ratio $\frac{d(f^{n}(x)), f^{n}(y))}{d(f^{0}(x), f^{0}(y))} = \prod_{i = 0}^{n-1}
+C(\theta, \phi_{i-1, i})$.
 
 If $\prod_{i = 0}^{n-1} C(\theta, \phi_{i}) < 1$, then $f^k(x)$ is a contraction
-mapping from $e_0$ back to iteself, and by the Banach fixed-point theorem, it
-has a unique fixed point \cite{Granas2003}.
+mapping from $e_0$ back to iteself, and has a unique fixed point by the Banach fixed-point theorem\cite{Granas2003}.
 
-Since all transition in this example are right transitions, the constraint $C(\theta,\phi_{i-1, i})<1$ is equivalent to $\theta < \frac{\pi}{2}-\frac{\phi_{i-1, i}}{2}$. So we can guarantee that this condition holds for the orbit by requiring
+Since all transitions in this case are right transitions, the constraint $C(\theta,\phi_{i-1, i})<1$ is equivalent to $\theta < \frac{\pi}{2}-\frac{\phi_{i-1, i}}{2}$. We can guarantee that this condition holds for the orbit by requiring
 
 \begin{equation*}
 \theta \in (0, \min(\min_{i = 0, 1, \dots, n-1}(\angle v_{i+2}v_{i}v_{i+1}),
-\frac{\pi}{2}-\frac{\phi_{i-1, i}}{2})),
+\min_{i = 0, 1, \dots, n-1}(\frac{\pi}{2}-\frac{\phi_{i-1, i}}{2}))),
 \end{equation*}
 
 \noindent

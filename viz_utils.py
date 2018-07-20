@@ -69,7 +69,7 @@ def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_d
     psize = link_diagram.shape[0]
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
-    plt.figure()
+    fig, ax = plt.subplots()
     x = []
     for j in range(psize):
         x.extend(list(np.linspace(j, j+1, resolution-1)))
@@ -77,9 +77,14 @@ def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_d
     for i in range(psize):
         plt.plot(x, link_diagram[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
         plt.axvline(x=i, linestyle='--')
-    if hline != None:
-        plt.plot(range(psize+1), hline*np.ones(psize+1))
-    leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+    # if hline != None:
+        # plt.plot(range(psize+1), hline*np.ones(psize+1))
+    leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.15), ncol=5)
+    ax.set_xticks(range(psize+1))
+    ax.set_yticks([0., np.pi/6., np.pi/3., np.pi/2., 2*np.pi/3., 5*np.pi/6., np.pi])
+    ax.set_yticklabels(["$0$", r"$\frac{1}{6}\pi$", r"$\frac{1}{3}\pi$", r"$\frac{1}{2}\pi$", r"$\frac{2}{3}\pi$", r"$\frac{5}{6}\pi$", r"$\pi$"])
+    plt.xlabel(r"vertices on $\partial P'$", fontsize=15)
+    plt.ylabel(r"bounce angle $\theta$", fontsize=15)
     plt.savefig(fname, bbox_inches="tight", dpi = 300)
     plt.show()
 
@@ -133,19 +138,19 @@ def VizPath(poly, intervals):
 
 
 if __name__ == '__main__':
-    poly = simple_bit
-    VizRay(poly)
-    VizPoly(poly)
+    poly = pent
+    # VizRay(poly)
+    # VizPoly(poly)
     p1 = InsertAllTransitionPts(poly)
     link_diagram = GetLinkDiagram(p1)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
-    print("inserted all transition pts")
-    VizPoly(p1)
-    G = mkGraph(p1, requireContract = False)
-    print("made graph")
-    PlotGraph(G)
-    H = mkSafeGraph(G, p1)
-    PlotGraph(H, "safe_graph")
+    # print("inserted all transition pts")
+    # VizPoly(p1)
+    # G = mkGraph(p1, requireContract = False)
+    # print("made graph")
+    # PlotGraph(G)
+    # H = mkSafeGraph(G, p1)
+    # PlotGraph(H, "safe_graph")
     #N = 3
     #for i in range(N):
     #    print(i,"th iteration")
