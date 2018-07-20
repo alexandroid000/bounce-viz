@@ -308,7 +308,7 @@ of states and actions, propagating each state forward with each possible action,
 and unioning the resulting set of states. 
 \item We model time as proceeding in stages; at each stage $k$, the robot
 is in contact with the environment boundary, executes an action $u_k$, and then
-moves forward until the next contact with the boundary at stage $u_{k+1}$.
+moves forward until the next contact with the boundary at stage $k+1$.
 \end{itemize}
 
 \begin{figure}
@@ -336,7 +336,9 @@ $u$, and determines how the robot will reorient itself when it collides with a
 boundary. Bounce laws are defined in the
 frame where the environment normal is aligned with the positive $y$ axis and the
 robot's point of contact with the boundary is the origin.
+\end{definition}
 
+\begin{definition}
 A \textbf{nondeterministic bounce law} is one which returns a set of actions
 instead of a singleton. In this paper, we will restrict such bounce laws to
 return a convex set of actions (a single interval in $(0, \pi)$).
@@ -673,9 +675,9 @@ that no such angle range exists.
 Cases 1 and 3 correspond to our definition of a \emph{safe actions}.
 
 \begin{definition} \label{def:sa}
-A \textbf{safe action} between segments $e_i$ and $e_j$ is an action $u$ such
-that $u \in \tilde{\theta}_{max}$ and $\tilde{\theta}_{max}$ is nonempty for 
-transition $e_i$ to $e_j$.
+Provided that $\tilde{\theta}_{max}$ is nonempty for a transition from $e_i$ to
+$e_j$, a \textbf{safe action} from $e_i$ to $e_j$ is an action $u$ such
+that $u \in \tilde{\theta}_{max}$.
 \end{definition}
 
 A safe action from $e_i$ to $e_j$ is guaranteed to
@@ -780,7 +782,7 @@ uncertainty in the robot's position, and to engineer stable limit cycles in
 Section \ref{sec:cycles}.
 
 \begin{definition}
-Let $\phi_{ij}$ be the interior angle between two edges $e_i, e_j \in \partial P$ if
+Let $\phi_{i,j}$ be the interior angle between two edges $e_i, e_j \in \partial P$ if
 they are extended to infinity. 
 \end{definition}
 
@@ -795,11 +797,12 @@ A function $g: \mathbb{R} \to \mathbb{R}$ is a contraction mapping if
 |g(x) - g(y)| \leq c |x-y|
 \end{equation*}
 
+\noindent
 where $0 \leq c < 1$.
 \end{definition}
 
 \begin{definition}
-Suppose segment $e_i$ is aligned with $x$ axis with its normal pointing up and
+Segment $e_i$ is aligned with $x$ axis with its normal pointing up and
 segment $e_j$ is above segment $e_i$. If the intersection of segment $e_i$ and
 $e_j$ is
 on the left of segment $e_i$, then call the transition from $e_i$ to $e_j$ a left
@@ -843,7 +846,7 @@ coefficients.
 Given a sequence of $m$ transitions $F = \{f_0, f_1, \ldots, f_{m-1}\}$, at stage $k$ the robot 
 will be located on edge $e(k)$ and will depart the edge with
 action $\theta_k$. Then, the contraction coefficient of the overall robot
-trajectory $f_{m_1} \circ \ldots \circ f_0$ is
+trajectory $f_{m-1} \circ \ldots \circ f_0$ is
 
 $$ C(F) = \prod_{k=0}^{m-1} C(\theta_{e(k)}, \phi_{e(k), e(k+1)}) $$.
 \end{definition}
@@ -931,6 +934,7 @@ Since all transition in this example are right transitions, the constraint $C(\t
 \frac{\pi}{2}-\frac{\phi_{i-1, i}}{2})),
 \end{equation*}
 
+\noindent
 in which case the fixed-angle bouncing strategy with $b(\alpha) = \theta$ leads to a convex
 cycle which visits each edge of $P$ sequentially, regardless of the robot's start position.
 \qed
@@ -946,69 +950,52 @@ to several different strategy synthesis problems in mobile robotics.
 
 \subsection{Navigation}
 
-Here, we define the \emph{navigation} task. Informally, we wish to decide if
-there is a strategy which uses only nondeterministic bounce laws which can cause
-the robot to move from any point in a given set of starting points in $\partial P$ to
-another given goal set. We require that the start and goal sets are
-convex (a single interval $[s_1, s_2] \in \partial P$).
+Here, we define the \emph{navigation} task. Informally, we wish to compute a strategy 
+of nondeterministic bounce laws taking a robot
+from any point in a starting set $S \subset \partial P$ to a point in a goal set
+$G \subset \partial P$. We require that the start and goal sets are
+convex (single intervals $[s_1, s_2] \in \partial P$).
 
 \begin{definition}
 \textbf{Navigation}:
-Given a polygonal environment $P$, a starting convex set $S \in \partial P$ of possible robot positions along the
-environment boundary, and a goal convex set $G \in \partial P$, determine a strategy $\pi$ which
+Given a polygonal environment $P$, a starting convex set $S \subset \partial P$ of possible robot positions along the
+environment boundary, and a goal convex set $G \subset \partial P$, determine a strategy $\pi$ which
 will be guaranteed to take the robot from any point in $S$ to a point in $G$, or
 determine that no such strategy exists.
 \end{definition}
 
-Using Definition \ref{def:sa}, we can create a \emph{safe roadmap} out of the 
+Using Definition \ref{def:sa}, we can create a \emph{safe roadmap}, $G_{safe}$,
+out of the 
 bounce visibility graph by traversing all edges and removing edges with an 
 empty $\tilde{\theta}_{max}$, and labelling the remaining edges with the interval 
-of safe actions. The edges in the safe roadmap are a subset of all the possible
-preimages of nondeterministic transitions.
+of safe actions.
 
-The resulting graph, $G_{safe}$, can be used to generate strategies for the
+$G_{safe}$ can be used to generate strategies for the
 robot which take it from segment $e_{start}$ to segment $e_{end}$: each path in
 $G_{safe}$ from the node corresponding to $e_{start}$ to $i_{end}$ represents
 such a strategy. In general, one can find all paths (up to a bounded length)
 between a start and goal set and then use different techniques to transform this
 path set into a strategy. See Algorithm \ref{algo:nav} for a pseudocode
-description of this process. The definition of \textsc{getStrategy} can vary;
+description of this process. The definition of \textsc{GetStrategy} can vary;
 here we detail a few options.
 
 
 \begin{algorithm}
-\caption{Generating a nondeterministic bounce strategy for navigation from any
-point in start set $S$ to a point in goal set $G$.}
+\caption{Generating a safe nondeterministic bounce strategy for navigation from any
+point in start set $S$ to a point in goal set $G$ in a polygon $P$.}
 \label{algo:nav}
 
 \begin{algorithmic}
-\Procedure{Navigate}{$poly$, $G$, $S$, $criterion$}
-\State $BVD \gets$ \Call{PartitionPoly}{$poly$}
-\State $G_{safe} \gets$ \Call{mkSafeGraph}{$BVD$}
-\State $paths \gets$ \Call{GetAllPaths}{$BVD$, $G$, $S$,$k$}
-\Comment $k$ is an upper bound on the path length
-\State $strategy \gets$ \Call{getStrategy}{$paths$}
+\Procedure{SafeNavigate}{$P$, $G$, $S$, $k$}
+\State $P' \gets$ \Call{PartitionPoly}{$P$}
+\State $G_{safe} \gets$ \Call{mkSafeGraph}{$P'$}
+\State $paths \gets$ \Call{GetAllPaths}{$G_{safe}$, $S$, $k$}
+\Comment $k$ bounds the path length
+\State \textbf{return} \Call{GetStrategy}{$paths$}
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Making Concise Strategies}
-
-The edge
-information along the path can be used to create more concise strategies: to
-determine if a path can be executed using a constant controller $b(\alpha,
-\theta) = \theta$, intersect all the intervals along the path and check if the
-resulting interval is nonempty. If it is, the path may be executed with any
-$\theta$ in that interval. Indeed, this execution operation gives us the exact
-accuracy range needed to successfully execute a trajectory in the family defined
-by the path in $G_{safe}$.
-
-
-In general, deciding whether a given path may be
-executed with $k$ constant fixed bounce law controllers is the interval
-hitting-set problem, which is NP-hard, though in practice we are mostly
-interested in small $k$ {\color{red} more convincing argument about why this is not so
-bad, add cite}.
 
 \subsubsection{Incorporating Contraction Mappings}
 
@@ -1055,21 +1042,55 @@ The transition must also be safe, by the same argument as Corollary
 \qed
 \end{proof}
 
-\begin{conjecture}
-Every segment in $\partial P'$ is part of a safe, contracting cycle.
-\end{conjecture}
-
-\begin{conjecture}
-All segments in the partitioned polygon $P'$ are reachable by a safe action from
+\begin{lemma}
+Not all segments in the partitioned polygon $P'$ are reachable by a safe action from
 at least one other segment.
-\end{conjecture}
+\end{lemma}
 
-\begin{conjecture}
-Any segment in $P'$ is reachable from any other segment along a path of safe
-actions.
-\end{conjecture}
+\begin{proof}
+See Figure \ref{fig:simple_bit} for an example where the segment between nodes
+10 and 11 is not reachable via a safe action from any other segments,
+corresponding to only outgoing edges on node 10 in $G_{safe}$.
 
-Don't have a proof but have lots of experiments with no counterexamples.
+The {\color{red}only?} such segments will be
+segments where both endpoints are vertices inserted by Algorithm
+\ref{algo:insert} or reflex vertices, since by Corollary \ref{coro:neighbor},
+segments adjacent to non-reflex vertices of $P$ will be reachable by a safe
+action.
+\end{proof}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/simple_bit_inserted.png}
+\captionof{figure}{\label{fig:simple_bit_inserted}}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/simple_bit_safe_graph.png}
+\end{subfigure}
+\caption{A polygon and the corresponding graph $G_{safe}$.}
+\label{fig:simple_bit}
+\end{figure}
+
+\subsubsection{Making Concise Strategies}
+
+The edge
+information along the path can be used to create more concise strategies: to
+determine if a path can be executed using a constant controller $b(\alpha,
+\theta) = \theta$, intersect all the intervals along the path and check if the
+resulting interval is nonempty. If it is, the path may be executed with any
+$\theta$ in that interval. Indeed, this execution operation gives us the exact
+accuracy range needed to successfully execute a trajectory in the family defined
+by the path in $G_{safe}$.
+
+
+In general, deciding whether a given path may be
+executed with $k$ constant fixed bounce law controllers is the interval
+hitting-set problem, which is NP-hard, though in practice we are mostly
+interested in small $k$ {\color{red} more convincing argument about why this is not so
+bad, add cite}.
 
 
 %\begin{lemma}
@@ -1161,61 +1182,56 @@ cycle reachable from all points in $S$ under the same strategy.
 Algorithm: finding limit cycles is done by finding cycles in graph with
 contraction coefficient less than 1
 
-\begin{definition}
-A sequence of transitions $f_1 \circ \ldots \circ f_k$ is \textbf{strongly
-contracting} if $\forall i \in \{1, \ldots, k\}, f_i$ is a contraction mapping.
-\end{definition}
+%\begin{definition}
+%A sequence of transitions $f_1 \circ \ldots \circ f_k$ is \textbf{strongly
+%contracting} if $\forall i \in \{1, \ldots, k\}, f_i$ is a contraction mapping.
+%\end{definition}
+%
+%\begin{corollary}
+%Every polygon will produce a bounce visibility graph containing at least two
+%strongly contracting cycles, for $\theta \in [0, \phi_{min}/2]$ and $\theta \in
+%[\pi - \phi_{min}/2, \pi]$.
+%\end{corollary}
+%
+%\begin{proof}
+%
+%Let the robot have a constant fixed angle bounce strategy, so it always leaves
+%the boundary at angle $\theta \in [0,\phi_{min}/2]$ counterclockwise from the
+%boundary.
+%
+%At each transition, the robot will either strike the next adjacent edge in
+%$P$, or a reflex vertex will cause the robot to strike some other edge in the
+%polygon. Either way, the transition is guaranteed to be a contraction mapping by
+%the definition of $\phi_{min}$ and Lemma \ref{lemma:angrange}.
+%
+%Eventually, this strategy will produce a strongly contracting cycle. Each
+%transition moves the robot from one edge to another, so at some point, the
+%robot's trajectory must return to an edge it has previously visited. The series
+%of transitions in this trajectory corresponds exactly to a strongly contracting
+%cycle in the bounce visibility graph.
+%\qed
+%
+%\end{proof}
+%
+%Note that the previous proof does not guarantee a limit cycle in every polygon.
+%It is possible to construct polygons such that the locations of the collision
+%points in the stable limit cycle do not all fall within the edges forming the
+%strongly contracting cycle. However, the only examples of such that we have been
+%able to construct are in general position and are unlikely to occur in practical
+%applications.
+%
+%Note that limit cycles can contain non-contracting bounces, so the number of
+%possible limit cycles is exponential in $n$.
 
-\begin{corollary}
-Every polygon will produce a bounce visibility graph containing at least two
-strongly contracting cycles, for $\theta \in [0, \phi_{min}/2]$ and $\theta \in
-[\pi - \phi_{min}/2, \pi]$.
-\end{corollary}
-
-\begin{proof}
-
-Let the robot have a constant fixed angle bounce strategy, so it always leaves
-the boundary at angle $\theta \in [0,\phi_{min}/2]$ counterclockwise from the
-boundary.
-
-At each transition, the robot will either strike the next adjacent edge in
-$P$, or a reflex vertex will cause the robot to strike some other edge in the
-polygon. Either way, the transition is guaranteed to be a contraction mapping by
-the definition of $\phi_{min}$ and Lemma \ref{lemma:angrange}.
-
-Eventually, this strategy will produce a strongly contracting cycle. Each
-transition moves the robot from one edge to another, so at some point, the
-robot's trajectory must return to an edge it has previously visited. The series
-of transitions in this trajectory corresponds exactly to a strongly contracting
-cycle in the bounce visibility graph.
-\qed
-
-\end{proof}
-
-Note that the previous proof does not guarantee a limit cycle in every polygon.
-It is possible to construct polygons such that the locations of the collision
-points in the stable limit cycle do not all fall within the edges forming the
-strongly contracting cycle. However, the only examples of such that we have been
-able to construct are in general position and are unlikely to occur in practical
-applications.
-
-Note that limit cycles can contain non-contracting bounces, so the number of
-possible limit cycles is exponential in $n$.
 
 
+\section{Open Questions and Future Work}
 
 \subsection{Comparing Bounce Laws}
 
 \begin{remark}
 reachability of graph gives ordering on the power of bounce laws
 \end{remark}
-
-{\color{red} needs example}
-
-
-
-
-\section{Open Questions and Future Work}
 
 \subsection{Optimal Backprojections for Navigation}
 
