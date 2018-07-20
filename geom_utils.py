@@ -421,7 +421,8 @@ def SafeAngles(e1, e2):
     else:
         theta_l = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
         theta_r = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
-    if abs(theta_l - theta_r) > 0.01: # declare lines parallel if within 1 deg
+    not_parallel = abs(theta_l - theta_r) > 0.01
+    if theta_l > theta_r and not_parallel: # declare lines parallel if within 1 deg
         return (theta_l, theta_r)
     else:
         return None
