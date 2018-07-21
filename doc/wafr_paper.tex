@@ -110,17 +110,18 @@ Current algorithmic approaches to these tasks take two flavors: 1)
 maximizing the information available to the robot though high-fidelity sensors
 and map-generating algorithms such as SLAM, or 2) minimizing the information needed
 by the robot, such as the largely random navigation strategies of the early
-iRobot vacuum models. The first approach is very powerful and well-suited to 
+robot vacuum models. The first approach is very powerful and well-suited to 
 dynamic environments, but also
 resource-intensive (in terms of required energy, computation, and storage
-space).  The second approach 
+space). The second approach 
 is more efficient but makes it more difficult to develop general-purpose strategies 
 for navigation and loop-closure. We propose a dual
 approach. First, global geometric information about environment boundaries is provided 
 to the system, either \emph{a priori} or calculated online by
 an algorithm such as SLAM. This global geometry is then processed to produce
 a strategy providing strong formal guarantees and which can be executed with minimal 
-processing power and only simple local sensors.
+processing power and only low bandwith local sensors, such as bump sensors,
+instead of high bandwith sensors such as cameras.
 
 Inspired by the motion patterns of some commercially available mobile robots, 
 we consider simple robots with ``bouncing" behaviors: robots that
@@ -130,8 +131,8 @@ A growing line of work is considering the computational power of individual boun
 and their applications to robotic tasks and applications in biological, microscale, 
 and dynamical contexts. The environment interactions may be mechanical,
 with the robot actually making contact with a surface, or may be simulated with
-virtual boundariess such as the wire-in-ground systems used by lawn mowing robots
-{\color{red} cite?}. Physical implementations of these bouncing behaviors have
+virtual boundaries such as the perimeter wire systems used by lawn mowing robots
+\cite{sahin2007household}. Physical implementations of the bouncing maneuver have
 been validated experimentally, for example in \cite{LewOKa13} and
 \cite{alam2018space}. However, often these lines of work consider only a small
 part of the strategy space, such as robot models which only allow $90^{\circ}$
@@ -140,7 +141,7 @@ strategy space of all possible bounce strategies.
 
 This paper presents two ideas for simplifying the characterization and
 generation of paths of such mobile robots.  First, that by using the geometric
-structure of a polygonal evironment, we can create a combinatorial
+structure of a polygonal environment, we can create a combinatorial
 representation of the environment that lets us reason over a finite number of
 families of paths, instead of the infinite collection of all possible paths.
 Second, we can take advantage of the fact that functions which map points
@@ -227,15 +228,14 @@ our approach considers all possible bounce strategies.
 
 
 The questions we pose, and our methods of attacking the problem, are related to
-work on visibility in computational geometry. Visibility graphs have been
-extensively in robotics, but usually in the context of the vertex visibility
-graph with the goal of avoiding obstacles {\color{red} add cites}.  If we instead use collisions strategically, then we require a slightly more
+work on visibility in computational geometry \cite{ghosh2007visibility}. Visibility has been
+considered extensively in robotics, but usually with the goal of avoiding obstacles 
+\cite{lozano1979algorithm,nissoux1999visibility}. If we wish to use collisions strategically, 
+we require a slightly more
 powerful data structure: the edge visibility graph for a partition of a polygon
 $P$. The edge visibility graph was analyzed along with the vertex-edge
-visibility graph in \cite{rourke_viz}. {\color{red} they have an O(n+k) algo for
-constructing vertex-edge. But correspondence to edge requires $O(n^2)$ at least
-- confirm? Also, is this valid w/out general position? Strong assumption on g.p.
-in O'Rourke paper}.
+visibility graph in \cite{rourke_viz}, and shown to be strictly more powerful
+than the vertex visibility graph.
 
 %%S Citations for visibility motion planning: Nil69, SimLauNis00
 %%S Hmm..this could have said all of combinatorial motion planning is devoted to obstacle avoidance, whereas here we use it to study how to hit obstacles!
@@ -468,80 +468,75 @@ transition. See Section \ref{sec:safe} for further exploration of this idea.
 
 We now define the \textbf{bounce visibility diagram}, which is a
 representation of the edge-edge visibility of a polygon $P'$. This representation
-was inspired by link diagrams \cite{efrat2000sweeping,tan_sweep}, though our
-diagrams represent only a link distance of one.
-%We choose an arbitrary vertex
-%$v_0$ of $P$ as the origin, and parameterize points $p \in \partial P$ by the
-%counterclockwise distance from $v_0$, divided by the perimeter length of
-%$\partial P$. This parameterization defines a bijective function $s: [0,1) \to \partial P$.
+was inspired by link diagrams \cite{efrat2000sweeping,tan_sweep}.
 If $|\partial P'|$ is the perimeter length of $\partial P'$, let the $x-$axis of the
 bounce visibility diagram be the interval $[0, |\partial P'|)$, where the
 endpoints of the interval are identified. Let the $y-$axis of the diagram be a
 parameter $\theta$ which is an angle between $0$ and $\pi$.
-We also use a labelling function $\ell: \partial P' \to [0, \ldots, n']$ to
-label each point $s \in \partial P'$ with the unique index of the edge segment in $P'$ that it
-belongs to. Thus, for a point $s \in \partial P'$, and an angle $\theta$, we can
-compose $\ell$ and the state transition function $f$ to compute
-$l(f(s,\theta))$. The graph of $l \circ f$ is the bounce visibility diagram. The
-diagram indicates which edges
-of $\partial P'$ are visible, and what actions the robot could take to
-transition from one edge to another.
 
-{\color{red} current diagram just shows lines where the visibility polygon at s
-changes combinatorial structure. In between the lines, we are not guaranteed
-that all transitions land on the same segment. Would need to do another
-iteration of partition algorithm to determine destination segments.}
-
-{\color{red} We can change the diagram so regions are assigned a unique "color" or "label" based on
-destination segment, and get plots to reflect this. Assuming we do, the
-following analysis holds}
+For a point $s \in \partial P'$, we can compute all the visible vertices and
+the angle at which they are visible. The graph of all angles at which vertices
+are visible from points in $\partial P'$ is the bounce visibility diagram.
 
 The bounce visibility diagram gives us some visual insight into the structure of
-the problem. For example, in Figure \ref{fig:regular_pent_bvd} we can see that
-there are intervals of $\theta$ for which we can draw lines horizontally across
-the diagram without crossing the solid lines. If we can draw a horizontal line
-for $\theta$ from $v_i$ to $v_{i+1}$, all transitions $f(s,\theta)$
-for any $s \in v_i v_{i+1}$ will be mapped to points in a single segment in
-$P'$. If we can
-draw such lines across the entire diagram, this indicates that this property
-holds true for the entire polygon. We call such transitions \emph{safe
-actions}, since for a range of $\theta$, $f(s,\theta)$ maps from one equivalence
-class on the boundary to another without splitting the $s$-interval.
+the problem. First, it shows our motivation for the specific partitioning we
+have chosen: at each inserted vertex (1, 2, 8, and 9 in Figure
+\ref{fig:diagram}), a vertex appears or disappears from view. Of course, such
+transitions also occur at vertices of $P$. Thus, the partition induced by the
+vertices of $P$ and our inserted partial local sequences captures all
+combinatorial changes in the visibility graph.
+
+Additionally, this diagram gives us some insight into types of possible
+segment-to-segment transitions under ranges of departure angles. {\color{red}
+point out examples of safe and unsafe transitions, and possible cycles at "clear
+intervals"}
+%{\color{red} current diagram just shows lines where the visibility polygon at s
+%changes combinatorial structure. In between the lines, we are not guaranteed
+%that all transitions land on the same segment. Would need to do another
+%iteration of partition algorithm to determine destination segments.}
+%
+%For example, in Figure \ref{fig:regular_pent_bvd} we can see that
+%there are intervals of $\theta$ for which we can draw lines horizontally across
+%the diagram without crossing the solid lines. If we can draw a horizontal line
+%for $\theta$ from $v_i$ to $v_{i+1}$, all transitions $f(s,\theta)$
+%for any $s \in v_i v_{i+1}$ will be mapped to points in a single segment in
+%$P'$. If we can
+%draw such lines across the entire diagram, this indicates that this property
+%holds true for the entire polygon. We call such transitions \emph{safe
+%actions}, since for a range of $\theta$, $f(s,\theta)$ maps from one equivalence
+%class on the boundary to another without splitting the $s$-interval.
 
 \begin{figure}
 \centering
-\begin{subfigure}{0.35\textwidth}
+\begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=\linewidth]{figures/regular_pent.png}
+\includegraphics[width=\linewidth]{figures/L_poly.jpg}
 \end{subfigure}%
-\begin{subfigure}{0.35\textwidth}
+\begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=\linewidth]{figures/regular_pent_bvd.png}
+\includegraphics[width=\linewidth]{figures/L_diagram.jpg}
 \end{subfigure}
-\caption{The bounce visibility diagram for the regular pentagon. }
-\label{fig:regular_pent_bvd}
+\caption{A partitioned polygon and its corresponding bounce visibility diagram. }
+\label{fig:diagram}
 \end{figure}
 
-{\color{red} need nice example here, something a little more exciting than
-regular pentagon, maybe two convex shapes with hallway between}
-
-
 \begin{algorithm}
-\caption{Partition the boundary of a polygon into visibility
-equivalence classes.}
+\caption{\textsc{PartitionPoly}(P)}
 \label{algo:insert}
-\begin{algorithmic}
-\Procedure{PartitionPoly}{$poly$}
+\hspace*{\algorithmicindent} \textbf{Input:} A polygon $P$ as a list of
+vertices in counterclockwise order.\\
+\hspace*{\algorithmicindent} \textbf{Output:} A polygon $P'$, which is $P$ with
+all partial local sequence points added as new vertices.
+\begin{algorithmic}[1]
 \State $v_{new} \gets \{\}$
-\State $reflex\_verts \gets$ \Call{GetReflexVerts}{$poly$}
+\State $reflex\_verts \gets$ \Call{GetReflexVerts}{$P$}
 \For{$v_r$ in $reflex\_verts$}
-    \For{$v_{vis}$ in \Call{VisibleVerts}{$poly, v_r$}} 
+    \For{$v_{vis}$ in \Call{VisibleVerts}{$P, v_r$}} 
         \State $v_{new} \gets$ $v_{new} \cup$ \Call{ShootRay}{$v_{vis}, v_r$}
     \EndFor
 \EndFor
-\State $partitioned\_poly \gets$ \Call{InsertVerts}{$v_{new}, poly$}
-\State \textbf{return} $partitioned\_poly$
-\EndProcedure
+\State $P' \gets$ \Call{InsertVerts}{$v_{new}, P$}
+\State \textbf{return} $P'$
 \end{algorithmic}
 \end{algorithm}
 
@@ -587,10 +582,6 @@ its complexity.
 %
 
 \section{Safe Paths} \label{sec:safe}
-
-{\color{red}
-Show with examples how useful trajectories in example correspond to queries to
-the graph or diagram.}
 
 One major advantage of this approach is that it allows us to characterize
 properties of families of paths the robot may take. For example, the  
@@ -965,18 +956,18 @@ here we detail a few options.
 
 
 \begin{algorithm}
-\caption{Generating a safe nondeterministic bounce strategy for navigation from any
-point in start set $S$ to a point in goal set $G$ in a polygon $P$.}
+\caption{\textsc{SafeNavigate}($P$, $S$, $G$, $k$}
 \label{algo:nav}
-
-\begin{algorithmic}
-\Procedure{SafeNavigate}{$P$, $G$, $S$, $k$}
+\hspace*{\algorithmicindent} \textbf{Input:} A polygon $P$, intervals $S$ and
+$G$ in $\partial P$, and an integer bound $k$.\\
+\hspace*{\algorithmicindent} \textbf{Output:} A strategy (list of bounce laws),
+or a special value \textsc{None} if no strategy can be found.
+\begin{algorithmic}[1]
 \State $P' \gets$ \Call{PartitionPoly}{$P$}
 \State $G_{safe} \gets$ \Call{mkSafeGraph}{$P'$}
 \State $paths \gets$ \Call{GetAllPaths}{$G_{safe}$, $S$, $k$}
 \Comment $k$ bounds the path length
 \State \textbf{return} \Call{GetStrategy}{$paths$}
-\EndProcedure
 \end{algorithmic}
 \end{algorithm}
 
