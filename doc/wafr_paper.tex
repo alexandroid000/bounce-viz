@@ -618,10 +618,11 @@ shortest path between $s_i$ and $s_j$ lies entirely within $P$).
 \end{definition}
 
 \begin{proposition} \label{prop:saferange}
-Given two entirely visible line segments $e_i$ and $e_j$, it is possible to compute
-the maximum range of angles $\bm{\tilde{\theta}_{max} = [\theta_r, \theta_l]}$ such
-that $f(s, \theta) \in e_j$, for all $s \in e_i$ and for all
-$\theta \in \tilde{\theta}_{max}$, or we may compute that no such range exists.
+Given two entirely visible line segments $e_i = (v_i, v_{i+1})$ and $e_j =
+(v_j, v_{j+1})$, if a safe action
+exists from $e_i$ to $e_j$, the maximum range of safe actions is $\bm{\tilde{\theta}_{max} = [\theta_r, \theta_l]}$ such
+that $\theta_r = \pi - \angle v_j v_{i+1} v_i$ and $\theta_l = \angle v_{j+1}
+v_i v_{i+1}$.
 \end{proposition}
 
 \begin{proof}
@@ -647,10 +648,6 @@ $\theta_l > \theta_r$ and if a ray is cast from any point on $e_i$ at angle
 $\theta \in [\theta_r, \theta_l]$, the ray is guaranteed to intersect $e_j$ in its
 interior.
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 \emph{Case 2:} $e_l$ and $e_r$ would meet above edge $e_i$. Then, $\theta_l <
 \theta_r$, and there is no angle
 $\theta$ such that a ray shot from \emph{any} point on $e_i$ will intersect
@@ -773,9 +770,12 @@ handled separately where necessary.
 
 \begin{definition}
 
-A function $g: \mathbb{R} \to \mathbb{R}$ is a contraction mapping if $\lvert g(x) - g(y)
-\rvert \leq c \lvert x-y \rvert$, and $0 \leq c < 1$.
+A function $g$ which maps a metric space $M$ to itself is a contraction mapping if for all
+$x, y \in M$, $\lvert g(x) - g(y) \rvert \leq c \lvert x-y \rvert$, and $0 \leq c < 1$.
 \end{definition}
+
+In our case, we will always take $M$ to be an interval in $\mathbb{R}$ and we
+will use the L1 norm.
 
 \begin{definition}
 Assume segment $e_i$ is aligned with $x$ axis with its normal pointing up and
@@ -973,8 +973,9 @@ by staying close enough to the boundary, the robot may guarantee a safe
 transition (as well as a contraction mapping).
 
 \begin{proposition} \label{prop:twosafe}
-Each segment $e$ in the partitioned polygon $\partial P'$ has at least two safe transitions
-leaving $e$.
+For every simple polygon $P$ and the resulting polygon $P'$ under Algorithm
+\ref{algo:insert}, each edge $e \in P'$ has at least two safe actions which allow
+transitions away from $e$.
 \end{proposition}
 
 \begin{proof}
@@ -999,8 +1000,9 @@ The transition must also be safe, by the same argument as Corollary
 \end{proof}
 
 \begin{proposition}
-Not all segments in the partitioned polygon $P'$ are reachable by a safe action from
-at least one other segment.
+There exist simple polygons such that under Algorithm \ref{algo:insert}, there
+exist edges in the partitioned polygon $P'$ which are \textbf{not} reachable by 
+a safe action from any other edge in $P'$.
 \end{proposition}
 
 \begin{proof}
