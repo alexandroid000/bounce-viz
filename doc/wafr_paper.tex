@@ -333,7 +333,8 @@ right hand side of the bounce law).
 
 \begin{definition}
 Let $\alpha: (0,\pi)$ be the robot's incoming heading relative to the
-environment boundary. A \textbf{bounce law} $b$ maps $\alpha$ to an action
+environment boundary. Let $\theta \in \mathbb{R}$ be a control parameter. A 
+\textbf{bounce law} $b$ maps $\alpha$ and $\theta$ to an action
 $u$, and determines how the robot will reorient itself when it collides with a
 boundary. Bounce laws are defined in the
 frame where the environment normal is aligned with the positive $y$ axis and the
@@ -347,12 +348,11 @@ return a convex set of actions (a single interval in $(0, \pi)$).
 \end{definition}
 
 For example, a specular bounce (laser beams, billiard balls) has bounce law
-$b(\alpha) = \pi - \alpha$. See Figure \ref{fig:bex} for more
+$b(\alpha, \theta) = \pi - \alpha$. See Figure \ref{fig:bex} for more
 examples of bounce laws. 
 
 \begin{definition}
-A \textbf{bounce strategy} is a sequence of bounce
-laws.
+A \textbf{bounce strategy} is a sequence of bounce laws.
 \end{definition}
 
 Uncertainty is modelled by computing strategies over nondeterministic bounce
@@ -496,8 +496,8 @@ produces a list of vertices visible from that point on the boundary (the
 combinatorial visibility vector) \cite{suri2008simple}. The vertical dotted
 lines, vertices of $P'$, are the exact points where the combinatorial visibility
 vector (cvv) changes. Within a segment $(v_i, v_{i+1})$, if two successive elements of the cvv are 
-adjacent vertices ($v_j$, $v_{j+1}$), then \emph{some} transition exists from
-$(v_i, v_{i+1})$ to a point on $(v_j$, $v_{j+1})$.
+adjacent vertices, then \emph{some} transition exists from
+$(v_i, v_{i+1})$ to a point on the edge between those vertices.
 
 If for a segment $(v_i, v_{i+1})$, if there is an interval of $\theta$ such that
 no vertex lines are crossed from left to right, this corresponds to our notion
@@ -507,7 +507,7 @@ For example, in
 Figure \ref{fig:diagram}, we see that a band of intervals exists at the top and
 bottom of the diagram with no ``crossings" as you move from left to right
 (moving the robot around $\partial P$). These bands correspond to the safe
-transitions described in Lemma \ref{lemma:twosafe}.
+transitions described in Proposition \ref{prop:twosafe}.
 
 %{\color{red} current diagram just shows lines where the visibility polygon at s
 %changes combinatorial structure. In between the lines, we are not guaranteed
@@ -559,29 +559,12 @@ all partial local sequence points added as new vertices.
 \end{algorithmic}
 \end{algorithm}
 
-\begin{proposition} The bounce visibility graph for a polygon with $n$ vertices has 
+\begin{proposition} \label{prop:complexity}
+The bounce visibility graph for a polygon with $n$ vertices has 
 $O(n^2)$ vertices and $O(n^4)$ edges.
 \end{proposition}
 
-\begin{proof}
-
-Consider a polygon $P$ with $n$ vertices, $r$ of which are reflex vertices. To
-construct the bounce visibility graph, we insert the vertices of the partial
-local sequence for each vertex in $P$. For a convex vertex, its partial local sequence 
-will not add any new vertices to $P$. However, a reflex vertex can add $O(n)$ new vertices. 
-
-Up to half of the vertices in the polygon can be reflex, so the complexity of
-$r$ is $O(n)$. Therefore, the number of vertices in $P'$, returned by Algorithm
-\ref{algo:insert} is $O(n^2)$. Each vertex indexes an edge in $P'$, and
-thus a node in the edge visibility graph of $P'$. At most, a given vertex in $P'$ may see all other vertices, so in the worst
-case, the bounce visibility graph will have $O(n^4)$ edges. See Figure
-\ref{fig:t4} for an example of such a polygon, and the Appendix for a proof of
-its complexity.
-\qed
-
-\end{proof}
-
-
+The proof of Proposition \ref{prop:complexity} is left to the Appendix.
 
 %\begin{figure}
 %
@@ -644,15 +627,31 @@ $\theta \in \tilde{\theta}_{max}$, or we may compute that no such range exists.
 \begin{proof}
 
 Let edge $e_i = (v_i, v_{i+1})$ be aligned with the positive $x$ axis with the clockwise
-%endpoint at the origin, without loss of generality. Due to the edges being
-%$\theta_l > \theta_r$ and if a ray is cast from any point on $e_i$ at angle
-%$\theta \in [\theta_r, \theta_l]$, the ray is guaranteed to intersect $e_j$ in its
-%interior.
-%
-%\emph{Case 2:} $e_l$ and $e_r$ would meet above edge $e_i$. Then, $\theta_l <
-%\theta_r$, and there is no angle
-%$\theta$ such that a ray shot from \emph{any} point on $e_i$ will intersect
-%$e_j$.
+endpoint at the origin, without loss of generality. 
+Due to the edges being
+entirely visible, $e_j = (v_j, v_{j+1})$ must be in the top half of the plane, above
+$e_i$.
+
+Take the quadrilateral formed by the convex hull of the edge endpoints.
+Let the edges between $e_i$ and $e_j$ be $e_l = (v_i, v_{j+1})$ and the right-hand edge 
+$e_r = (v_{i+1}, v_j)$. Let $\theta_{l}$ be
+the angle between $e_l$ and the positive $x$ axis ($0 < \theta_l < \pi$); similarly
+for $e_r$ and $\theta_r$. See Figure \ref{fig:bounce_range} for an illustration of
+the setup. 
+
+There are three cases to consider: if $e_l$ and $e_r$ are extended to infinity,
+they cross either above or below edge $e_i$, or they are parallel.
+
+\emph{Case 1:} $e_l$ and $e_r$ would meet below edge $e_i$. Then,
+$\theta_l > \theta_r$ and if a ray is cast from any point on $e_i$ at angle
+$\theta \in [\theta_r, \theta_l]$, the ray is guaranteed to intersect $e_j$ in its
+interior.
+
+
+\emph{Case 2:} $e_l$ and $e_r$ would meet above edge $e_i$. Then, $\theta_l <
+\theta_r$, and there is no angle
+$\theta$ such that a ray shot from \emph{any} point on $e_i$ will intersect
+$e_j$.
 To see this, imagine sliding a ray at angle $\theta_l$ across the quadrilateral
 - at some point before reaching $v_{i+1}$, the ray must stop intersecting $e_j$,
 else we would have $\theta_l > \theta_r$.
@@ -776,7 +775,7 @@ A function $g: \mathbb{R} \to \mathbb{R}$ is a contraction mapping if $\lvert g(
 \end{definition}
 
 \begin{definition}
-Segment $e_i$ is aligned with $x$ axis with its normal pointing up and
+Assume segment $e_i$ is aligned with $x$ axis with its normal pointing up and
 segment $e_j$ is above segment $e_i$. If the intersection of segment $e_i$ and
 $e_j$ is
 on the left of segment $e_i$, then call the transition from $e_i$ to $e_j$ a left
@@ -872,7 +871,7 @@ to the next adjacent edge if and only if
 $\theta \in (0, \min_{i}(\angle v_{i+2}v_{i}v_{i+1})$.
 
 Suppose we have two start positions $x$ and $y$ on edge $e_0$ and the two
-corresponding trajectories under a constant fixed bounce law $b(\alpha) = \theta$. Denote the positions of the two trajectories on $e_k$ as $f^{k}(x)$ and
+corresponding trajectories under a constant fixed bounce law $b(\alpha, \theta) = \theta$. Denote the positions of the two trajectories on $e_k$ as $f^{k}(x)$ and
 $f^{k}(y)$ and the distance between them as $d(f^{k}(x), f^{k}(y))$. Since function composition multiplies the coefficients $C(\theta, \phi)$, 
 the distance between $x$ and $y$ changes after one orbit of the polygon by the
 ratio $\frac{d(f^{n}(x)), f^{n}(y))}{d(f^{0}(x), f^{0}(y))} = \prod_{i = 0}^{n-1}
@@ -889,7 +888,7 @@ Since all transitions in this case are right transitions, the constraint \\$C(\t
 \end{equation*}
 
 \noindent
-in which case the fixed-angle bouncing strategy with $b(\alpha) = \theta$ leads to a convex
+in which case the fixed-angle bouncing strategy with $b(\alpha, \theta) = \theta$ leads to a convex
 cycle which visits each edge of $P$ sequentially, regardless of the robot's start position.
 \qed
 
@@ -970,10 +969,10 @@ for two angles ranges. These ranges are the ones bordering the segment itself:
 by staying close enough to the boundary, the robot may guarantee a safe
 transition (as well as a contraction mapping).
 
-\begin{lemma} \label{lemma:twosafe}
+\begin{proposition} \label{prop:twosafe}
 Each segment $e$ in the partitioned polygon $\partial P'$ has at least two safe transitions
 leaving $e$.
-\end{lemma}
+\end{proposition}
 
 \begin{proof}
 
@@ -996,10 +995,10 @@ The transition must also be safe, by the same argument as Corollary
 \qed
 \end{proof}
 
-\begin{lemma}
+\begin{proposition}
 Not all segments in the partitioned polygon $P'$ are reachable by a safe action from
 at least one other segment.
-\end{lemma}
+\end{proposition}
 
 \begin{proof}
 See Figure \ref{fig:simple_bit} for an example where the segment between nodes
@@ -1313,15 +1312,38 @@ $O ((2t(t-1)+n)(t(t-1)+n/2)) = O(t^4) = O(n^4)$.
 Fig \ref{fig:t4} shows the polygon for $t = 4$ with all the
 vertices in the partial local sequences. % show the diagram to edge
 
+\section{Proof of Proposition \ref{prop:complexity}}
+
+
+\textbf{Proposition 1.} {\em The bounce visibility graph for a polygon with $n$ vertices has 
+$O(n^2)$ vertices and $O(n^4)$ edges.}
+
+\begin{proof}
+
+Consider a polygon $P$ with $n$ vertices, $r$ of which are reflex vertices. To
+construct the bounce visibility graph, we insert the vertices of the partial
+local sequence for each vertex in $P$. For a convex vertex, its partial local sequence 
+will not add any new vertices to $P$. However, a reflex vertex can add $O(n)$ new vertices. 
+
+Up to half of the vertices in the polygon can be reflex, so the complexity of
+$r$ is $O(n)$. Therefore, the number of vertices in $P'$, returned by Algorithm
+\ref{algo:insert} is $O(n^2)$. Each vertex indexes an edge in $P'$, and
+thus a node in the edge visibility graph of $P'$. At most, a given vertex in $P'$ may see all other vertices, so in the worst
+case, the bounce visibility graph will have $O(n^4)$ edges. See Figure
+\ref{fig:t4} for an example of such a polygon, and the Appendix for a proof of
+its complexity.
+\qed
+
+\end{proof}
 \section{Proof of Lemma \ref{lemma:angrange}}
 
-\begin{lemma}
+\textbf{Lemma 2.} {\em
 If the transition from segment $e_i$ to segment $e_j$ is a left transition, then the
 transition function $f(x, \theta)$ between segments $e_i$ and $e_j$ is a contraction
 mapping if and only if $\theta > \frac{\pi}{2}+\frac{\phi_{i, j}}{2}$;
 otherwise, the transition function $f(x, \theta)$ is a contraction mapping if
-and only if $\theta < \frac{\pi}{2}-\frac{\phi_{i, j}}{2}$.
-\end{lemma}
+and only if $\theta < \frac{\pi}{2}-\frac{\phi_{i, j}}{2}$.}
+
 \begin{proof}
 
 \begin{figure}
