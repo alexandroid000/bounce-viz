@@ -529,11 +529,11 @@ transitions described in Lemma \ref{lemma:twosafe}.
 \centering
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=\linewidth]{figures/L_poly.jpg}
+\includegraphics[width=\linewidth]{figures/L_poly.png}
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=\linewidth]{figures/L_diagram.jpg}
+\includegraphics[width=\linewidth]{figures/L_diagram.png}
 \end{subfigure}
 \caption{A partitioned polygon and its corresponding bounce visibility diagram. }
 \label{fig:diagram}
@@ -881,7 +881,7 @@ C(\theta, \phi_{i-1, i})$.
 If $\prod_{i = 0}^{n-1} C(\theta, \phi_{i}) < 1$, then $f^k(x)$ is a contraction
 mapping from $e_0$ back to iteself, and has a unique fixed point by the Banach fixed-point theorem\cite{Granas2003}.
 
-Since all transitions in this case are right transitions, the constraint $C(\theta,\phi_{i-1, i})<1$ is equivalent to $\theta < \frac{\pi}{2}-\frac{\phi_{i-1, i}}{2}$. We can guarantee that this condition holds for the orbit by requiring
+Since all transitions in this case are right transitions, the constraint \\$C(\theta,\phi_{i-1, i})<1$ is equivalent to $\theta < \frac{\pi}{2}-\frac{\phi_{i-1, i}}{2}$. We can guarantee that this condition holds for the orbit by requiring
 
 \begin{equation*}
 \theta \in (0, \min(\min_{i = 0, 1, \dots, n-1}(\angle v_{i+2}v_{i}v_{i+1}),
@@ -935,7 +935,7 @@ here we detail a few options.
 
 
 \begin{algorithm}
-\caption{\textsc{SafeNavigate}($P$, $S$, $G$, $k$}
+\caption{\textsc{SafeNavigate}($P$, $S$, $G$, $k$)}
 \label{algo:nav}
 \hspace*{\algorithmicindent} \textbf{Input:} A polygon $P$, intervals $S$ and
 $G$ in $\partial P$, and an integer bound $k$.\\
@@ -1334,8 +1334,8 @@ and only if $\theta < \frac{\pi}{2}-\frac{\phi_{i, j}}{2}$.
 We consider the two cases of transition separately:
 \begin{enumerate}
     \item For the transition shown in the left hand side of Figure~\ref{fig:cont_map}, 
-          \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\theta - \phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta-\phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta-\phi_{i, j})$. If $\theta < \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta-\phi_{i, j})$. Thus we need $\theta>\frac{\pi}{2}$. If $\theta-\phi_{i, j} > \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta-\phi_{i, j})$ and we are done; otherwise we need $\pi - \theta < \theta-\phi_{i, j} \Rightarrow \theta - \frac{\phi_{i, j}}{2} > \frac{\pi}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta >\frac{\pi}{2} + \frac{\phi_{i, j}}{2}$.
-    \item Similarly, for a right transiton shown in the right diagram of figure~\ref{fig:cont_map}, \begin{eqnarray*}\overline{xf(x)} \parallel \overline{yf(y)} \Rightarrow \frac{|f(x)-f(y)|}{|x-y|} = \frac{|f(x)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\pi -\theta-\phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta + \phi_{i, j})}.\end{eqnarray*} The transition will be contraction if and only if $\frac{|f(x)-f(y)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta+\phi_{i, j})$. If $\theta  > \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta + \phi_{i, j})$. Thus we need $\theta<\frac{\pi}{2}$. If $\theta+\phi_{i, j} < \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta+\phi_{i, j})$ and we are done; otherwise we need $\theta < \pi-\theta-\phi_{i, j} \Rightarrow \theta < \frac{\pi}{2} - \frac{\phi_{i, j}}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta <\frac{\pi}{2} - \frac{\phi_{i, j}}{2}$.
+          $\overline{xf(x, \theta)} \parallel \overline{yf(y, \theta)} \Rightarrow \frac{|f(x, \theta)-f(y, \theta)|}{|x-y|} = \frac{|f(x, \theta)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\theta - \phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta-\phi_{i, j})}.$ The transition will be contraction if and only if $\frac{|f(x, \theta)-f(y, \theta)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta-\phi_{i, j})$. If $\theta < \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta-\phi_{i, j})$. Thus we need $\theta>\frac{\pi}{2}$. If $\theta-\phi_{i, j} > \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta-\phi_{i, j})$ and we are done; otherwise we need $\pi - \theta < \theta-\phi_{i, j} \Rightarrow \theta - \frac{\phi_{i, j}}{2} > \frac{\pi}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta >\frac{\pi}{2} + \frac{\phi_{i, j}}{2}$.
+    \item Similarly, for a right transiton shown in the right diagram of figure~\ref{fig:cont_map}, $\overline{xf(x, \theta)} \parallel \overline{yf(y, \theta)} \Rightarrow \frac{|f(x, \theta)-f(y, \theta)|}{|x-y|} = \frac{|f(x, \theta)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\pi -\theta-\phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta + \phi_{i, j})}.$ The transition will be contraction if and only if $\frac{|f(x, \theta)-f(y, \theta)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta+\phi_{i, j})$. If $\theta  > \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta + \phi_{i, j})$. Thus we need $\theta<\frac{\pi}{2}$. If $\theta+\phi_{i, j} < \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta+\phi_{i, j})$ and we are done; otherwise we need $\theta < \pi-\theta-\phi_{i, j} \Rightarrow \theta < \frac{\pi}{2} - \frac{\phi_{i, j}}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta <\frac{\pi}{2} - \frac{\phi_{i, j}}{2}$.
 \end{enumerate}
 \qed
 
