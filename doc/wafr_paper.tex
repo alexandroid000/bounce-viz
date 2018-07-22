@@ -133,8 +133,8 @@ and dynamical contexts. The environment interactions may be mechanical,
 with the robot actually making contact with a surface, or may be simulated with
 virtual boundaries such as the perimeter wire systems used by lawn mowing robots
 \cite{sahin2007household}. Physical implementations of the bouncing maneuver have
-been validated experimentally, for example in \cite{LewOKa13} and
-\cite{alam2018space}. However, often these lines of work consider only a small
+been validated experimentally, for example in \cite{alam2018space} and \cite{LewOKa13}. 
+However, often these lines of work consider only a small
 part of the strategy space, such as \cite{ErLav13} which considers only robots
 which ``bounce'' at a single fixed angle to the normal. In this work, we present 
 a tractable approach to reasoning over the entire
@@ -194,19 +194,16 @@ The first-class study of the motion model's dynamical properties was proposed in
 these analysis tools, and presents new insights from the use of visibility to
 discretize the strategy space.
 
-The most closely related work to ours is \cite{LewOKa13}, which addressed the
-navigation task with a very similar robot model in polygons. Their robot moves
-in a straight line until encountering an environment boundary, at which point it
-is able to rotate in place, with some bounded nonzero nondeterministic error
-cone.
-They then generate a strategy as a sequence of bounce angles that navigate
-the robot between given start and end locations in a known environment. They
-introduce the idea of ``safe actions,'' which place the entire forward projected
-state of the robot within a single linear segment of the polygonal environment.
-However, this algorithm is not complete, due to the problem formulation taking
-the robot's motion uncertainty as a fixed input. Our approach is to consider all
-possible error cones, and return bounds on the required accuracy of movement as
-an output of the algorithm.
+The most closely related work to ours is \cite{LewOKa13}, which considered
+navigation for a robot that moves in a straight line until encountering an
+environment boundary, then rotates in place with bounded nonzero
+uncertainty, with the bound given as input to the task. 
+They introduce the idea of ``safe actions,'' which place the entire forward
+projected state of the robot within a single segment of the partitioned
+environment boundary. However, their boundary partition is computed with the robot's 
+motion uncertainty as a fixed input. Our approach
+is to consider all possible amounts of uncertainty, and return bounds on the required
+accuracy of movement as an output of the algorithm.
 
 %due to the method used to discretize
 %the environment boundary and the restriction of only allowing deterministic
@@ -217,48 +214,41 @@ an output of the algorithm.
 
 
 In \cite{alam2017minimalist} and \cite{alam2018space}, the authors describe
-navigation, coverage, and localization algorithms for a robot model, focused
-on bounce laws which turn a fixed amount relative to the robot's prior heading. 
-Their approach uses a grid discretization of the robot configuration space and actuation
-space, and then searches the discretized dynamical system for limit cycles. The
-algorithm is complete and correct up to discretization error, though periodic
+navigation, coverage, and localization algorithms for a similar robot that rotates a fixed amount 
+relative to the robot's prior heading. 
+Their approach uses a grid discretization of the robot configuration space, and 
+then searches the discretized dynamical system for paths and limit cycles. The
+algorithm is complete and correct up to discretization, though periodic
 trajectories may exist which require bounce angles not allowed by the
 discretization. By using a discretization induced by the environment geometry,
-our approach considers all possible bounce strategies.
+we are able to find all possible limit cycles.
 
 
 
 The questions we pose, and our methods of attacking the problem, are related to
 work on visibility in computational geometry \cite{ghosh2007visibility}. Visibility has been
 considered extensively in robotics, but usually with the goal of avoiding obstacles 
-\cite{lozano1979algorithm,nissoux1999visibility}. If we wish to use collisions strategically, 
+\cite{lozano1979algorithm,SimLauNis00}. If we wish to use collisions strategically, 
 we require a slightly more
-powerful data structure: the edge visibility graph for a partition of a polygon
-$P$. The edge visibility graph was analyzed along with the vertex-edge
+powerful data structure: the edge visibility graph, analyzed along with the vertex-edge
 visibility graph in \cite{rourke_viz}, and shown to be strictly more powerful
 than the vertex visibility graph.
+Our work is also related to problems in computational geometry that consider what
+parts of a polygon will be illuminated by a light source after multiple
+reflections (as if the edges of the polygon are mirrors) 
+\cite{Aronov1996}, or with diffuse
+reflections \cite{prasad1998visibility}, which are related to our nondeterministic bounces.
 
-%%S Citations for visibility motion planning: Nil69, SimLauNis00
-%%S Hmm..this could have said all of combinatorial motion planning is devoted to obstacle avoidance, whereas here we use it to study how to hit obstacles!
-
-%%S I think you do not use - properly.  Try to avoid.  Most of the time is should be ; or sometimes : .   
-The dynamical system defined by our robot model is related to \emph{dynamical billiards}. Many 
-possible reflection laws have been studied;
-the most common is purely specular reflection, but slightly modified laws have
+The dynamical system defined by our robot model is related to \emph{dynamical billiards}
+\cite{billiards}. Along with specular reflection, modified dynamical systems have
 also attracted recent interest \cite{DelMagno2014,billiards,pinball}. 
 One very similar work was inspired by the dynamics of microorganisms; in \cite{microorganism2017}, 
 the authors show that 
 \textit{Chlamydomonas reinhardtii} ``bounce'' off boundaries at a specific
 angle depending on their body morphology. They characterize periodic and
-chaotic trajectories of such agents in regular polygons, planar curves, and other environments, 
-without a focus on generating control strategies.
+chaotic trajectories of such agents in regular polygons, planar curves, and other
+environments.
 
-Our work is also related to problems in computational geometry that consider what
-parts of a polygon will be illuminated by a light source after multiple
-reflections (as if the edges of the polygon are mirrors). It has been shown that
-the complexity of the region lit in an $n-$gon after $k$ bounces is $O(n^{2k})$
-\cite{Aronov1996}. Another interesting line of work considers \emph{diffuse}
-reflections \cite{prasad1998visibility}, which are related to our nondeterministic bounces.
 
 We are working toward a generalization and hierarchy of robot models, in a
 similar spirit to \cite{brunner2008simple}. Their basic robot model, the simple
@@ -342,8 +332,8 @@ robot's point of contact with the boundary is the origin.
 \end{definition}
 
 \begin{definition}
-A \textbf{nondeterministic bounce law} is one which returns a set of actions
-instead of a singleton. In this paper, we will restrict such bounce laws to
+A \textbf{nondeterministic bounce law} is a bounce law lifted to return a set of actions
+instead of a singleton. In this paper, we will restrict nondeterministic bounce laws to
 return a convex set of actions (a single interval in $(0, \pi)$).
 \end{definition}
 
@@ -560,7 +550,7 @@ all partial local sequence points added as new vertices.
 \end{algorithm}
 
 \begin{proposition} \label{prop:complexity}
-The bounce visibility graph for a polygon with $n$ vertices has 
+The bounce visibility graph for a simple polygon with $n$ vertices has 
 $O(n^2)$ vertices and $O(n^4)$ edges.
 \end{proposition}
 
@@ -1320,7 +1310,7 @@ vertices in the partial local sequences. % show the diagram to edge
 \section{Proof of Proposition \ref{prop:complexity}}
 
 
-\textbf{Proposition 1.} {\em The bounce visibility graph for a polygon with $n$ vertices has 
+\textbf{Proposition 1.} {\em The bounce visibility graph for a simple polygon with $n$ vertices has 
 $O(n^2)$ vertices and $O(n^4)$ edges.}
 
 \begin{proof}
@@ -1336,8 +1326,7 @@ $r$ is $O(n)$. Therefore, the number of vertices in $P'$, returned by Algorithm
 thus a node in the edge visibility graph of $P'$. At most, a given vertex in $P'$ may see all other vertices, so in the worst
 case, the bounce visibility graph will have $O(n^4)$ edges. See Figure
 \ref{fig:t4} for an example of such a polygon, and the Appendix for a proof of
-its complexity.
-\qed
+its complexity. \qed
 
 \end{proof}
 \section{Proof of Lemma \ref{lemma:angrange}}
