@@ -5,6 +5,7 @@ from graph_utils import *
 from graph_operations import *
 from maps import *
 import numpy as np
+from numpy.linalg import norm
 
 # Used to plot the example
 import matplotlib.pyplot as plt
@@ -65,22 +66,30 @@ def VizPoly(poly, fname="inserted_poly"):
 # Resolution is the number of sample points on each edge
 # hline is for showing fix theta bouncing
 # fname is the output file name for the link diagram
-def PlotLinkDiagram(link_diagram, resolution = 15, hline = None, fname = 'link_diagram.png'):
+def PlotLinkDiagram(poly, link_diagram, resolution = 15, hline = None, fname = 'link_diagram.png'):
+    poly = np.array([list(x) for x in poly])
+    edge_len = [norm(poly[i]-poly[(i+1)%len(poly)]) for i in range(len(poly))]
+    acc_edge_len = [sum(edge_len[:i]) for i in range(len(edge_len)+1)]
     psize = link_diagram.shape[0]
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
     fig, ax = plt.subplots()
     x = []
-    for j in range(psize):
-        x.extend(list(np.linspace(j, j+1, resolution-1)))
-        x.extend([j+1])
+    for i in range(psize):
+        x.extend(list(np.linspace(acc_edge_len[i], acc_edge_len[i+1], resolution-1)))
+        x.extend([acc_edge_len[i+1]])
     for i in range(psize):
         plt.plot(x, link_diagram[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
-        plt.axvline(x=i, linestyle='--')
-    # if hline != None:
-        # plt.plot(range(psize+1), hline*np.ones(psize+1))
+        plt.axvline(x=acc_edge_len[i], linestyle='--')
+    plt.axvline(x = acc_edge_len[-1], linestyle='--')
+    if hline != None:
+        plt.plot(range(psize+1), hline*np.ones(psize+1))
+
     leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.15), ncol=5)
-    ax.set_xticks(range(psize+1))
+    ax.set_xticks(acc_edge_len)
+    x_labels = list(range(psize))
+    x_labels.append(0)
+    ax.set_xticklabels(x_labels)
     ax.set_yticks([0., np.pi/6., np.pi/3., np.pi/2., 2*np.pi/3., 5*np.pi/6., np.pi])
     ax.set_yticklabels(["$0$", r"$\frac{1}{6}\pi$", r"$\frac{1}{3}\pi$", r"$\frac{1}{2}\pi$", r"$\frac{2}{3}\pi$", r"$\frac{5}{6}\pi$", r"$\pi$"])
     plt.xlabel(r"vertices on $\partial P'$", fontsize=15)
@@ -138,19 +147,19 @@ def VizPath(poly, intervals):
 
 
 if __name__ == '__main__':
-    poly = pent
-    # VizRay(poly)
-    # VizPoly(poly)
+    poly = simple_bit
+    VizRay(poly)
+    VizPoly(poly)
     p1 = InsertAllTransitionPts(poly)
     link_diagram = GetLinkDiagram(p1)
     PlotLinkDiagram(link_diagram, hline = 1.4707)
-    # print("inserted all transition pts")
-    # VizPoly(p1)
-    # G = mkGraph(p1, requireContract = False)
-    # print("made graph")
-    # PlotGraph(G)
-    # H = mkSafeGraph(G, p1)
-    # PlotGraph(H, "safe_graph")
+    print("inserted all transition pts")
+    VizPoly(p1)
+    G = mkGraph(p1, requireContract = False)
+    print("made graph")
+    PlotGraph(G)
+    H = mkSafeGraph(G, p1)
+    PlotGraph(H, "safe_graph")
     #N = 3
     #for i in range(N):
     #    print(i,"th iteration")

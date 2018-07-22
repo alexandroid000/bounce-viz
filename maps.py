@@ -4,6 +4,7 @@ from env_gen import *
 
 # Some initial polygons
 # Use these below (inside main() to set the initial shape poly
+l_poly = [(0, 0), (600, 0), (600, 230), (260, 230), (260, 460), (0, 460)]
 square = [(250,250),(-250,250),(-250,-250),(250,-250)]
 shelf = [(250,250),(-250,250),(-250,-250), (-5,-250), (-100, -50), (100,
 -50), (5,-250), (250,-250)]
