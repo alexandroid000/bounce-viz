@@ -99,11 +99,23 @@ def PlotLinkDiagram(poly, link_diagram, resolution = 15, hline = None, fname = '
 
 def PlotGraph(G, fname = "graph"):
     plt.clf()
-    nx.draw_circular(G, with_labels=True,
-        node_color='#DA70D6',
-        arrowsize=20, arrowstyle='fancy',
+    pos = nx.circular_layout(G)
+    labels = nx.get_edge_attributes(G,'weight')
+    new_pos = dict()
+    count = 0
+    for i in pos:
+        new_pos[count] = pos[i]
+        count += 1
+    nx.draw_networkx(G, with_labels=True,
+        pos = new_pos,
+        node_color='white',
         width=1.2,
-        node_size = 1200, font_size=20)
+        node_size = 600, 
+        font_size=14)
+    # nx.draw_networkx_edge_labels(G,new_pos,edge_labels=labels)
+    plt.axis('off')
+    ax = plt.gca()
+    ax.collections[0].set_edgecolor('black') 
     plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
 
 def VizPath(poly, intervals):

@@ -145,14 +145,16 @@ def mkSafeGraph(G, poly):
     new_edges = []
     viz_verts = mkVizSets(poly)
     for i in H.nodes():
-        outgoing = G.edge[i]
+        outgoing = G.edges([i])
         vset = viz_verts[i]+[i]
         for e in outgoing:
+            e = e[1]
             e1 = (poly[i], poly[(i+1)%psize])
             e2 = (poly[e], poly[(e+1)%psize])
             e_viz = (e in vset) and ((e+1)%psize in vset)
             if SafeAngles(e1,e2) and e_viz:
-                new_edges.append((i,e,SafeAngles(e1,e2)))
+                curr_weight = '{0:.2f}'.format(SafeAngles(e1,e2)[1])
+                new_edges.append((i,e,curr_weight))
     H.add_weighted_edges_from(new_edges)
     if DEBUG:
         print("Safe graph data:")
