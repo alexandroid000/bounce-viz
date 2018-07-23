@@ -120,8 +120,8 @@ approach. First, global geometric information about environment boundaries is pr
 to the system, either \emph{a priori} or calculated online by
 an algorithm such as SLAM. This global geometry is then processed to produce
 a strategy providing strong formal guarantees and which can be executed with minimal 
-processing power and only low bandwith local sensors, such as bump sensors,
-instead of high bandwith sensors such as cameras.
+processing power and only low bandwidth local sensors, such as bump sensors,
+instead of high bandwidth sensors such as cameras.
 
 Inspired by the motion patterns of some commercially available mobile robots, 
 we consider simple robots with ``bouncing" behaviors: robots that
@@ -135,8 +135,8 @@ virtual boundaries such as the perimeter wire systems used by lawn mowing robots
 \cite{sahin2007household}. Physical implementations of the bouncing maneuver have
 been validated experimentally, for example in \cite{alam2018space} and \cite{LewOKa13}. 
 However, often these lines of work consider only a small
-part of the strategy space, such as \cite{ErLav13} which considers only robots
-which ``bounce'' at a single fixed angle to the normal. In this work, we present 
+part of the strategy space, such as \cite{ErLav13}, which considers only robots
+that ``bounce'' at a single fixed angle to the normal. In this work, we present 
 a tractable approach to reasoning over the entire
  space of all possible bounce strategies.
 
@@ -151,29 +151,12 @@ bounce mapping function become closer together.  We use this property to
 control uncertainty and synthesize strategies with explicit descriptions of the
 amount of allowable uncertainty for successful execution of the strategy.
 
-%%S I am not sure why there is another first, second below.  There are a lot of first-seconds, BTW
-%%S Maybe you need a  transition sentence here.  I tried one.
-%Our approach to developing robot motion strategies is as follows.
-%First, we construct a data structure that represents possible transitions between points on
-%the polygon boundary. This data structure can be interpreted as a diagram or graph. 
-%Each node in the graph (or region in the diagram) corresponds to a segment of the
-%boundary where the visibility polygon at each point is combinatorially equivalent.  This data structure also encodes information about which transitions are 
-%uncertainty-reducing.  We then show how this data structure can be augmented and queried to solve different robotic tasks, such as navigation and patrolling.
-
-
-% two prongs: beauty of geometry and dynamical systems approach
-% and practicality of efficient navigation / patrolling / coverage with mobile
-% robots
-
-% current draw gain of regular roomba vs. SLAM- or GPS- enabled roomba?
-% would guess at least 10x improvement
-% email iRobot people for actual stats?
 
 \section{Related Work}
 
 The constrained motion model that we use (forward motion until collision,
 followed by rotation) is a
-form of \emph{compliant motion}, where task constraints are used to guide task
+form of \emph{compliant motion}, in which task constraints are used to guide task
 completion, even when the exact system state is not known. Our approach is
 related to the idea of funnelling: using
 the attraction regions of a dynamical system to guide states into a goal region.
@@ -190,7 +173,7 @@ recently explored for multi-robot systems \cite{mayya2017collisions}. Our
 specific motion model has been used in works such as \cite{OkaLav06} to
 determine minimal information processing requirements for mobile robot tasks.
 The first-class study of the motion model's dynamical properties was proposed in
-\cite{bounce} and continued in \cite{NilBecLav17}. Our work extends and improves
+\cite{ErLav13} and continued in \cite{NilBecLav17}. Our work extends and improves
 these analysis tools, and presents new insights from the use of visibility to
 discretize the strategy space.
 
@@ -205,12 +188,6 @@ motion uncertainty as a fixed input. Our approach
 is to consider all possible amounts of uncertainty, and return bounds on the required
 accuracy of movement as an output of the algorithm.
 
-%due to the method used to discretize
-%the environment boundary and the restriction of only allowing deterministic
-%transitions between boundary segments. Their navigation graph has $O(n^4)$
-%nodes, while ours includes only $O(n^2)$ nodes.
-
-%%S Be careful with this `` and '' and that other one.  Make sure it turns out OK each time in the pdf outpout.  I prefer `` and '' to the single-character quotes.  I can't recall why any more.
 
 
 In \cite{alam2017minimalist} and \cite{alam2018space}, the authors describe
@@ -255,7 +232,7 @@ similar spirit to \cite{brunner2008simple}. Their basic robot model, the simple
 combinatorial robot, is able to scan all visible vertices and detect the
 presence of an edge between them. It is able to choose a destination vertex and
 move in a straight line to that vertex. They then augment this basic robot model
-with sensors such as pebbles, angle-measuring devices, and a reflexity detector.
+with sensors such as pebbles, angle-measuring devices, and a reflexivity detector.
 They then construct a hierarchy of these robot models, showing for instance that
 some can construct the vertex visibility graph of a polygonal environment
 and others cannot. Our questions are related but different: if the robot is
@@ -265,11 +242,10 @@ it capable of accomplishing with only local sensing?
 
 \section{Model and Definitions}
 
-%%S Using singular rather than plural often makes life better in definitions.
 We consider the movement of a point robots in simple 
 polygonal environments\footnote{All index arithmetic for polygons with $n$ vertices is mod $n$ 
 throughout this paper. We do not require polygons in general position. We do
-not consider trajectories which intersect polygon vertices.}. We define our robot to move forward in a straight line, until
+not consider trajectories that intersect polygon vertices.}. We define our robot to move forward in a straight line, until
 encountering an environment boundary (such as when a bump or range sensor is
 triggered). Once at a boundary, the robot is able to rotate in place.
 Of course, robots rarely move perfectly, so our analysis will assume the
@@ -280,7 +256,7 @@ nondeterministically.
 More formally, the model is:
 \begin{itemize}
 \item The \emph{configuration space} $X = P \times S^1$. $P$ is a simple polygon with 
-piecewise linear boundary $\partial P$, and $S^1$ is the robot's orientation in the plane. For the most part, one can ignore configurations in the interior
+piece-wise linear boundary $\partial P$, and $S^1$ is the robot's orientation in the plane. For the most part, one can ignore configurations in the interior
 of the polygon and only consider transitions between points and intervals on the
 boundary. Let $s \in \partial P$ refer to a point on
 the boundary of without an associated robot orientation.
@@ -306,12 +282,12 @@ moves forward until the next contact with the boundary at stage $k+1$.
 \begin{figure}
     \includegraphics[width=0.8\linewidth]{figures/bounce_examples.pdf}
     \centering
-    \caption[test]{\label{fig:bex}Examples of different ``bounce laws'' which can be implemented on
+    \caption[test]{\label{fig:bex}Examples of different ``bounce laws'' that can be implemented on
 mobile robots. In the first row, $b(\alpha, \theta) = \theta$, which we refer to
 as a \textbf{fixed} bounce law. In the second row, we have a \textbf{monotonic
-fixed} bounce law, where
+fixed} bounce law, in which
 $b(\alpha, \theta) = \theta$ or $\pi-\theta$, depending on what is necessary to
-preserve monotonicity of travel direction along the $x$-axis. In the third
+preserve monotonicity of travel direction along the $x$ axis. In the third
 row, $b(\alpha, \theta) = \alpha - \theta$, rotating $\alpha$ through $\theta$ in the clockwise
 direction. It is possible that this rotation will cause the 
 heading of the robot to still be facing into the boundary, in which case the robot 
@@ -323,14 +299,13 @@ right hand side of the bounce law).
 
 \begin{definition}
 Let $\alpha: (0,\pi)$ be the robot's incoming heading relative to the
-environment boundary. Let $\theta \in \mathbb{R}$ be a control parameter. A 
+environment boundary at the point of contact. Let $\theta \in \mathbb{R}$ be a control parameter. A 
 \textbf{bounce law} $b$ maps $\alpha$ and $\theta$ to an action
 $u$, and determines how the robot will reorient itself when it collides with a
 boundary. Bounce laws are defined in the
-frame where the environment normal is aligned with the positive $y$ axis and the
+frame in which the environment normal is aligned with the positive $y$ axis and the
 robot's point of contact with the boundary is the origin.
 \end{definition}
-
 \begin{definition}
 A \textbf{nondeterministic bounce law} is a bounce law lifted to return a set of actions
 instead of a singleton. In this paper, we will restrict nondeterministic bounce laws to
@@ -342,15 +317,14 @@ $b(\alpha, \theta) = \pi - \alpha$. See Figure \ref{fig:bex} for more
 examples of bounce laws. 
 
 \begin{definition}
-A \textbf{bounce strategy} is a sequence of bounce laws.
+A \textbf{bounce strategy} is a sequence of nondeterministic bounce laws.
 \end{definition}
-
 Uncertainty is modelled by computing strategies over nondeterministic bounce
 laws, which result in the robot achieving its goal as long as it executes an
 action in the specified \emph{interval} at each stage.
 
 Given a polygonal environment (such as the floor plan of a warehouse or office
-space), we would like to synthesize bounce strategies which allow a robot to
+space), we would like to synthesize bounce strategies that allow a robot to
 perform a given task (such as navigation or patrolling).
 
 
@@ -359,15 +333,15 @@ perform a given task (such as navigation or patrolling).
 
 First, we must find a way to discretize the continuous space of all possible
 transitions between points on $\partial P$. We find a visibility-based partition
-which encodes the idea of some points on $\partial P$ having different
+that encodes the idea of some points on $\partial P$ having different
 available transitions.
 
 \begin{definition}
 The \textbf{visibility polygon} of a point $s$ in a polygon $P$ is the polygon
-formed by all the points in $P$ which can be connected to $s$ with a line
-segment which lies entirely within $P$.
+formed by all the points in $P$ that can be connected to $s$ with a line
+segment that lies entirely within $P$.
 \end{definition}
-
+%%S Are there any open/closed set issues with this?  Ambiguous?
 Imagine a robot sliding along the boundary of a polygon, calculating 
 the visibility polygon as it moves. In a convex polygon, nothing exciting 
 happens, but in a nonconvex polygon, the reflex vertices (vertices with an
@@ -381,7 +355,7 @@ from $r$), a combinatorial change will occur in the visibility polygon. Either
 $v$ will become visible to the robot, adding an edge to the visibility 
 polygon, or $v$ will disappear behind $r$, removing an edge from the visibility polygon.
 
-To compute all such points where the visibility polygon changes structure, we
+To compute all such points at which the visibility polygon changes structure, we
 must compute the \textbf{partial local sequence}, defined in \cite{rourke_viz}.
 The partial local sequence is a sequence of points on $\partial P$, associated with 
 a vertex $v_0$ in $P$, constructed by shooting a ray through $v_0$ from every vertex in $P$
@@ -390,10 +364,10 @@ $\partial P$. If $v_0$ is reflex, some of the rays shot through it may intersect
 $\partial P$ in the interior of existing edges. See Figure \ref{fig:pls} for an
 example of the vertices in the partial local sequence of $v_0$ (blue dots with
 accompanying rays). Each point in the partial local sequence marks the point
-where a visible vertex appears or disappears behind a reflex vertex.
+at which a visible vertex appears or disappears behind a reflex vertex.
 
 Thus, once all the partial local sequences have been inserted into the original
-polygon, the resulting points along the boundary define segments where two points in the same interval can see the same edge set of the
+polygon, the resulting points along the boundary define segments for which two points in the same interval can see the same edge set of the
 original polygon (though they may see different portions of those edges). Thus,
 we can reason over a finite set of transitions between these intervals, instead
 of the infinite set of possible transitions between points on the boundary of
@@ -481,10 +455,10 @@ We now define the \textbf{bounce visibility diagram}, a
 representation of the vertex-edge visibility structure of a polygon $P'$.
 %This representation
 %was inspired by link diagrams \cite{efrat2000sweeping,tan_sweep}.
-If $|\partial P'|$ is the perimeter length of $\partial P'$, let the $x-$axis of the
-bounce visibility diagram be the interval $[0, |\partial P'|)$, where the
-endpoints of the interval are identified. Let the $y-$axis of the diagram be a
-parameter $\theta$ which is an angle between $0$ and $\pi$.
+If $|\partial P'|$ is the perimeter length of $\partial P'$, let the $x$ axis of the
+bounce visibility diagram be the interval $[0, |\partial P'|)$, in which the
+endpoints of the interval are identified. Let the $y$ axis of the diagram be a
+parameter $\theta$, which is an angle between $0$ and $\pi$.
 
 For a point $s \in \partial P'$, we can compute all the visible vertices and
 the angle at which they are visible. The graph of all angles at which vertices
@@ -517,7 +491,7 @@ segment-to-segment transitions under ranges of departure angles.
 For example, slicing the diagram vertically at a specific $s \in \partial P'$
 produces a list of vertices visible from that point on the boundary (the
 combinatorial visibility vector) \cite{suri2008simple}. The vertical dotted
-lines, vertices of $P'$, are the exact points where the combinatorial visibility
+lines, vertices of $P'$, are the exact points at which the combinatorial visibility
 vector (cvv) changes. Within a segment $(v_i, v_{i+1})$, if two successive elements of the cvv are 
 adjacent vertices, then \emph{some} transition exists from
 $(v_i, v_{i+1})$ to a point on the edge between those vertices.
@@ -598,8 +572,8 @@ collision points and bounce strategies.}
 
 To characterize some of these families of paths, we will use the boundary
 partition technique defined in Section \ref{sec:partition}, then define
-\emph{safe actions} between segments in the partition, where safe actions are
-ones which are guaranteed to be successful from anywhere in a segment under an
+\emph{safe actions} between segments in the partition, in which safe actions are
+ones that are guaranteed to be successful from anywhere in a segment under an
 interval of bounce angles.
 
 \begin{definition}
@@ -636,14 +610,14 @@ how we generate constraints on robot uncertainty instead of assuming uncertainty
 bounds are an input to the algorithm.
 
 \begin{lemma}
-If two segments are entirely visible to each other, there will be at least one safe
+If two segments are entirely visible to each other, then there will be at least one safe
 action between them.
 \end{lemma}
 
 See Appendix for proof.
 
 \begin{corollary} \label{coro:neighbor}
-If two segments share a vertex which is not reflex, there exist safe actions
+If two segments share a vertex that is not reflex, then there exist safe actions
 from one to the other in both directions.
 \end{corollary}
 
@@ -652,6 +626,30 @@ counterclockwise transition,
 $\theta_r$ is zero, and $\theta_l$ must be larger than zero, 
 so $\tilde{\theta}_{max}$ must be nonempty. The same holds for clockwise
 transitions.
+
+\begin{proposition} \label{prop:twosafe}
+For every simple polygon $P$ and the resulting polygon $P'$ under Algorithm
+\ref{algo:insert}, each edge $e \in P'$ has at least two safe actions which allow
+transitions away from $e$.
+\end{proposition}
+
+\begin{proof}
+By Corollary \ref{coro:neighbor}, if a segment
+$e_i$ has an adjacent segment not separated by a reflex angle, a safe
+transition exists between the segments.
+
+Otherwise, if one or more of the adjacent edges to $e_i$ is
+separated by a reflex angle. If so, by Algorithm \ref{algo:insert} a vertex
+will be inserted in line with $e_i$ on the closest visible edge. Call the
+segment counterclockwise from this inserted vertex $e_j$.
+$e_j$ must be entirely visible from $e_i$; otherwise, a vertex would have been
+inserted from whatever structure is blocking visibility. By Lemma
+\ref{lemma:angrange}, there must be a contraction mapping from $e_i$ to $e_j$.
+The transition must also be safe, by the same argument as Corollary
+\ref{coro:neighbor}. The same argument holds for left transitions, leading to
+two guaranteed safe actions.
+\qed
+\end{proof}
 
 %\begin{definition}
 %We say that two robot trajectories are in the same \textbf{combinatorial family}
@@ -706,13 +704,13 @@ Section \ref{sec:cycles}.
 Let $\phi_{i,j}$ be the interior angle between two edges $e_i, e_j \in \partial P$ if
 they are extended to infinity. 
 \end{definition}
-
-The case where the segments are parallel will be
-handled separately where necessary. 
+%%S I don't understand what extended to infinity has to do with the def.  Isn't angle local?
+The case in which the segments are parallel will be
+handled separately as necessary. 
 
 \begin{definition}
 
-A function $g$ which maps a metric space $M$ to itself is a contraction mapping if for all
+A function $g$ that maps a metric space $M$ to itself is a contraction mapping if for all
 $x, y \in M$, $\lvert g(x) - g(y) \rvert \leq c \lvert x-y \rvert$, and $0 \leq c < 1$.
 \end{definition}
 
@@ -727,7 +725,7 @@ on the left of segment $e_i$, then call the transition from $e_i$ to $e_j$ a lef
 transition; if the intersection is on the right of segment $e_i$, then call the
 transition a right transition.
 \end{definition}
-
+%%S I am afraid to make changes this late, but shouldn't right be emphasized above?  In a definition, it is common to italicize the defined thing.  And if it is all italicised in this strange style, then it should get unitalicized.
 \begin{lemma} \label{lemma:angrange}
 If the transition from segment $e_i$ to segment $e_j$ is a left transition, then the
 transition function $f(x, \theta)$ between segments $e_i$ and $e_j$ is a contraction
@@ -763,7 +761,7 @@ coefficients.
 \begin{definition}
 Given a sequence of $m$ transitions $F = \{f_0, f_1, \ldots, f_{m-1}\}$, at stage $k$ the robot 
 will be located on edge $e(k)$ and will depart the edge with
-action $\theta_k$. Then, the contraction coefficient of the overall robot
+action $\theta_k$; the contraction coefficient of the overall robot
 trajectory $f_{m-1} \circ \ldots \circ f_0$ is $C(F) = \prod_{k=0}^{m-1} C(\theta_{e(k)}, \phi_{e(k), e(k+1)})$.
 \end{definition}
 
@@ -847,12 +845,14 @@ stable limit cycle.
 \end{proposition}
 
 \begin{proof}
-Since by Proposition \ref{prop:twosafe} every segment in the partitioned polgyon
-$P'$ has at least two safe contracting transitions leaving the segment, and
-there are a finite number of segments in $P'$, there must be a strategy reaching
+First we observe that by Proposition \ref{prop:twosafe} for every segment $e
+\in \partial P'$, 
+safe transitions always exist
+for two angles ranges. These ranges are the ones bordering the segment itself:
+by staying close enough to the boundary, the robot may guarantee a safe
+transition. By Lemma \ref{lemma:angrange}, these safe transitions will also
+admit contraction mappings. Since there are a finite number of segments in $P'$, there must be a strategy reaching
 a limit cycle from every point in $P$. \qed
-{\color{red} TODO clarify that the fixed-angle controller will be in range of angles
-close to boundary}
 \end{proof}
 
 \section{Applications}
@@ -910,49 +910,20 @@ or a special value \textsc{None} if no strategy can be found.
 
 \subsubsection{Completeness}
 
-To understand how much of the environment the robot may reach with only safe
-transitions, first we observe that for every segment, safe transitions always exist
-for two angles ranges. These ranges are the ones bordering the segment itself:
-by staying close enough to the boundary, the robot may guarantee a safe
-transition (as well as a contraction mapping).
-
-\begin{proposition} \label{prop:twosafe}
-For every simple polygon $P$ and the resulting polygon $P'$ under Algorithm
-\ref{algo:insert}, each edge $e \in P'$ has at least two safe actions which allow
-transitions away from $e$.
-\end{proposition}
-
-\begin{proof}
-By Corollaries \ref{coro:neighbor} and \ref{coro:existcontract}, if a segment
-$e_i$ has an adjacent segment not separated by a reflex angle, a safe
-contracting transition exists between the segments.
-
-Otherwise, if one or more of the adjacent edges to $e_i$ is
-separated by a reflex angle. If so, by Algorithm \ref{algo:insert} a vertex
-will be inserted in line with $e_i$ on the closest visible edge. Call the
-segment counterclockwise from this inserted vertex $e_j$.
-$e_j$ must be entirely visible from $e_i$; otherwise, a vertex would have been
-inserted from whatever structure is blocking visibility. By Lemma
-\ref{lemma:angrange}, there must be a contraction mapping from $e_i$ to $e_j$.
-The transition must also be safe, by the same argument as Corollary
-\ref{coro:neighbor}. The same argument holds for left transitions, leading to
-two guaranteed safe actions.
-\qed
-\end{proof}
 
 \begin{proposition}
 There exist simple polygons such that under Algorithm \ref{algo:insert}, there
-exist edges in the partitioned polygon $P'$ which are \textbf{not} reachable by 
+exist edges in the partitioned polygon $P'$ that are \textbf{not} reachable by 
 a safe action from any other edge in $P'$.
 \end{proposition}
 
 \begin{proof}
-See Figure \ref{fig:simple_bit} for an example where the segment between nodes
+See Figure \ref{fig:simple_bit} for an example in which the segment between nodes
 10 and 11 is not reachable via a safe action from any other segments,
 corresponding to only outgoing edges on node 10 in $G_{safe}$.
 
 The {\color{red} TODO only?} such segments will be
-segments where both endpoints are vertices inserted by Algorithm
+segments for which both endpoints are vertices inserted by Algorithm
 \ref{algo:insert} or reflex vertices, since by Corollary \ref{coro:neighbor},
 segments adjacent to non-reflex vertices of $P$ will be reachable by a safe
 action.
@@ -978,6 +949,7 @@ action.
 Say no safe path exists between two subsets of $\partial P$. We may
 use limit cycles to reduce the uncertainty in the robot's position enough to
 transform the unsafe transition into a safe transition.
+
 
 By Proposition \ref{prop:cycle}, limit cycles are reachable from any point $s
 \in \partial P$ under a constant fixed-angle controller (and we know the range
@@ -1176,7 +1148,7 @@ bounce strategies in a given polygon, by comparing the reachability of the
 transition systems induced by each strategy family. This would require a
 method of either reducing the full bounce visibility graph given constraints on
 possible bounces, or a method of constructing a more appropriate transition
-system. It is not clear the best way to analyze relative bounce laws, where the
+system. It is not clear the best way to analyze relative bounce laws, in which the
 outgoing angle of a robot after a collision is a function of the incoming angle.
 One method would be to choose a subset of configuration space to be the initial
 conditions of such a robot, and then propagate this set forward. Depending on
@@ -1200,7 +1172,7 @@ Connect to Shell/Alam/Bobadilla work on limit cycles for localization.
 
 \textbf{Ergodic Trajectories.} 
 We are very interested in using the dynamical properties of this robot model to
-create controllers which produce ergodic motion, where the time-averaged
+create controllers that produce ergodic motion, in which the time-averaged
 behavior of the system approaches the space-averaged behavior, causing the robot
 to not spend ``too much'' time in any given part of the state space. Measures
 of ergodicity have recently been used in exploration tasks
@@ -1271,7 +1243,7 @@ vertices, the new vertices produced in their partial local sequence, and the new
 vertices' visibility can be large at the same time. We will present a family of
 input polygons with bounce visibility graph edge-set size of $O(n^4)$.
 
-Let $n = 4t+2$, where $t$ is a positive integer. We design a polygon with
+Let $n = 4t+2$, in which $t$ is a positive integer. We design a polygon with
 $r = 2t$ reflex vertices. The polygon is symmetric with respect to its medium
 horizontal line. In the top half, the reflex vertices are uniformly located on a
 circle and thus they are visible to each other; the convex vertices are chosen
@@ -1346,12 +1318,12 @@ exist)}
 There are three cases to consider: if $e_l$ and $e_r$ are extended to infinity,
 they cross either above or below edge $e_i$, or they are parallel.
 
-\emph{Case 1:} $e_l$ and $e_r$ would meet below edge $e_i$. Then,
+\emph{Case 1:} $e_l$ and $e_r$ meet below edge $e_i$. In this case,
 $\theta_l > \theta_r$ and if a ray is cast from any point on $e_i$ at angle
 $\theta \in [\theta_r, \theta_l]$, the ray is guaranteed to intersect $e_j$ in its
 interior.
 
-\emph{Case 2:} $e_l$ and $e_r$ would meet above edge $e_i$. Then, $\theta_l <
+\emph{Case 2:} $e_l$ and $e_r$ meet above edge $e_i$. In this case, $\theta_l <
 \theta_r$, and there is no angle
 $\theta$ such that a ray shot from \emph{any} point on $e_i$ will intersect
 $e_j$.
