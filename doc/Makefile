@@ -8,3 +8,6 @@ all: \
 	bibtex $*
 	pdflatex $<
 	pdflatex $<
+
+clean:
+	rm *.aux *.blg *.log *.out

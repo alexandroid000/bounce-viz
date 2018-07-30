@@ -1129,7 +1129,30 @@ post-doctoral fellowship 277028.
 
 \begin{appendix}
 
-\section{Worst Case Example for Algorithm \ref{algo:insert}}
+
+\section{Proof of Proposition \ref{prop:complexity}}
+
+
+\textbf{Proposition 1.} {\em The bounce visibility graph for a simple polygon with $n$ vertices has 
+$O(n^2)$ vertices and $O(n^4)$ edges.}
+
+\begin{proof}
+
+Consider a polygon $P$ with $n$ vertices, $r$ of which are reflex vertices. To
+construct the bounce visibility graph, we insert the vertices of the partial
+local sequence for each vertex in $P$. For a convex vertex, its partial local sequence 
+will not add any new vertices to $P$. However, a reflex vertex can add $O(n)$ new vertices. 
+
+Up to half of the vertices in the polygon can be reflex, so the complexity of
+$r$ is $O(n)$. Therefore, the number of vertices in $P'$, returned by Algorithm
+\ref{algo:insert} is $O(n^2)$. Each vertex indexes an edge in $P'$, and
+thus a node in the edge visibility graph of $P'$. At most, a given vertex in $P'$ may see all other vertices, so in the worst
+case, the bounce visibility graph will have $O(n^4)$ edges. See Figure
+\ref{fig:alg1} for an example of such a polygon. \qed
+
+\end{proof}
+
+\subsection{Worst Case Example for Algorithm \ref{algo:insert}}
 
 We might hope that if $r$ is large, then not all of the reflex vertices will
 produce a large number of new vertices, and we may bound the size of the edge
@@ -1152,29 +1175,6 @@ polygon with inserted vertices is
 $O ((2t(t-1)+n)(t(t-1)+n/2)) = O(t^4) = O(n^4)$.
 Fig \ref{fig:alg1} shows the polygon for $t = 4$ with all the
 vertices in the partial local sequences. % show the diagram to edge
-
-\section{Proof of Proposition \ref{prop:complexity}}
-
-
-\textbf{Proposition 1.} {\em The bounce visibility graph for a simple polygon with $n$ vertices has 
-$O(n^2)$ vertices and $O(n^4)$ edges.}
-
-\begin{proof}
-
-Consider a polygon $P$ with $n$ vertices, $r$ of which are reflex vertices. To
-construct the bounce visibility graph, we insert the vertices of the partial
-local sequence for each vertex in $P$. For a convex vertex, its partial local sequence 
-will not add any new vertices to $P$. However, a reflex vertex can add $O(n)$ new vertices. 
-
-Up to half of the vertices in the polygon can be reflex, so the complexity of
-$r$ is $O(n)$. Therefore, the number of vertices in $P'$, returned by Algorithm
-\ref{algo:insert} is $O(n^2)$. Each vertex indexes an edge in $P'$, and
-thus a node in the edge visibility graph of $P'$. At most, a given vertex in $P'$ may see all other vertices, so in the worst
-case, the bounce visibility graph will have $O(n^4)$ edges. See Figure
-\ref{fig:alg1} for an example of such a polygon, and the Appendix for a proof of
-its complexity. \qed
-
-\end{proof}
 
 \section{Proof of Proposition \ref{prop:saferange}}
 
@@ -1275,6 +1275,8 @@ We consider the two cases of transition separately:
     \item Similarly, for a right transiton shown in the right diagram of figure~\ref{fig:cont_map}, $\overline{xf(x, \theta)} \parallel \overline{yf(y, \theta)} \Rightarrow \frac{|f(x, \theta)-f(y, \theta)|}{|x-y|} = \frac{|f(x, \theta)|}{|x|} = \frac{\sin(\pi - \theta)}{\sin(\pi -\theta-\phi_{i, j})} = \frac{\sin(\theta)}{\sin(\theta + \phi_{i, j})}.$ The transition will be contraction if and only if $\frac{|f(x, \theta)-f(y, \theta)|}{|x-y|} < 1 \iff \sin(\theta)<\sin(\theta+\phi_{i, j})$. If $\theta  > \frac{\pi}{2}$, then $\sin(\theta) > \sin(\theta + \phi_{i, j})$. Thus we need $\theta<\frac{\pi}{2}$. If $\theta+\phi_{i, j} < \frac{\pi}{2}$, then $\sin(\theta) < \sin(\theta+\phi_{i, j})$ and we are done; otherwise we need $\theta < \pi-\theta-\phi_{i, j} \Rightarrow \theta < \frac{\pi}{2} - \frac{\phi_{i, j}}{2}$. Combining all conditions, we have the transition will be contraction if and only if $\theta <\frac{\pi}{2} - \frac{\phi_{i, j}}{2}$.
 \end{enumerate}
 \qed
+
+\newpage
 
 \section{Supplementary Figure for Theorem \ref{thm:convex}}
 
