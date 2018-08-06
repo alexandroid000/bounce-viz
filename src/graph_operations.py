@@ -80,12 +80,12 @@ def navigate(poly, S, G):
     return path2transitions(paths[0], safe_BVD)
     #strategy = getStrategies(BVG, S, "const", path)
 
-def path2transitions(path, BVD):
+def path2transitions(path, BVG):
     transitions = []
     path = list(path)[0]
     #path.reverse()
     for (i,j) in zip(path, path[1:]):
-        ang_range = BVD.get_edge_data(i,j)['weight']
+        ang_range = BVG.get_edge_data(i,j)
         transitions.append((i,j,ang_range))
     return transitions
 

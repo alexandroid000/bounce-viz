@@ -158,27 +158,3 @@ def VizPath(poly, intervals):
 
 
 
-if __name__ == '__main__':
-    poly = simple_bit
-    VizRay(poly)
-    VizPoly(poly)
-    p1 = InsertAllTransitionPts(poly)
-    link_diagram = GetLinkDiagram(p1)
-    PlotLinkDiagram(link_diagram, hline = 1.4707)
-    print("inserted all transition pts")
-    VizPoly(p1)
-    G = mkGraph(p1, requireContract = False)
-    print("made graph")
-    PlotGraph(G)
-    H = mkSafeGraph(G, p1)
-    PlotGraph(H, "safe_graph")
-    #N = 3
-    #for i in range(N):
-    #    print(i,"th iteration")
-    #    poly = InsertAllTransitionPts(poly)
-    #    print(len(poly))
-    #VizPoly(poly, str(N)+"_iterations")
-    #S = (0.1,0.15)
-    #path = navigate(poly, S, (0.55, 0.56))
-    #intervals = PropagatePath(p1, path, S)
-    #VizPath(p1, intervals)
