@@ -11,8 +11,9 @@ import sys, random, math, pygame
 from pygame.locals import *
 from math import sqrt,cos,sin,atan2,pi
 from time import sleep
-from geom_utils import *
-from maps import *
+
+from src.geom_utils import *
+from src.maps import *
 
 #constants
 XDIM = 500

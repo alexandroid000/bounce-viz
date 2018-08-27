@@ -1,11 +1,11 @@
 #! /usr/bin/env python
 
 import unittest
-from bounce import *
-from geom_utils import *
-from graph_utils import *
-from graph_operations import *
-from maps import *
+from src.bounce import *
+from src.geom_utils import *
+from src.graph_utils import *
+from src.graph_operations import *
+from src.maps import *
 
 class TestGeomUtils(unittest.TestCase):
 

@@ -10,6 +10,8 @@ from numpy.linalg import norm
 # Used to plot the example
 import matplotlib.pyplot as plt
 
+# draws all transition points in poly
+# saves to viz_test.pdf
 def VizRay(poly):
     # Set the title
     wall_x = [x for (x,y) in poly]
@@ -39,6 +41,7 @@ def VizRay(poly):
 
     plt.savefig('viz_test.pdf')
 
+# draws polygon, numbers vertices
 def VizPoly(poly, fname="inserted_poly"):
     psize = len(poly)
     jet = plt.cm.jet
@@ -106,12 +109,12 @@ def PlotGraph(G, fname = "graph"):
     for i in pos:
         new_pos[count] = pos[i]
         count += 1
-    nx.draw_networkx(G, with_labels=True,
-        pos = new_pos,
-        node_color='white',
-        width=1.2,
-        node_size = 600, 
-        font_size=14)
+        nx.draw_networkx(G, with_labels=True,
+            pos = new_pos,
+            node_color='white',
+            width=1.2,
+            node_size = 600, 
+            font_size=14)
     # nx.draw_networkx_edge_labels(G,new_pos,edge_labels=labels)
     plt.axis('off')
     ax = plt.gca()
@@ -155,6 +158,3 @@ def VizPath(poly, intervals):
 
     plt.savefig('path.png', dpi = 300)
     plt.show()
-
-
-

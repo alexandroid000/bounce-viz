@@ -3,10 +3,11 @@
 # graph_operations.py
 # applications of the bounce visibility graph to robotic tasks
 
-from geom_utils import *
-from graph_utils import *
 from copy import copy
-from maps import *
+
+from src.geom_utils import *
+from src.graph_utils import *
+from src.maps import *
 
 # a strategy should be an automata where inputs = sensor obs, and outputs = bounce angles
 
@@ -69,15 +70,15 @@ def nodesCovered(poly, interval):
 
 def navigate(poly, S, G):
     P = InsertAllTransitionPts(poly)
-    BVD = mkGraph(P)
-    safe_BVD = mkSafeGraph(BVD, P)
+    BVG = mkGraph(P)
+    safe_BVG = mkSafeGraph(BVG, P)
     # find all paths with fewest bounces
     # choose the one with the widest ang interval
     paths = []
     for g in nodesCovered(poly, G):
         for s in nodesCovered(poly, S):
-            paths.append(findPaths(safe_BVD, s, g))
-    return path2transitions(paths[0], safe_BVD)
+            paths.append(findPaths(safe_BVG, s, g))
+    return path2transitions(paths[0], safe_BVG)
     #strategy = getStrategies(BVG, S, "const", path)
 
 def path2transitions(path, BVG):

@@ -3,7 +3,7 @@
 # graph_utils.py
 # functions for constructing and querying the bounce visibility graph
 
-from geom_utils import *
+from src.geom_utils import *
 
 DEBUG = False
 
@@ -90,7 +90,7 @@ def mkGraph(poly, requireContract = False):
             G.add_weighted_edges_from(edges)
     if DEBUG:
         print("Graph data:")
-        print(G.edge)
+        #print(G.edge)
         plt.clf()
         nx.draw_circular(G, with_labels=True)
         plt.savefig("graph.png")
