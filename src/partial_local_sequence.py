@@ -1,7 +1,11 @@
-from geom_utils import *
-from general_position import *
-from helper.visibility_helper import *
-from settings import *
+#!/usr/bin/env python
+
+from src.helper.visibility_helper import *
+from src.geom_utils import *
+from src.general_position import *
+from src.settings import *
+
+
 def IsInPoly(p, poly):
     ''' test if point p is in poly using crossing number
     '''

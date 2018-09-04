@@ -1,8 +1,8 @@
 ''' Functions for constructing and querying the bounce visibility graph
 '''
-from geom_utils import *
-from settings import *
-from partial_local_sequence import *
+from src.settings import *
+from src.geom_utils import *
+from src.partial_local_sequence import *
 
 import networkx as nx
 import os

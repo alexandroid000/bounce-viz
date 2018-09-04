@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 import visilibity as vis
-from settings import *
 from copy import copy
+
+from src.settings import *
 # for polygons not in general position: returns all visible vertices along a ray
 
 def GetVisibleVertices(poly, j):

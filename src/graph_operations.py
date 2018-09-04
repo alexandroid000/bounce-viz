@@ -2,9 +2,9 @@
 '''
 from copy import copy
 
-from geom_utils import *
-from graph_utils import *
-from maps import *
+from src.geom_utils import *
+from src.graph_utils import *
+from src.maps import *
 
 # a strategy should be an automata where inputs = sensor obs, and outputs = bounce angles
 
