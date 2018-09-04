@@ -1,12 +1,23 @@
-#!/usr/bin/env python
-
 from math import cos, sin, pi
 from random import random, uniform
 
-# generate regular polygon with n sides, radius r, centered at x,y
-
-#
 def reg_poly(N, r, x, y):
+    ''' generate regular polygon with n sides, radius r, centered at x,y
+
+    Parameters
+    ----------
+    N : int
+        The size of the polygon
+    r : float
+        The radius of the polygon
+    (x,y) : (float, float)
+        The coordinates of the center of the polygon
+    
+    Returns
+    -------
+    list of (float, float)
+        The regular polygon represented by vertex coordinates
+    '''
     return [(x + r * cos(2*pi*n/N), y + r * sin(2*pi*n/N)) for n in range(N)]
 
 

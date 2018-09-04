@@ -1,15 +1,17 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 from geom_utils import *
 from graph_utils import *
 from graph_operations import *
 from maps import *
+from link_diagram import *
+from partial_local_sequence import FindReflexVerts, ShootRaysFromReflex, ShootRaysToReflexFromVerts
+from settings import *
+
 import numpy as np
 from numpy.linalg import norm
-
-# Used to plot the example
 import matplotlib.pyplot as plt
-
+import os.path as osp
 # draws all transition points in poly
 # saves to viz_test.pdf
 def VizRay(poly):
@@ -37,12 +39,12 @@ def VizRay(poly):
     t_x = [x for (x,y) in t_pts]
     t_y = [y for (x,y) in t_pts]
     plt.plot(t_x, t_y, 'ro')
-    plt.show()
-
-    plt.savefig('viz_test.pdf')
+    plt.savefig(osp.join(image_save_folder,'viz_test.pdf'))
+    if DEBUG:
+        plt.show()
 
 # draws polygon, numbers vertices
-def VizPoly(poly, fname="inserted_poly"):
+def VizPoly(poly, fname='inserted_poly'):
     psize = len(poly)
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
@@ -63,8 +65,9 @@ def VizPoly(poly, fname="inserted_poly"):
         plt.annotate(str(i), (point[0]+5, point[1]+20), size = 20)
     plt.axis('equal')
 
-    plt.savefig(fname+'.png', dpi = 300, bbox_inches="tight")
-    plt.show()
+    plt.savefig(osp.join(image_save_folder,fname+'.png'), dpi = 300, bbox_inches='tight')
+    if DEBUG:
+        plt.show()
 
 # Resolution is the number of sample points on each edge
 # hline is for showing fix theta bouncing
@@ -97,10 +100,11 @@ def PlotLinkDiagram(poly, link_diagram, resolution = 15, hline = None, fname = '
     ax.set_yticklabels(["$0$", r"$\frac{1}{6}\pi$", r"$\frac{1}{3}\pi$", r"$\frac{1}{2}\pi$", r"$\frac{2}{3}\pi$", r"$\frac{5}{6}\pi$", r"$\pi$"])
     plt.xlabel(r"vertices on $\partial P'$", fontsize=15)
     plt.ylabel(r"bounce angle $\theta$", fontsize=15)
-    plt.savefig(fname, bbox_inches="tight", dpi = 300)
-    plt.show()
+    plt.savefig(osp.join(image_save_folder,fname), bbox_inches='tight', dpi = 300)
+    if DEBUG:
+        plt.show()
 
-def PlotGraph(G, fname = "graph"):
+def PlotGraph(G, fname = 'graph'):
     plt.clf()
     pos = nx.circular_layout(G)
     labels = nx.get_edge_attributes(G,'weight')
@@ -119,7 +123,7 @@ def PlotGraph(G, fname = "graph"):
     plt.axis('off')
     ax = plt.gca()
     ax.collections[0].set_edgecolor('black') 
-    plt.savefig(fname+".png", bbox_inches="tight", dpi = 300)
+    plt.savefig(osp.join(image_save_folder,fname+'.png'), bbox_inches='tight', dpi = 300)
 
 def VizPath(poly, intervals):
     psize = len(poly)
@@ -151,10 +155,11 @@ def VizPath(poly, intervals):
     plt.plot([p1[0],p2[0]], [p1[1], p2[1]], 'red',linewidth=5)
 
     for ((pt1, pt2), (new_pt1, new_pt2)) in interval_ts:
-        print("plotting", ((pt1, pt2), (new_pt2, new_pt1)))
+        print('plotting', ((pt1, pt2), (new_pt2, new_pt1)))
         plt.plot([new_pt1[0],new_pt2[0]], [new_pt1[1], new_pt2[1]], 'red',linewidth=5)
         plt.plot([pt1[0],new_pt2[0]], [pt1[1], new_pt2[1]], 'green')
         plt.plot([pt2[0],new_pt1[0]], [pt2[1], new_pt1[1]], 'green')
 
-    plt.savefig('path.png', dpi = 300)
-    plt.show()
+    plt.savefig(osp.join(image_save_folder,'path.png'), dpi = 300)
+    if DEBUG:
+        plt.show()

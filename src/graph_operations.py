@@ -1,13 +1,10 @@
-#!/usr/bin/env python
-
-# graph_operations.py
-# applications of the bounce visibility graph to robotic tasks
-
+''' Applications of the bounce visibility graph to robotic tasks
+'''
 from copy import copy
 
-from src.geom_utils import *
-from src.graph_utils import *
-from src.maps import *
+from geom_utils import *
+from graph_utils import *
+from maps import *
 
 # a strategy should be an automata where inputs = sensor obs, and outputs = bounce angles
 
@@ -35,7 +32,7 @@ def s(s_param, poly):
         if s_len - edge_lens[i] < 0.0:
             s_edge = s_len/edge_lens[i]
             if DEBUG:
-                print("param", s_edge, "on edge", poly[i], poly[(i+1)%psize])
+                print('param', s_edge, 'on edge', poly[i], poly[(i+1)%psize])
             return interp(poly[i],poly[(i+1)%psize],s_edge)
         else:
             s_len = s_len - edge_lens[i]
@@ -79,7 +76,7 @@ def navigate(poly, S, G):
         for s in nodesCovered(poly, S):
             paths.append(findPaths(safe_BVG, s, g))
     return path2transitions(paths[0], safe_BVG)
-    #strategy = getStrategies(BVG, S, "const", path)
+    #strategy = getStrategies(BVG, S, 'const', path)
 
 def path2transitions(path, BVG):
     transitions = []
@@ -99,7 +96,7 @@ def PropagatePath(poly, path, S):
     for (i,j, ang_range) in path:
         theta_i = FixAngle( atan2(poly[(i+1)%psize][1]-poly[i][1],\
                                  poly[(i+1)%psize][0]-poly[i][0]))
-        print("orientation of edge",i,"is", theta_i)
+        print('orientation of edge',i,'is', theta_i)
         P1_FOUND = False
         P2_FOUND = False
 
@@ -112,19 +109,19 @@ def PropagatePath(poly, path, S):
 
 
         theta_l = FixAngle(theta_i + ang_range[0])
-        print("theta_l", theta_l)
+        print('theta_l', theta_l)
         theta_r = FixAngle(theta_i + ang_range[1])
-        print("theta_r", theta_r)
+        print('theta_r', theta_r)
         # heuristic to generate vector, hacky
         d = 0.1*PointDistance(poly[i], poly[j])
         (p1,p2) = ints[-1]
         p1theta = (p1[0]+d*cos(theta_l), p1[1]+d*sin(theta_l))
         p2theta = (p2[0]+d*cos(theta_r), p2[1]+d*sin(theta_r))
         if not P1_FOUND:
-            print("shoot ray from",p2,"to",p2theta)
+            print('shoot ray from',p2,'to',p2theta)
             next_p1, k = ClosestPtAlongRay(p2,p2theta,poly,last_bounce_edge=i)
         if not P2_FOUND:
-            print("shoot ray from",p1,"to",p1theta)
+            print('shoot ray from',p1,'to',p1theta)
             next_p2, k = ClosestPtAlongRay(p1,p1theta,poly,last_bounce_edge=i)
         ints.append((next_p1, next_p2))
     return ints

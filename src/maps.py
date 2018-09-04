@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-from src.env_gen import *
+from env_gen import *
 
 # Some initial polygons
 # Use these below (inside main() to set the initial shape poly

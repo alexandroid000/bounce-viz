@@ -1,13 +1,50 @@
-#!/usr/bin/env python
+''' Functions for constructing and querying the bounce visibility graph
+'''
+from geom_utils import *
+from settings import *
+from partial_local_sequence import *
 
-# graph_utils.py
-# functions for constructing and querying the bounce visibility graph
+import networkx as nx
+import os
+import os.path as osp
+import numpy as np
 
-from src.geom_utils import *
+# return minimum and maximum angles that allow transition from e1 to e2
+# from *somewhere* on e1
+# only need to check endpoints
+def AnglesBetweenSegs(e1, e2):
+    (p1,p2) = e1
+    (p3,p4) = e2
+    if DEBUG:
+        print('finding angle between',e1,'and',e2)
 
-DEBUG = False
+    min_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
+    max_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))
 
-# the coefficent of "contraction" for the mapping from edge i to edge j
+    return min_ang, max_ang
+
+# return angle range that allows transition from e1 to e2
+# from *anywhere* on e1
+# or return None if there is no such range
+def SafeAngles(e1, e2):
+    (p1,p2) = e1
+    (p3,p4) = e2
+    if p1 == p4:
+        theta_l = np.pi
+        theta_r = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+    elif p2 == p3:
+        theta_r = 0.0
+        theta_l = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
+    else:
+        theta_l = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
+        theta_r = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+    not_parallel = abs(theta_l - theta_r) > 0.01
+    if theta_l > theta_r and not_parallel: # declare lines parallel if within 1 deg
+        return (theta_l, theta_r)
+    else:
+        return None
+
+# the coefficent of 'contraction' for the mapping from edge i to edge j
 # |f(x) - f(y)| = |x - y| * sin(theta) / sin (theta-phi)
 # -1 < |f(x) - f(y)| < 1 leads to
 # theta > phi/2
@@ -45,7 +82,7 @@ def validAnglesForContract(poly, i, j):
     e2 = (poly[j], poly[(j+1) % n])
     min_a, max_a = AnglesBetweenSegs(e1, e2)
     overlap_1 = intersect_intervals((0,phi),(min_a, max_a))
-    overlap_2 = intersect_intervals((pi-phi,pi),(min_a, max_a))
+    overlap_2 = intersect_intervals((np.pi-phi,np.pi),(min_a, max_a))
 
     intervals = []
 
@@ -66,7 +103,7 @@ def mkGraph(poly, requireContract = False):
     for start in range(psize):
         edges = [(start,v,validAnglesForContract(poly, start, v))
                 for v in GetVisibleVertices(poly, start)
-                # don't allow transition to edge "around corner"
+                # don't allow transition to edge 'around corner'
                 # don't allow zero-measure transition from one endpoint
                 # TODO: clean up logic
                 if not (
@@ -89,11 +126,11 @@ def mkGraph(poly, requireContract = False):
         else:
             G.add_weighted_edges_from(edges)
     if DEBUG:
-        print("Graph data:")
+        print('Graph data:')
         #print(G.edge)
         plt.clf()
         nx.draw_circular(G, with_labels=True)
-        plt.savefig("graph.png")
+        plt.savefig(ops.join(image_save_folder, 'graph.png'))
     return G
 
 # includes transient cycles
@@ -105,7 +142,7 @@ def allCycles(G):
 # TODO - filter on previous function
 # some limit cycles exist which are compositions of transient cycles.
 # How to detect?
-# Can we find where the transient cycles put the robot once it "escapes" and
+# Can we find where the transient cycles put the robot once it 'escapes' and
 # then look for cycles in that graph?
 # Maybe we can start by find all cycles of length up to some bound and
 # exhaustively search.
@@ -134,7 +171,7 @@ def reduceGraphWrtAngle(G, theta_min, theta_max):
                 new_edges.append((i,e,ang_info))
     H.add_weighted_edges_from(new_edges)
     if DEBUG:
-        print("Reduced graph H for angle interval [",theta_min,",",theta_max,"]")
+        print('Reduced graph H for angle interval [',theta_min,',',theta_max,']')
         print(H.edge)
     return H
 
@@ -157,8 +194,8 @@ def mkSafeGraph(G, poly):
                 new_edges.append((i,e,curr_weight))
     H.add_weighted_edges_from(new_edges)
     if DEBUG:
-        print("Safe graph data:")
+        print('Safe graph data:')
         for i in range(psize):
-            print("Node",i)
+            print('Node',i)
             print(H.edge[i])
     return H

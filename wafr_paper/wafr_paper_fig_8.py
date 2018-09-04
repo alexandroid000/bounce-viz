@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 from maps import *
-from viz_utils import *
+from visualization_helper import *
 
 if __name__ == '__main__':
     poly = simple_bit

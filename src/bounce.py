@@ -1,19 +1,17 @@
 #!/usr/bin/env python
+'''
+This program simulates the bouncing of balls
+under various bouncing strategies
 
-# bounce.py
-# This program simulates the bouncing of balls
-# under various bouncing strategies
-#
-# Written by Steve LaValle
-# November 2011
-
+Written by Steve LaValle November 2011
+'''
 import sys, random, math, pygame
 from pygame.locals import *
 from math import sqrt,cos,sin,atan2,pi
 from time import sleep
 
-from src.geom_utils import *
-from src.maps import *
+from geom_utils import *
+from maps import *
 
 #constants
 XDIM = 500
@@ -25,6 +23,8 @@ MAXDIST = 10000000.0
 
 
 def ShootInterval(poly,i,j,pt1,pt2,min_ang,max_ang):
+    ''' Shoot Interval
+    '''
     psize = len(poly)
 
     # furthest left bounce
@@ -51,6 +51,8 @@ def ShootInterval(poly,i,j,pt1,pt2,min_ang,max_ang):
 
 # n is the inward edge normal (in radians 0 to pi)
 def PerformRotation(incoming, n, strategy):
+    ''' 
+    '''
     # Random bounce
     if strategy == 0:
         dir = n + random.random()*pi - pi/2.0
@@ -64,7 +66,6 @@ def PerformRotation(incoming, n, strategy):
     # Billiard bounce
     elif strategy == 2:
         rebound = FixAngle(incoming + pi)
-#    print "ad:",AngleDifference(rebound,n),"rebound:",rebound,"n:",n
         dir = rebound + 2.0*AngleDifference(rebound,n)
 
     # Normal bounce
@@ -72,7 +73,7 @@ def PerformRotation(incoming, n, strategy):
         dir = n
     dir = FixAngle(dir)
     if AngleDistance(dir,n) > pi/2.0:
-        print("Error: Illegal bounce.  n:",n,"dir:",dir)
+        print('Error: Illegal bounce.  n:',n,'dir:',dir)
         raise ValueError
     return dir
 
@@ -121,17 +122,10 @@ def main():
                     bounce_point = pt
                     closest_bounce = pdist
                     b_edge = j
-#                    print "bnormal:",bnormal
-#                    print "pdist:",pdist,"closest_bounce:",closest_bounce,"pint:",pint
 
-#            pygame.draw.circle(screen,green,PointToWindowScale(pint),5)
-#        raw_input("Press Enter to continue...")
-
-#        print "closest_bounce:",closest_bounce,"bounce_point:",bounce_point
         pygame.draw.line(screen,green,PointToWindowScale(bounce_point, YDIM),\
                          PointToWindowScale((state[0],state[1]), YDIM))
         pygame.display.update()
-#        print "state:",state
         sleep(0.1)
 
 # Set the last argument to PerformBounce:
@@ -144,7 +138,7 @@ def main():
 
         for e in pygame.event.get():
 	        if e.type == QUIT or (e.type == KEYUP and e.key == K_ESCAPE):
-	            sys.exit("Leaving because you requested it.")
+	            sys.exit('Leaving because you requested it.')
     while (1):
         1 == 1
 
