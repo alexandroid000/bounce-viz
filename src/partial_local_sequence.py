@@ -2,35 +2,18 @@ from geom_utils import *
 from general_position import *
 from helper.visibility_helper import *
 from settings import *
-def IsInPoly(p, poly):
-    ''' test if point p is in poly using crossing number
-    '''
-    intersects = 0
-    theta = random.random()*2*pi
-    state=(p[0],p[1],theta)
-    psize = len(poly)
-    for j in range(psize):
-        v1, v2 = poly[j], poly[(j+1) % psize]
-        try:
-            t, pt = ShootRay(state, v1, v2)
-            if t>0 and BouncePointInEdge(p, pt, v1, v2):
-                intersects += 1
-        except:
-            pass
-    return not (intersects%2 == 0)
 
 def VertexExists(v, poly):
     for pt in poly:
-        if PointDistance(v, pt) < EPSILON:
+        if la.norm(v-pt) < EPSILON:
             return True
     return False
 
 def FindReflexVerts(poly):
     ''' return indices of all reflex vertices in poly
     '''
-    psize = len(poly)
+    psize = poly.shape[0]
     reflex_verts = []
-
     for j in range(psize):
         v1, v2, v3 = poly[(j-1) % psize], poly[j], poly[(j+1) % psize]
         if IsRightTurn(v1,v2,v3) and not IsThreePointsOnLine(v1,v2,v3):
@@ -65,7 +48,7 @@ def ShootRaysFromReflex(poly, j):
 # shoot ray from visible vertices through reflex verts
 # Poly -> Int -> [(Point, Int)]
 def ShootRaysToReflexFromVerts(poly, j):
-    psize = len(poly)
+    psize = poly.shape[0]
     r_v = poly[j]
     pts = []
     visible_verts = GetVisibleVertices(poly,j)
@@ -78,7 +61,7 @@ def ShootRaysToReflexFromVerts(poly, j):
             res = ClosestPtAlongRay(poly[v], r_v, poly)
             if res:
                 pt, k = res
-                if (IsInPoly(((pt[0]+r_v[0])/2, (pt[1]+r_v[1])/2), poly) and
+                if (IsInPoly((pt+r_v)/2, poly) and
                     not VertexExists(pt, poly)):
                     #print('successful insert')
                     pts.append((pt,k))

@@ -5,6 +5,7 @@ from copy import copy
 from geom_utils import *
 from graph_utils import *
 from maps import *
+import numpy.linalg as la
 
 # a strategy should be an automata where inputs = sensor obs, and outputs = bounce angles
 
@@ -18,7 +19,7 @@ def interp(p1, p2, s):
 def polyLens(poly):
     p = copy(poly)
     p.append(poly[0])
-    edge_lens = [PointDistance(p1,p2) for (p1, p2) in zip(p, p[1:])]
+    edge_lens = [la.norm(p1-p2) for (p1, p2) in zip(p, p[1:])]
     perim_len = sum(edge_lens)
     return edge_lens, perim_len
 
@@ -49,7 +50,7 @@ def s_inv(pt, poly):
         if IsThreePointsOnLineSeg(p1,p2,pt) or p1==pt:
             edge = i
             s = sum(edge_lens[:i])/perim_len
-            s += PointDistance(p1, pt)/perim_len
+            s += la.norm(p1-pt)/perim_len
             return s
 
 # this needs an algebra
@@ -113,7 +114,7 @@ def PropagatePath(poly, path, S):
         theta_r = FixAngle(theta_i + ang_range[1])
         print('theta_r', theta_r)
         # heuristic to generate vector, hacky
-        d = 0.1*PointDistance(poly[i], poly[j])
+        d = 0.1*la.norm(poly[i]-poly[j])
         (p1,p2) = ints[-1]
         p1theta = (p1[0]+d*cos(theta_l), p1[1]+d*sin(theta_l))
         p2theta = (p2[0]+d*cos(theta_r), p2[1]+d*sin(theta_r))

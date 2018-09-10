@@ -3,12 +3,25 @@ def IsThreePointsOnLine(p1, p2, p3):
     cross_prod = (p1[1] - p2[1]) * (p3[0] - p2[0]) - (p1[0] - p2[0]) * (p3[1] - p2[1])
     return abs(cross_prod)<degeneracy_error
 
-# true if p3 is in line with and in between p1 and p2
 def IsThreePointsOnLineSeg(p1, p2, p3):
+    ''' Check whether a point is on the line segment defined two other points
+
+    Parameters
+    ----------
+    p1:np.array(2)
+        line segment point one
+    p2:np.array(2)
+        line segment point two
+    p3:np.array(2)
+        the point we want to know whether it is on the line segment
+
+    Returns
+    -------
+    bool
+        true if p3 is in line with and in between p1 and p2
+    '''
     if IsThreePointsOnLine(p1, p2, p3):
-        v1 = (p1[0]-p3[0], p1[1]-p3[1])
-        v2 = (p2[0]-p3[0], p2[1]-p3[1])
-        return (v1[0]*v2[0]+v1[1]*v2[1])<0
+        return np.dot(p1-p3, p2-p3)<0
     return False
 
 # return true if the four given points are not in general position

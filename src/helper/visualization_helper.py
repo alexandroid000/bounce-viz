@@ -7,44 +7,37 @@ from maps import *
 from link_diagram import *
 from partial_local_sequence import FindReflexVerts, ShootRaysFromReflex, ShootRaysToReflexFromVerts
 from settings import *
-
 import numpy as np
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 import os.path as osp
-# draws all transition points in poly
-# saves to viz_test.pdf
+
 def VizRay(poly):
-    # Set the title
-    wall_x = [x for (x,y) in poly]
-    wall_x.append(wall_x[0])
-    wall_y = [y for (x,y) in poly]
-    wall_y.append(wall_y[0])
-    
+    ''' Draws all transition points in poly and saves to viz_test.pdf
+    '''
     # Plot the outer boundary with black color
     plt.figure()
-    plt.plot(wall_x, wall_y, 'black')
+    plt.plot(np.vstack((poly, poly[0])), 'black')
 
     # mark reflex vertices
     rvs = FindReflexVerts(poly)
     for p in rvs:
-        plt.plot([poly[p][0]], [poly[p][1]], 'bo')
+        plt.plot(poly, 'bo')
         r_children = ShootRaysFromReflex(poly, p)
         transition_pts = ShootRaysToReflexFromVerts(poly,p)
         transition_pts.extend(r_children)
         for (pt,k) in transition_pts:
-            plt.plot([poly[p][0], pt[0]], [poly[p][1], pt[1]], 'green')
+            plt.plot(poly, 'green')
 
     t_pts = InsertAllTransitionPts(poly)
-    t_x = [x for (x,y) in t_pts]
-    t_y = [y for (x,y) in t_pts]
-    plt.plot(t_x, t_y, 'ro')
+    plt.plot(t_pts, 'ro')
     plt.savefig(osp.join(image_save_folder,'viz_test.pdf'))
     if DEBUG:
         plt.show()
 
-# draws polygon, numbers vertices
 def VizPoly(poly, fname='inserted_poly'):
+    ''' Draws polygon with numbered vertices
+    '''
     psize = len(poly)
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
@@ -54,11 +47,7 @@ def VizPoly(poly, fname='inserted_poly'):
     ax = fig.add_axes([0, 0, 1, 1])
     ax.axis('off')
 
-    wall_x = [x for (x,y) in poly]
-    wall_x.append(wall_x[0])
-    wall_y = [y for (x,y) in poly]
-    wall_y.append(wall_y[0])
-    plt.plot(wall_x, wall_y, 'black')
+    plt.plot(np.vstack((poly, poly[0])), 'black')
     for i in range(psize):
         point = poly[i]
         plt.scatter(point[0], point[1], color=colors[i], s=100)
@@ -73,6 +62,21 @@ def VizPoly(poly, fname='inserted_poly'):
 # hline is for showing fix theta bouncing
 # fname is the output file name for the link diagram
 def PlotLinkDiagram(poly, link_diagram, resolution = 15, hline = None, fname = 'link_diagram.png'):
+    ''' Save the link diagram for a given polygon to image
+
+    Parameters
+    ----------
+    poly:np.array
+        The input polygon represented by its vertex coordinates
+    link_diagram:np.array
+        The link diagram computed for the given polygon
+    Resolution:int
+        The number of sample points on each edge
+    hline:float
+        The angle of fix theta bouncing
+    fname:string
+        The output file name for the link diagram
+    '''
     poly = np.array([list(x) for x in poly])
     edge_len = [norm(poly[i]-poly[(i+1)%len(poly)]) for i in range(len(poly))]
     acc_edge_len = [sum(edge_len[:i]) for i in range(len(edge_len)+1)]

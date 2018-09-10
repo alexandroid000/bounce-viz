@@ -5,12 +5,12 @@ from copy import copy
 
 def GetVisibleVertices(poly, j):
     #print('At vertex',j)
-    psize = len(poly)
+    psize = poly.shape[0]
 
     # Outer boundary polygon must be COUNTER-CLOCK-WISE(ccw)
     # Create the outer boundary polygon
     # Define an epsilon value (should be != 0.0)
-    vpoly = [vis.Point(*pt) for pt in poly]
+    vpoly = list(map(lambda x: vis.Point(x[0], x[1]), poly))
     walls = vis.Polygon(vpoly)
     walls.enforce_standard_form()
 

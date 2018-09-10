@@ -1,26 +1,17 @@
 ''' Utility functions for geometry in simple polygons
 '''
 import numpy as np
+import numpy.linalg as la
 
 # Do we have theta1 <= theta <= theta2 (mod 2pi) ?
 # It is just a particular cyclic permutation
 
 def FixAngle(theta):
-    return theta % (2.0*pi)
-
-def PointDistance(p,q):
-    return np.sqrt((p[0]-q[0])*(p[0]-q[0])+(p[1]-q[1])*(p[1]-q[1]))
-
-def Points2Vect(p1,p2):
-    return (p2[0]-p1[0], p2[1]-p1[1])
-
-def GetVectorLen(v):
-    return np.sqrt(sum((a*b) for a, b in zip(v, v)))
+    return theta % (2.0*np.pi)
 
 # angle between two vectors in range [0,pi]
 def GetVector2Angle(v1, v2):
-    dot_prod = v1[0]*v2[0]+v1[1]*v2[1]
-    ratio = max(min(dot_prod/(GetVectorLen(v1)*GetVectorLen(v2)), 1), -1)
+    ratio = max(min(np.dot(v1, v2)/(la.norm(v1)*la.norm(v2)), 1), -1)
     return np.arccos(ratio)
 
 # r is left of the vector formed by p->q
@@ -32,9 +23,6 @@ def IsLeftTurn(p,q,r):
 def IsRightTurn(p,q,r):
     return q[0]*r[1] + p[0]*q[1] + r[0]*p[1] - \
            (q[0]*p[1] + r[0]*q[1] + p[0]*r[1]) < 0
-
-def IsIntersectSegments(p1, p2, q1, q2):
-    return (IsLeftTurn(p1, p2, q1) != IsLeftTurn(p1, p2, q2)) and (IsLeftTurn(q1, q2, p1) != IsLeftTurn(q1, q2, p2))
 
 # checks if vector sp->bp points within edge p1p2
 # start point, boundary point, edge p1, edge p2
@@ -73,8 +61,7 @@ def ShootRay(state, v1, v2):
 # find intersection with edge v1,v2
 # will return first intersection *after* p2
 def ShootRayFromVect(p1, p2, v1, v2):
-    (x1,y1), (x2,y2) = p1, p2
-    (x,y) = (x2-x1, y2-y1) # recenter points so p1 is at origin
+    [x,y] = p2-p1# recenter points so p1 is at origin
     theta = FixAngle(np.arctan2(y,x))
     state = (p2[0], p2[1], theta)
     return ShootRay(state, v1, v2)
@@ -98,7 +85,7 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
                 t,pt = ShootRayFromVect(p1, p2, v1, v2)
                 
                 # Find closest bounce for which t > 0
-                pdist = PointDistance(pt,p2)
+                pdist = la.norm(pt-p2)
                 if ((t > 0) and (pdist < closest_bounce) and
                     BouncePointInEdge((x1,y1),pt,v1,v2)):
                     found_coll = True
@@ -114,6 +101,22 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
     else:
         return False
 
-#def MaxPreimage(e1, e2):
+def IsInPoly(p, poly):
+    ''' test if point p is in poly using crossing number
+    '''
+    intersects = 0
+    theta = np.random.rand()*2*np.pi
+    state=(p[0],p[1],theta)
+    psize = len(poly)
+    for j in range(psize):
+        v1, v2 = poly[j], poly[(j+1) % psize]
+        try:
+            t, pt = ShootRay(state, v1, v2)
+            if t>0 and BouncePointInEdge(p, pt, v1, v2):
+                intersects += 1
+        except:
+            pass
+    return not (intersects%2 == 0)
+
 
 

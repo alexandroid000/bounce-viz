@@ -13,6 +13,7 @@ from time import sleep
 from geom_utils import *
 from maps import *
 
+import numpy.linalg as la
 #constants
 XDIM = 500
 YDIM = 500
@@ -21,6 +22,8 @@ EPSILON = 1.0
 NUMBOUNCES = 100000
 MAXDIST = 10000000.0
 
+def PointDistance(p,q):
+    return la.norm(p-q)
 
 def ShootInterval(poly,i,j,pt1,pt2,min_ang,max_ang):
     ''' Shoot Interval

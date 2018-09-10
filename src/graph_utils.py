@@ -7,7 +7,6 @@ from partial_local_sequence import *
 import networkx as nx
 import os
 import os.path as osp
-import numpy as np
 
 # return minimum and maximum angles that allow transition from e1 to e2
 # from *somewhere* on e1
@@ -18,8 +17,8 @@ def AnglesBetweenSegs(e1, e2):
     if DEBUG:
         print('finding angle between',e1,'and',e2)
 
-    min_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p3))
-    max_ang = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p4))
+    min_ang = GetVector2Angle(p2-p1,p3-p1)
+    max_ang = GetVector2Angle(p2-p1,p4-p2)
 
     return min_ang, max_ang
 
@@ -31,13 +30,13 @@ def SafeAngles(e1, e2):
     (p3,p4) = e2
     if p1 == p4:
         theta_l = np.pi
-        theta_r = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+        theta_r = GetVector2Angle(p2-p1, p3-p2)
     elif p2 == p3:
         theta_r = 0.0
-        theta_l = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
+        theta_l = GetVector2Angle(p2-p1, p4-p1)
     else:
-        theta_l = GetVector2Angle(Points2Vect(*e1),Points2Vect(p1,p4))
-        theta_r = GetVector2Angle(Points2Vect(*e1),Points2Vect(p2,p3))
+        theta_l = GetVector2Angle(p2-p1, p4-p1)
+        theta_r = GetVector2Angle(p2-p1, p3-p2)
     not_parallel = abs(theta_l - theta_r) > 0.01
     if theta_l > theta_r and not_parallel: # declare lines parallel if within 1 deg
         return (theta_l, theta_r)
@@ -52,8 +51,8 @@ def SafeAngles(e1, e2):
 # for contraction mapping
 def angleBound(poly, i, j):
     n = len(poly)
-    v1 = Points2Vect(poly[i], poly[(i+1) % n])
-    v2 = Points2Vect(poly[j], poly[(j+1) % n])
+    v1 = poly[i] - poly[(i+1) % n]
+    v2 = poly[j] - poly[(j+1) % n]
     phi = GetVector2Angle(v1, v2)
     return phi/2
 
