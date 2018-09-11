@@ -1,47 +1,12 @@
 from partial_local_sequence import *
 import numpy as np
 import numpy.linalg as la
-
-def GetAngleFromThreePoint(p1, p2, origin):
-    return GetVector2Angle(p1-origin, p2-origin)
-
-def SortByDistance(p1, unsorted_vs):
-    ''' sort the input vertices by distance and remove duplicates
-
-    '''
-    if unsorted_vs.shape[0] == 0:
-        unsorted_vs = p1
-    else:
-        unsorted_vs = np.vstack((unsorted_vs, p1))
-    verts = list(np.unique(np.reshape(unsorted_vs, (-1, 2)), axis = 0))
-    return sorted(verts, key = lambda v: la.norm(v-p1))
-
+from helper.polygon_helper import *
+from helper.visibility_helper import *
+from helper.point_helper import *
 # find all induced transition points, sort and insert into polygon
 # probably the most naive way to do this
 # return a list of edge indicators for each vertex
-def InsertAllTransitionPts(poly):
-    t_pts_grouped = {i:[] for i in range(poly.shape[0])}
-    rvs = FindReflexVerts(poly)
-    # find all transition points, group by edge
-    for p in rvs:
-        t_pts = []
-        t_pts.extend(ShootRaysFromReflex(poly, p))
-        t_pts.extend(ShootRaysToReflexFromVerts(poly,p))
-        for (pt,edge_i) in t_pts:
-            t_pts_grouped[edge_i].append(pt)
-
-    # sort transition points along edge
-    new_poly_grouped = {}
-    for i in range(poly.shape[0]):
-        new_poly_grouped[i] = SortByDistance(poly[i], np.array(t_pts_grouped[i]))
-        if DEBUG:
-            print('Inserted verts', new_poly_grouped[i], 'on edge',i)
-
-    # insert into polygon
-    new_poly = []
-    for i in range(poly.shape[0]):
-        new_poly.extend(new_poly_grouped[i])
-    return np.array(new_poly)
 
 # make all sets of vertices visible from everywhere along edge
 def mkVizSets(poly):

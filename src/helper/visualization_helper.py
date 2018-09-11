@@ -7,38 +7,35 @@ from maps import *
 from link_diagram import *
 from partial_local_sequence import FindReflexVerts, ShootRaysFromReflex, ShootRaysToReflexFromVerts
 from settings import *
+from partial_local_sequence import Partial_Local_Sequence
+
+
 import numpy as np
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 import os.path as osp
 
-def VizRay(poly):
+def visualize_all_partial_order_sequence(poly_vx, inserted_poly_vx, sequence_info):
     ''' Draws all transition points in poly and saves to viz_test.pdf
     '''
     # Plot the outer boundary with black color
     plt.figure()
-    plt.plot(np.vstack((poly, poly[0])), 'black')
-
-    # mark reflex vertices
-    rvs = FindReflexVerts(poly)
-    for p in rvs:
-        plt.plot(poly, 'bo')
-        r_children = ShootRaysFromReflex(poly, p)
-        transition_pts = ShootRaysToReflexFromVerts(poly,p)
-        transition_pts.extend(r_children)
-        for (pt,k) in transition_pts:
-            plt.plot(poly, 'green')
-
-    t_pts = InsertAllTransitionPts(poly)
-    plt.plot(t_pts, 'ro')
+    wall = np.vstack((poly_vx, poly_vx[0]))
+    ax = plt.gca()
+    ax.axis('off')
+    plt.plot(wall[:, 0], wall[:, 1], 'black')
+    plt.plot(inserted_poly_vx[:, 0], inserted_poly_vx[:, 1], 'ro')
+    for index, seq in enumerate(sequence_info):
+        for (pt,k) in seq:
+            plt.plot([poly_vx[index][0], pt[0]], [poly_vx[index][1], pt[1]], 'green')
     plt.savefig(osp.join(image_save_folder,'viz_test.pdf'))
     if DEBUG:
         plt.show()
 
-def VizPoly(poly, fname='inserted_poly'):
+def visualize_polygon(poly, fname):
     ''' Draws polygon with numbered vertices
     '''
-    psize = len(poly)
+    psize = poly.shape[0]
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
 
@@ -46,8 +43,8 @@ def VizPoly(poly, fname='inserted_poly'):
     fig = plt.figure(frameon=False)
     ax = fig.add_axes([0, 0, 1, 1])
     ax.axis('off')
-
-    plt.plot(np.vstack((poly, poly[0])), 'black')
+    wall = np.vstack((poly, poly[0]))
+    plt.plot(wall[:, 0], wall[:, 1], 'black')
     for i in range(psize):
         point = poly[i]
         plt.scatter(point[0], point[1], color=colors[i], s=100)
@@ -58,9 +55,19 @@ def VizPoly(poly, fname='inserted_poly'):
     if DEBUG:
         plt.show()
 
-# Resolution is the number of sample points on each edge
-# hline is for showing fix theta bouncing
-# fname is the output file name for the link diagram
+def visualize_partial_local_sequence_for_one_vx(poly_vx, origin, sequence, fname = 'partial_local_sequence'):
+    plt.figure()
+    ax = plt.gca()
+    ax.axis('off')
+    wall = np.vstack((poly_vx, poly_vx[0]))
+    plt.plot(wall[:, 0], wall[:, 1], 'black')
+    plt.plot(origin[0], origin[1], 'bo')
+    for (pt,k) in sequence:
+        plt.plot([origin[0], pt[0]], [origin[1], pt[1]], 'green')
+    plt.savefig(osp.join(image_save_folder, fname+'.png'), dpi = 300)
+    if DEBUG:
+        plt.show()
+
 def PlotLinkDiagram(poly, link_diagram, resolution = 15, hline = None, fname = 'link_diagram.png'):
     ''' Save the link diagram for a given polygon to image
 

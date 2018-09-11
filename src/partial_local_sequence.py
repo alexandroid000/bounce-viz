@@ -1,68 +1,58 @@
-from geom_utils import *
-from general_position import *
-from helper.visibility_helper import *
 from settings import *
+from simple_polygon import Simple_Polygon
+from link_diagram import *
+from helper.shoot_ray_helper import *
 
-def VertexExists(v, poly):
-    for pt in poly:
-        if la.norm(v-pt) < EPSILON:
-            return True
-    return False
+class Partial_Local_Sequence(object):
+    ''' Partial local sequence is a sequence of points on ∂P associated with a vertex v0, and is constructed by shooting a ray through a reflex vertex v0 from every visible vertex and keeping the resulting sequence of intersections with ∂P. The partial local sequence for a convex vertex is empty.
 
-def FindReflexVerts(poly):
-    ''' return indices of all reflex vertices in poly
+    Attributes
+    ----------
+    polygon : numpy.array
+        The polygon that the partial local sequence is built upon
+    inserted_polygon : numpy.array
+        The polygon with all new vertices inserted 
+    sequence_info : list
+        A 2D array stores the partial local sequence for each vertex in polygon in rows
     '''
-    psize = poly.shape[0]
-    reflex_verts = []
-    for j in range(psize):
-        v1, v2, v3 = poly[(j-1) % psize], poly[j], poly[(j+1) % psize]
-        if IsRightTurn(v1,v2,v3) and not IsThreePointsOnLine(v1,v2,v3):
-            reflex_verts.append(j)
+    def compute_sequence(self, input_polygon):
+        ''' Compute the partial local sequence for all vertices of the polygon
+        '''
+        rvs = FindReflexVerts(input_polygon.vertices)
+        sequence_info = []
+        for i in range(input_polygon.size):
+            if not i in rvs:
+                sequence_info.append([])
+                continue
+            r_children = ShootRaysFromReflex(input_polygon.vertices, i)
+            transition_pts = ShootRaysToReflexFromVerts(input_polygon.vertices, i)
+            transition_pts.extend(r_children)
+            sequence_info.append(transition_pts)
+        return sequence_info
 
-    return reflex_verts
+    def compute_inserted_polygon(self, polygon, sequence_info):
+        ''' Compute the polygon with all new vertices from the partial local sequence inserted
+        '''
+        t_pts_grouped = {i:[] for i in range(polygon.size)}
+        for i in range(len(sequence_info)):
+            for (pt, edge) in sequence_info[i]:
+                t_pts_grouped[edge].append(pt)
+        
+        # sort transition points along edge
+        new_poly_grouped = {}
+        for i in range(polygon.size):
+            new_poly_grouped[i] = SortByDistance(polygon.vertices[i], np.array(t_pts_grouped[i]))
+            if DEBUG:
+                print('Inserted verts', new_poly_grouped[i], 'on edge',i)
 
+        inserted_polygon = []
+        new_vertices = []
+        for i in range(polygon.size):
+            new_vertices.extend(new_poly_grouped[i])
+        inserted_polygon = Simple_Polygon(np.array(new_vertices))
+        return inserted_polygon
 
-# shoot two rays from each reflex vertex, along incident edges
-# group by edge so we can insert them in correct order
-def ShootRaysFromReflex(poly, j):
-    psize = len(poly)
-    p2 = poly[j]
-    p1_ccw = poly[(j+1) % psize]
-    p1_cw = poly[(j-1) % psize]
-
-    int_pts = []
-
-    # ClosestPtAlongRay returns False if we shoot ray into existing vertex
-    if ClosestPtAlongRay(p1_ccw,p2,poly,j):
-        pt, k = ClosestPtAlongRay(p1_ccw,p2,poly,j)
-        if not VertexExists(pt, poly):
-            int_pts.append((pt,k))
-
-    if ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize)):
-        pt, k = ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize))
-        if not VertexExists(pt, poly):
-            int_pts.append((pt,k))
-
-    return int_pts
-
-# shoot ray from visible vertices through reflex verts
-# Poly -> Int -> [(Point, Int)]
-def ShootRaysToReflexFromVerts(poly, j):
-    psize = poly.shape[0]
-    r_v = poly[j]
-    pts = []
-    visible_verts = GetVisibleVertices(poly,j)
-
-    # only ray shoot from non-adjacent vertices
-    # previous and next neighbors always visible
-    for v in visible_verts:
-        if (v != (j-1)%psize) and (v != (j+1)%psize):
-            #print('shooting ray from',v,'to',j)
-            res = ClosestPtAlongRay(poly[v], r_v, poly)
-            if res:
-                pt, k = res
-                if (IsInPoly((pt+r_v)/2, poly) and
-                    not VertexExists(pt, poly)):
-                    #print('successful insert')
-                    pts.append((pt,k))
-    return pts
+    def __init__(self, polygon_vx):
+        self.polygon = Simple_Polygon(polygon_vx)
+        self.sequence_info = self.compute_sequence(self.polygon)
+        self.inserted_polygon = self.compute_inserted_polygon(self.polygon, self.sequence_info) 

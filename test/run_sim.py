@@ -4,15 +4,20 @@ sys.path.append('../src')
 from helper.visualization_helper import *
 
 if __name__ == '__main__':
-    poly = simple_bit
-    VizRay(poly)
-    VizPoly(poly)
-    p1 = InsertAllTransitionPts(poly)
-    link_diagram = GetLinkDiagram(p1)
-    PlotLinkDiagram(p1, link_diagram, hline = 1.4707)
+    poly_vx = simple_bit
+    poly_name = 'simple_bit'
+    pls = Partial_Local_Sequence(poly_vx)
+    visualize_all_partial_order_sequence(pls.polygon.vertices, pls.inserted_polygon.vertices, pls.sequence_info)
+    visualize_polygon(poly_vx, poly_name)
+    link_diagram = GetLinkDiagram(pls.inserted_polygon.vertices)
+    PlotLinkDiagram(pls.inserted_polygon.vertices, link_diagram, hline = 1.4707)
     print("inserted all transition pts")
-    VizPoly(p1)
-    
+    visualize_polygon(pls.inserted_polygon.vertices, 'inserted_'+poly_name)
+    pls2 = Partial_Local_Sequence(poly2)
+    origin = poly2[10]
+    sequence = pls2.sequence_info[10]
+    visualize_partial_local_sequence_for_one_vx(poly2, origin, sequence)
+
     # G = mkGraph(p1, requireContract = False)
     # print("made graph")
     # PlotGraph(G)
