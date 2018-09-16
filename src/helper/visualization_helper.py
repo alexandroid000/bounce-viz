@@ -26,7 +26,7 @@ def visualize_all_partial_order_sequence(poly_vx, inserted_poly_vx, sequence_inf
     plt.plot(wall[:, 0], wall[:, 1], 'black')
     plt.plot(inserted_poly_vx[:, 0], inserted_poly_vx[:, 1], 'ro')
     for index, seq in enumerate(sequence_info):
-        for (pt,k) in seq:
+        for (pt,k, _) in seq:
             plt.plot([poly_vx[index][0], pt[0]], [poly_vx[index][1], pt[1]], 'green')
     plt.savefig(osp.join(image_save_folder,'viz_test.pdf'))
     if DEBUG:
@@ -61,42 +61,46 @@ def visualize_partial_local_sequence_for_one_vx(poly_vx, origin, sequence, fname
     ax.axis('off')
     wall = np.vstack((poly_vx, poly_vx[0]))
     plt.plot(wall[:, 0], wall[:, 1], 'black')
-    plt.plot(origin[0], origin[1], 'bo')
-    for (pt,k) in sequence:
-        plt.plot([origin[0], pt[0]], [origin[1], pt[1]], 'green')
+    psize = poly_vx.shape[0]
+    for i, pt in enumerate(poly_vx):
+        plt.plot(pt[0], pt[1], 'ko', markersize = 5)
+        plt.annotate("{}".format(i), xy = (pt[0], pt[1]+7), size =8, color = 'red')
+
+    for (pt,k, v) in sequence:
+        plt.plot([origin[0], pt[0]], [origin[1], pt[1]], 'b--',  markersize = 4)
+        plt.plot(pt[0], pt[1], 'bo', markersize = 5)
+        plt.annotate("{}'".format(v), xy = (pt[0]-8, pt[1]-20),  size =8, color = 'red')
+
+    plt.plot(origin[0], origin[1], 'bo', markersize = 5)
     plt.savefig(osp.join(image_save_folder, fname+'.png'), dpi = 300)
     if DEBUG:
         plt.show()
 
-def PlotLinkDiagram(poly, link_diagram, resolution = 15, hline = None, fname = 'link_diagram.png'):
+def visualize_link_diagram(link_diagram, hline = None, fname = 'link_diagram.png'):
     ''' Save the link diagram for a given polygon to image
 
     Parameters
     ----------
-    poly:np.array
-        The input polygon represented by its vertex coordinates
-    link_diagram:np.array
+    link_diagram: :obj:`Link_Diagram`
         The link diagram computed for the given polygon
-    Resolution:int
-        The number of sample points on each edge
     hline:float
         The angle of fix theta bouncing
     fname:string
         The output file name for the link diagram
     '''
-    poly = np.array([list(x) for x in poly])
-    edge_len = [norm(poly[i]-poly[(i+1)%len(poly)]) for i in range(len(poly))]
+    i_poly_vx = link_diagram.partial_local_sequence.inserted_polygon.vertices
+    psize = i_poly_vx.shape[0]
+    edge_len = [norm(i_poly_vx[i]-i_poly_vx[(i+1)%psize]) for i in range(psize)]
     acc_edge_len = [sum(edge_len[:i]) for i in range(len(edge_len)+1)]
-    psize = link_diagram.shape[0]
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
     fig, ax = plt.subplots()
     x = []
     for i in range(psize):
-        x.extend(list(np.linspace(acc_edge_len[i], acc_edge_len[i+1], resolution-1)))
+        x.extend(list(np.linspace(acc_edge_len[i], acc_edge_len[i+1], link_diagram.resolution-1)))
         x.extend([acc_edge_len[i+1]])
     for i in range(psize):
-        plt.plot(x, link_diagram[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
+        plt.plot(x, link_diagram.visible_angle_info[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
         plt.axvline(x=acc_edge_len[i], linestyle='--')
     plt.axvline(x = acc_edge_len[-1], linestyle='--')
     if hline != None:

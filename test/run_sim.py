@@ -2,6 +2,7 @@
 import sys
 sys.path.append('../src')
 from helper.visualization_helper import *
+from link_diagram import Link_Diagram
 
 if __name__ == '__main__':
     poly_vx = simple_bit
@@ -9,9 +10,8 @@ if __name__ == '__main__':
     pls = Partial_Local_Sequence(poly_vx)
     visualize_all_partial_order_sequence(pls.polygon.vertices, pls.inserted_polygon.vertices, pls.sequence_info)
     visualize_polygon(poly_vx, poly_name)
-    link_diagram = GetLinkDiagram(pls.inserted_polygon.vertices)
-    PlotLinkDiagram(pls.inserted_polygon.vertices, link_diagram, hline = 1.4707)
-    print("inserted all transition pts")
+    link_diagram = Link_Diagram(pls)
+    visualize_link_diagram(link_diagram, hline = 1.4707)
     visualize_polygon(pls.inserted_polygon.vertices, 'inserted_'+poly_name)
     pls2 = Partial_Local_Sequence(poly2)
     origin = poly2[10]

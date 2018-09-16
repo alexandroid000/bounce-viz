@@ -2,11 +2,10 @@
 
 import visilibity as vis
 from copy import copy
-
 from settings import *
 # for polygons not in general position: returns all visible vertices along a ray
 
-def GetVisibleVertices(poly, j):
+def get_visible_vertices(poly, j):
     #print('At vertex',j)
     psize = poly.shape[0]
 
@@ -39,3 +38,27 @@ def GetVisibleVertices(poly, j):
     if DEBUG:
         print('vertices',visibleVertexSet,'visible from',j)
     return visibleVertexSet
+
+# make all sets of vertices visible from everywhere along edge
+def get_all_edge_visible_vertices(poly):
+    psize = poly.shape[0]
+    all_viz_vxs = [get_visible_vertices(poly, i) for i in range(psize)]
+    if DEBUG:
+        print('All visible verts:\n{}\n'.format(all_viz_vxs))
+
+    # each element in the map is indexed by its clockwise vertex (smaller index)
+    vizSets = []
+
+    # get vertices that are visible to the current vertex and the next vertex
+    for i in range(psize):
+        viz_vxs = list(set(all_viz_vxs[i]) & set(all_viz_vxs[(i+1)%psize]))
+        # if the following line included, allows transition to next edge by wall
+        # following, even if reflex angle
+        # TODO: figure out if we want to allow this behavior
+        viz_vxs.append((i+1)%psize) 
+        # vizSets[i] = viz_vxs
+        vizSets.append(viz_vxs)
+
+    if DEBUG:
+        print('viz sets\n--------\n{}\n'.format(vizSets))
+    return vizSets 

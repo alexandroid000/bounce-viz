@@ -17,12 +17,12 @@ def ShootRaysFromReflex(poly, j):
     if ClosestPtAlongRay(p1_ccw,p2,poly,j):
         pt, k = ClosestPtAlongRay(p1_ccw,p2,poly,j)
         if not VertexExists(pt, poly):
-            int_pts.append((pt,k))
+            int_pts.append((pt,k, (j+1) % psize))
 
     if ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize)):
         pt, k = ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize))
         if not VertexExists(pt, poly):
-            int_pts.append((pt,k))
+            int_pts.append((pt,k, (j-1) % psize))
 
     return int_pts
 
@@ -32,7 +32,7 @@ def ShootRaysToReflexFromVerts(poly, j):
     psize = poly.shape[0]
     r_v = poly[j]
     pts = []
-    visible_verts = GetVisibleVertices(poly,j)
+    visible_verts = get_visible_vertices(poly,j)
 
     # only ray shoot from non-adjacent vertices
     # previous and next neighbors always visible
@@ -45,5 +45,5 @@ def ShootRaysToReflexFromVerts(poly, j):
                 if (IsInPoly((pt+r_v)/2, poly) and
                     not VertexExists(pt, poly)):
                     #print('successful insert')
-                    pts.append((pt,k))
+                    pts.append((pt,k, v))
     return pts

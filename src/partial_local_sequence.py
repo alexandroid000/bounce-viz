@@ -35,13 +35,13 @@ class Partial_Local_Sequence(object):
         '''
         t_pts_grouped = {i:[] for i in range(polygon.size)}
         for i in range(len(sequence_info)):
-            for (pt, edge) in sequence_info[i]:
+            for (pt, edge, _) in sequence_info[i]:
                 t_pts_grouped[edge].append(pt)
         
         # sort transition points along edge
         new_poly_grouped = {}
         for i in range(polygon.size):
-            new_poly_grouped[i] = SortByDistance(polygon.vertices[i], np.array(t_pts_grouped[i]))
+            new_poly_grouped[i] = sort_by_distance(polygon.vertices[i], np.array(t_pts_grouped[i]))
             if DEBUG:
                 print('Inserted verts', new_poly_grouped[i], 'on edge',i)
 
