@@ -1,10 +1,9 @@
 #! /usr/bin/env python3
 
 from geom_utils import *
-from graph_utils import *
+# from graph_utils import *
 from graph_operations import *
 from maps import *
-from link_diagram import *
 from partial_local_sequence import FindReflexVerts, ShootRaysFromReflex, ShootRaysToReflexFromVerts
 from settings import *
 from partial_local_sequence import Partial_Local_Sequence
@@ -76,19 +75,19 @@ def visualize_partial_local_sequence_for_one_vx(poly_vx, origin, sequence, fname
     if DEBUG:
         plt.show()
 
-def visualize_link_diagram(link_diagram, hline = None, fname = 'link_diagram.png'):
+def visualize_bounce_visibility_diagram(bvd, hline = None, fname = 'bvd.png'):
     ''' Save the link diagram for a given polygon to image
 
     Parameters
     ----------
-    link_diagram: :obj:`Link_Diagram`
+    bvd: :obj:`Bounce_Visibility_Diagram`
         The link diagram computed for the given polygon
     hline:float
         The angle of fix theta bouncing
     fname:string
         The output file name for the link diagram
     '''
-    i_poly_vx = link_diagram.partial_local_sequence.inserted_polygon.vertices
+    i_poly_vx = bvd.partial_local_sequence.inserted_polygon.vertices
     psize = i_poly_vx.shape[0]
     edge_len = [norm(i_poly_vx[i]-i_poly_vx[(i+1)%psize]) for i in range(psize)]
     acc_edge_len = [sum(edge_len[:i]) for i in range(len(edge_len)+1)]
@@ -97,10 +96,10 @@ def visualize_link_diagram(link_diagram, hline = None, fname = 'link_diagram.png
     fig, ax = plt.subplots()
     x = []
     for i in range(psize):
-        x.extend(list(np.linspace(acc_edge_len[i], acc_edge_len[i+1], link_diagram.resolution-1)))
+        x.extend(list(np.linspace(acc_edge_len[i], acc_edge_len[i+1], bvd.resolution-1)))
         x.extend([acc_edge_len[i+1]])
     for i in range(psize):
-        plt.plot(x, link_diagram.visible_angle_info[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
+        plt.plot(x, bvd.visible_angle_info[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
         plt.axvline(x=acc_edge_len[i], linestyle='--')
     plt.axvline(x = acc_edge_len[-1], linestyle='--')
     if hline != None:
@@ -119,7 +118,9 @@ def visualize_link_diagram(link_diagram, hline = None, fname = 'link_diagram.png
     if DEBUG:
         plt.show()
 
-def PlotGraph(G, fname = 'graph'):
+def visualize_graph(G, fname = 'graph'):
+    ''' Draw graph in circular shape
+    '''
     plt.clf()
     pos = nx.circular_layout(G)
     labels = nx.get_edge_attributes(G,'weight')
@@ -128,13 +129,12 @@ def PlotGraph(G, fname = 'graph'):
     for i in pos:
         new_pos[count] = pos[i]
         count += 1
-        nx.draw_networkx(G, with_labels=True,
-            pos = new_pos,
-            node_color='white',
-            width=1.2,
-            node_size = 600, 
-            font_size=14)
-    # nx.draw_networkx_edge_labels(G,new_pos,edge_labels=labels)
+    nx.draw_networkx(G, with_labels=True,
+        pos = new_pos,
+        node_color='white',
+        width=1.2,
+        node_size = 600, 
+        font_size=14)
     plt.axis('off')
     ax = plt.gca()
     ax.collections[0].set_edgecolor('black') 

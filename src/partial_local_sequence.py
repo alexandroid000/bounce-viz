@@ -1,6 +1,5 @@
 from settings import *
 from simple_polygon import Simple_Polygon
-from link_diagram import *
 from helper.shoot_ray_helper import *
 
 class Partial_Local_Sequence(object):

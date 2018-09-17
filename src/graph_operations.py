@@ -3,7 +3,7 @@
 from copy import copy
 
 from geom_utils import *
-from graph_utils import *
+from helper.bounce_graph_helper import *
 from maps import *
 import numpy.linalg as la
 

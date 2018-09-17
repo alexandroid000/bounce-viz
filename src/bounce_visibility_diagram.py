@@ -2,8 +2,18 @@ import numpy as np
 from helper.visibility_helper import *
 from helper.point_helper import *
 
-class Link_Diagram(object):
-    def compute_visible_angle_info(self, pls, resolution):
+class Bounce_Visibility_Diagram(object):
+    ''' Bounce visibility diagram is a representation of the vertex-edge visibility structure of a partitioned polygon
+    Attributes
+    ----------
+    resolution : int
+        the discretization constant for the angle function
+    partial_local_sequence : :obj:`Partial_Local_Sequence
+        The partial local sequence for the polygon
+    visible_angle_info : numpy.array
+        The angle functions for each edge
+    '''
+    def compute_visible_angle_info(self, pls, visible_vx_set_for_edges, resolution):
         ''' Compute the visible angle info for the input polygon
             For each visible vertex, we need to calculate:
              (1) the view angle at the current vertex w.r.t the current edge and
@@ -22,9 +32,8 @@ class Link_Diagram(object):
             The visible angle info for the input polygon
         '''
         i_poly_vx = pls.inserted_polygon.vertices
-        psize = i_poly_vx.shape[0]
+        psize =  pls.inserted_polygon.size
         visible_angle_info = np.nan*np.ones((psize, resolution*psize))
-        visible_vx_set_for_edges = get_all_edge_visible_vertices(i_poly_vx)
         for i, visible_vxs in enumerate(visible_vx_set_for_edges):
             for vx_index in visible_vxs:
                 curr_p = i_poly_vx[i]
@@ -49,4 +58,5 @@ class Link_Diagram(object):
     def __init__(self, pls):
         self.resolution = 15
         self.partial_local_sequence = pls
-        self.visible_angle_info = self.compute_visible_angle_info(pls, self.resolution)
+        self.visible_vx_set_for_edges = get_all_edge_visible_vertices(pls.inserted_polygon.vertices)
+        self.visible_angle_info = self.compute_visible_angle_info(pls, self.visible_vx_set_for_edges, self.resolution)
