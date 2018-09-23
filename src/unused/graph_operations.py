@@ -17,7 +17,7 @@ def interp(p1, p2, s):
     return (x_new, y_new)
 
 def polyLens(poly):
-    p = copy(poly)
+    p = list(copy(poly))
     p.append(poly[0])
     edge_lens = [la.norm(p1-p2) for (p1, p2) in zip(p, p[1:])]
     perim_len = sum(edge_lens)
@@ -47,46 +47,11 @@ def s_inv(pt, poly):
     s_edge = 0.0
     for i in range(psize):
         p1,p2 = poly[i], poly[(i+1)%psize]
-        if IsThreePointsOnLineSeg(p1,p2,pt) or p1==pt:
+        if IsThreePointsOnLineSeg(p1,p2,pt) or (p1==pt).all():
             edge = i
             s = sum(edge_lens[:i])/perim_len
             s += la.norm(p1-pt)/perim_len
             return s
-
-# this needs an algebra
-def nodesCovered(poly, interval):
-    psize = len(poly)
-    (s1, s2) = interval
-    s_dist = (s2-s1)%1
-    s_verts = [s_inv(p, poly) for p in poly]
-    s_verts.extend([s+1.0 for s in s_verts])
-    nodes = []
-    for i,s in enumerate(s_verts[:-1]):
-        if s_verts[i+1] > s1 and (s1+s_dist) > s:
-            nodes.append(i%psize)
-    return nodes
-
-def navigate(poly, S, G):
-    P = InsertAllTransitionPts(poly)
-    BVG = mkGraph(P)
-    safe_BVG = mkSafeGraph(BVG, P)
-    # find all paths with fewest bounces
-    # choose the one with the widest ang interval
-    paths = []
-    for g in nodesCovered(poly, G):
-        for s in nodesCovered(poly, S):
-            paths.append(findPaths(safe_BVG, s, g))
-    return path2transitions(paths[0], safe_BVG)
-    #strategy = getStrategies(BVG, S, 'const', path)
-
-def path2transitions(path, BVG):
-    transitions = []
-    path = list(path)[0]
-    #path.reverse()
-    for (i,j) in zip(path, path[1:]):
-        ang_range = BVG.get_edge_data(i,j)
-        transitions.append((i,j,ang_range))
-    return transitions
 
 def PropagatePath(poly, path, S):
     psize = len(poly)    
@@ -95,7 +60,7 @@ def PropagatePath(poly, path, S):
     ints = [(p1,p2)]
     print(path)
     for (i,j, ang_range) in path:
-        theta_i = FixAngle( atan2(poly[(i+1)%psize][1]-poly[i][1],\
+        theta_i = FixAngle( np.arctan2(poly[(i+1)%psize][1]-poly[i][1],\
                                  poly[(i+1)%psize][0]-poly[i][0]))
         print('orientation of edge',i,'is', theta_i)
         P1_FOUND = False

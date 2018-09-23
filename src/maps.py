@@ -1,11 +1,15 @@
-from env_gen import *
+'''
+Polygonal environment vertices information
+'''
+# from env_gen import *
 import numpy as np
 # Some initial polygons
 # Use these below (inside main() to set the initial shape poly
+fold_in_triangle = np.array([(-2.9, -2.7), (2.3, -2.7), (0.9, -0.5), (3.6, -0.5), (0.9, 4), (-0.4, 1.8), (-1.7, 4), (-4.3, -0.5), (-1.7, -0.5)])
 l_poly = np.array([(0, 0), (600, 0), (600, 230), (260, 230), (260, 460), (0, 460)], dtype=np.float)
 square = np.array([(250,250),(-250,250),(-250,-250),(250,-250)], dtype=np.float)
 shelf = np.array([(250,250),(-250,250),(-250,-250), (-5,-250), (-100, -50), (100,-50), (5,-250), (250,-250)], dtype=np.float)
-rm = np.array(rooms(5,200,0,0), dtype=np.float)
+# rm = np.array(rooms(5,200,0,0), dtype=np.float)
 simple_nonconv = np.array([(250,250),(0,100),(-250,250),(-250,-250),(250,-250)], dtype=np.float)
 simple_nonconv_deep = np.array([(250,250),(0,-100),(-250,250),(-250,-250),(250,-250)], dtype=np.float)
 simple_bit = np.array([(250,250),(-100,0),(-250,250),(-250,-250),(150,-100),(250,-250)], dtype=np.float)

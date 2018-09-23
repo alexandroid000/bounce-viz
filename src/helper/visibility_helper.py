@@ -39,8 +39,9 @@ def get_visible_vertices(poly, j):
         print('vertices',visibleVertexSet,'visible from',j)
     return visibleVertexSet
 
-# make all sets of vertices visible from everywhere along edge
 def get_all_edge_visible_vertices(poly):
+    ''' make all sets of vertices visible from everywhere along edge
+    '''
     psize = poly.shape[0]
     all_viz_vxs = [get_visible_vertices(poly, i) for i in range(psize)]
     if DEBUG:

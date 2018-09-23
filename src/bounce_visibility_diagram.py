@@ -4,11 +4,12 @@ from helper.point_helper import *
 
 class Bounce_Visibility_Diagram(object):
     ''' Bounce visibility diagram is a representation of the vertex-edge visibility structure of a partitioned polygon
+    
     Attributes
     ----------
     resolution : int
         the discretization constant for the angle function
-    partial_local_sequence : :obj:`Partial_Local_Sequence
+    partial_local_sequence : :obj:`Partial_Local_Sequence`
         The partial local sequence for the polygon
     visible_angle_info : numpy.array
         The angle functions for each edge

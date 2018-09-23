@@ -1,8 +1,4 @@
-#! /usr/bin/env python3
-
-from geom_utils import *
-# from graph_utils import *
-from graph_operations import *
+from helper.geometry_helper import *
 from maps import *
 from partial_local_sequence import FindReflexVerts, ShootRaysFromReflex, ShootRaysToReflexFromVerts
 from settings import *
@@ -13,6 +9,7 @@ import numpy as np
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 import os.path as osp
+import networkx as nx
 
 def visualize_all_partial_order_sequence(poly_vx, inserted_poly_vx, sequence_info):
     ''' Draws all transition points in poly and saves to viz_test.pdf
@@ -55,6 +52,8 @@ def visualize_polygon(poly, fname):
         plt.show()
 
 def visualize_partial_local_sequence_for_one_vx(poly_vx, origin, sequence, fname = 'partial_local_sequence'):
+    ''' Draw the partial local sequence for a given vertex
+    '''
     plt.figure()
     ax = plt.gca()
     ax.axis('off')
@@ -89,8 +88,7 @@ def visualize_bounce_visibility_diagram(bvd, hline = None, fname = 'bvd.png'):
     '''
     i_poly_vx = bvd.partial_local_sequence.inserted_polygon.vertices
     psize = i_poly_vx.shape[0]
-    edge_len = [norm(i_poly_vx[i]-i_poly_vx[(i+1)%psize]) for i in range(psize)]
-    acc_edge_len = [sum(edge_len[:i]) for i in range(len(edge_len)+1)]
+    acc_edge_len = bvd.partial_local_sequence.inserted_polygon.unit_interval_mapping
     jet = plt.cm.jet
     colors = jet(np.linspace(0, 1, psize))
     fig, ax = plt.subplots()
@@ -103,8 +101,7 @@ def visualize_bounce_visibility_diagram(bvd, hline = None, fname = 'bvd.png'):
         plt.axvline(x=acc_edge_len[i], linestyle='--')
     plt.axvline(x = acc_edge_len[-1], linestyle='--')
     if hline != None:
-        plt.plot(range(psize+1), hline*np.ones(psize+1))
-
+        plt.axhline(y = hline)
     leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.15), ncol=5)
     ax.set_xticks(acc_edge_len)
     x_labels = list(range(psize))
@@ -140,41 +137,41 @@ def visualize_graph(G, fname = 'graph'):
     ax.collections[0].set_edgecolor('black') 
     plt.savefig(osp.join(image_save_folder,fname+'.png'), bbox_inches='tight', dpi = 300)
 
-def VizPath(poly, intervals):
-    psize = len(poly)
-    jet = plt.cm.jet
-    colors = jet(np.linspace(0, 1, psize))
+# def VizPath(poly, intervals):
+#     psize = len(poly)
+#     jet = plt.cm.jet
+#     colors = jet(np.linspace(0, 1, psize))
 
-    # plot only polygon, no axis or frame
-    fig = plt.figure(frameon=False)
-    ax = fig.add_axes([0, 0, 1, 1])
-    ax.axis('off')
+#     # plot only polygon, no axis or frame
+#     fig = plt.figure(frameon=False)
+#     ax = fig.add_axes([0, 0, 1, 1])
+#     ax.axis('off')
 
-    wall_x = [x for (x,y) in poly]
-    wall_x.append(wall_x[0])
-    wall_y = [y for (x,y) in poly]
-    wall_y.append(wall_y[0])
-    plt.plot(wall_x, wall_y, 'black')
-    for i in range(psize):
-        point = poly[i]
-        plt.scatter(point[0], point[1], color=colors[i])
-        plt.annotate(str(i), (point[0]+10, point[1]+10), size = 'small')
-    plt.axis('equal')
+#     wall_x = [x for (x,y) in poly]
+#     wall_x.append(wall_x[0])
+#     wall_y = [y for (x,y) in poly]
+#     wall_y.append(wall_y[0])
+#     plt.plot(wall_x, wall_y, 'black')
+#     for i in range(psize):
+#         point = poly[i]
+#         plt.scatter(point[0], point[1], color=colors[i])
+#         plt.annotate(str(i), (point[0]+10, point[1]+10), size = 'small')
+#     plt.axis('equal')
 
-    print(intervals)
+#     print(intervals)
 
-    interval_ts = list(zip(intervals, intervals[1:]))
-    for i in interval_ts:
-        print(i)
-    p1, p2 = list(interval_ts)[0][0]
-    plt.plot([p1[0],p2[0]], [p1[1], p2[1]], 'red',linewidth=5)
+#     interval_ts = list(zip(intervals, intervals[1:]))
+#     for i in interval_ts:
+#         print(i)
+#     p1, p2 = list(interval_ts)[0][0]
+#     plt.plot([p1[0],p2[0]], [p1[1], p2[1]], 'red',linewidth=5)
 
-    for ((pt1, pt2), (new_pt1, new_pt2)) in interval_ts:
-        print('plotting', ((pt1, pt2), (new_pt2, new_pt1)))
-        plt.plot([new_pt1[0],new_pt2[0]], [new_pt1[1], new_pt2[1]], 'red',linewidth=5)
-        plt.plot([pt1[0],new_pt2[0]], [pt1[1], new_pt2[1]], 'green')
-        plt.plot([pt2[0],new_pt1[0]], [pt2[1], new_pt1[1]], 'green')
+#     for ((pt1, pt2), (new_pt1, new_pt2)) in interval_ts:
+#         print('plotting', ((pt1, pt2), (new_pt2, new_pt1)))
+#         plt.plot([new_pt1[0],new_pt2[0]], [new_pt1[1], new_pt2[1]], 'red',linewidth=5)
+#         plt.plot([pt1[0],new_pt2[0]], [pt1[1], new_pt2[1]], 'green')
+#         plt.plot([pt2[0],new_pt1[0]], [pt2[1], new_pt1[1]], 'green')
 
-    plt.savefig(osp.join(image_save_folder,'path.png'), dpi = 300)
-    if DEBUG:
-        plt.show()
+#     plt.savefig(osp.join(image_save_folder,'path.png'), dpi = 300)
+#     if DEBUG:
+#         plt.show()

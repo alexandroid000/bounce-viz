@@ -1,7 +1,7 @@
 ''' Functions for constructing and querying the bounce visibility graph
 '''
 from settings import *
-from geom_utils import *
+from helper.geometry_helper import *
 from partial_local_sequence import *
 
 import networkx as nx
@@ -46,12 +46,7 @@ def SafeAngles(e1, e2):
         return None
 
 def angleBound(poly, i, j):
-    ''' the coefficent of 'contraction' for the mapping from edge i to edge j
-    |f(x) - f(y)| = |x - y| * sin(theta) / sin (theta-phi)
-    -1 < |f(x) - f(y)| < 1 leads to
-    theta > phi/2
-    theta < -phi/2
-    for contraction mapping
+    ''' the coefficent of 'contraction' for the mapping from edge i to edge j `|f(x) - f(y)| = |x - y| * sin(theta) / sin (theta-phi) -1 < |f(x) - f(y)| < 1` leads to `theta > phi/2 theta < -phi/2` for contraction mapping
     '''
     n = len(poly)
     v1 = poly[i] - poly[(i+1) % n]
@@ -125,7 +120,7 @@ def allCycles(G):
 # def allLimitCycles
 
 # find all shortest paths (from start segment to end segment)
-def findPaths(G, start, goal):
+def get_shortest_path_helper(G, start, goal):
     return nx.all_shortest_paths(G, source=start, target=goal)
 
 # return G given a range of bounce angles smaller than 0 to pi

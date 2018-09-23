@@ -27,6 +27,8 @@ class Bounce_Graph(object):
         return bvg
 
     def create_safe_action_graph(self, bvg, poly, visible_vx_set_for_edges):
+        ''' Remove edges with an empty angle range from the bounce visibility graph to create the safe action graph
+        ''' 
         psize = poly.size
         safe_action_graph = nx.DiGraph()
         safe_action_graph.add_nodes_from(bvg.nodes())
@@ -44,6 +46,15 @@ class Bounce_Graph(object):
                     new_edges.append((i,e,curr_weight))
         safe_action_graph.add_weighted_edges_from(new_edges)
         return safe_action_graph
+
+    def get_shortest_path(self, start_set, goal_set, graph_type = 'safe'):
+        ''' Get shortest paths set from a start set to the goal set in a given graph
+        '''
+        if graph_type == 'safe':
+            graph = self.safe_action_graph
+        else:
+            graph = self.visibility_graph
+        return get_shortest_path_helper(graph, start_set, goal_set)
 
     def __init__(self, bvd):
         self.bounce_visibility_diagram = bvd

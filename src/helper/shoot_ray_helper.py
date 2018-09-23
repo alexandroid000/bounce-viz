@@ -1,11 +1,12 @@
-from geom_utils import *
+from helper.geometry_helper import *
 from helper.visibility_helper import *
 from helper.polygon_helper import *
 from settings import *
 
-# shoot two rays from each reflex vertex, along incident edges
-# group by edge so we can insert them in correct order
 def ShootRaysFromReflex(poly, j):
+    ''' shoot two rays from each reflex vertex, along incident edges
+        group by edge so we can insert them in correct order
+    '''
     psize = len(poly)
     p2 = poly[j]
     p1_ccw = poly[(j+1) % psize]
@@ -26,9 +27,10 @@ def ShootRaysFromReflex(poly, j):
 
     return int_pts
 
-# shoot ray from visible vertices through reflex verts
-# Poly -> Int -> [(Point, Int)]
 def ShootRaysToReflexFromVerts(poly, j):
+    ''' shoot ray from visible vertices through reflex verts
+        Poly -> Int -> [(Point, Int)]
+    '''
     psize = poly.shape[0]
     r_v = poly[j]
     pts = []

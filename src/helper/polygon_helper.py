@@ -1,9 +1,11 @@
-from geom_utils import *
+from helper.geometry_helper import *
 from helper.general_position_helper import *
 from settings import *
 from helper.point_helper import *
 
 def VertexExists(v, poly):
+    ''' Check whether a given vertex exists in the polygon
+    '''
     for pt in poly:
         if la.norm(v-pt) < EPSILON:
             return True
