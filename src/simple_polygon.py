@@ -2,7 +2,7 @@ from numpy.linalg import norm
 import numpy as np
 import settings
 class Simple_Polygon(object):
-    ''' Partial local sequence is a sequence of points on ∂P associated with a vertex v0, and is constructed by shooting a ray through a reflex vertex v0 from every visible vertex and keeping the resulting sequence of intersections with ∂P. The partial local sequence for a convex vertex is empty.
+    ''' Partial local sequence is a sequence of points on the boundary of P associated with a vertex v0, and is constructed by shooting a ray through a reflex vertex v0 from every visible vertex and keeping the resulting sequence of intersections with the boundary of P. The partial local sequence for a convex vertex is empty.
 
     Attributes
     ----------
