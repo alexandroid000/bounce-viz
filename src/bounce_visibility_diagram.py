@@ -1,6 +1,7 @@
 import numpy as np
-from helper.visibility_helper import *
-from helper.point_helper import *
+from src.helper.visibility_helper import *
+from src.helper.point_helper import *
+
 
 class Bounce_Visibility_Diagram(object):
     ''' Bounce visibility diagram is a representation of the vertex-edge visibility structure of a partitioned polygon

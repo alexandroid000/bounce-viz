@@ -1,9 +1,5 @@
 import networkx as nx
-import os
-import os.path as osp
 
-from helper.polygon_helper import *
-from helper.bounce_graph_helper import *
 class Bounce_Graph(object):
     ''' Bounce visibility diagram is the directed edge visibility graph a partitioned polygon
     Attributes

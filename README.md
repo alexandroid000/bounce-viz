@@ -25,3 +25,11 @@ polygons, and strategy generation for mobile "bouncing" robots.
    cd test
    ./run_sim.py
    ```
+## Generate Documentations
+   ```bash
+   cd $bounce_viz
+   cd docs
+   make apidoc
+   # to view the documentation
+   open ./build/html/bounce_viz.html
+   ```
