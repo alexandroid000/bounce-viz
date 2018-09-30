@@ -1,7 +1,7 @@
-from helper.geometry_helper import *
-from helper.general_position_helper import *
-from settings import *
-from helper.point_helper import *
+from src.helper.geometry_helper import *
+from src.helper.general_position_helper import *
+from src.settings import *
+from src.helper.point_helper import *
 
 def VertexExists(v, poly):
     ''' Check whether a given vertex exists in the polygon

@@ -1,69 +1,65 @@
 # #! /usr/bin/env python
 
-# import unittest
-# from src.bounce import *
-# from src.geom_utils import *
-# from src.graph_utils import *
-# from src.graph_operations import *
-# from src.maps import *
+import unittest
+from src.bounce_graph import *
+from src.bounce_visibility_diagram import *
+from src.partial_local_sequence import *
+from src.navigation import *
+from src.maps import *
 
-# class TestGeomUtils(unittest.TestCase):
+class TestGeomUtils(unittest.TestCase):
 
-#     def setUp(self):
-#         self.origin = [0.0, 0.0]
+     def setUp(self):
+         self.origin = [0.0, 0.0]
+         # square on xy axis
+         self.p1 = [ 10.0,   0.0]
+         self.p2 = [-10.0,   0.0]
+         self.p3 = [  0.0,  10.0]
+         self.p4 = [  0.0, -10.0]
+         # right triangle
+         self.t1 = [6.0, 0.0]
+         self.t2 = [3.0, 4.0]
+         self.x3 = [[0.0, 0.0],[3.0,0.0]]
+         self.y4 = [[3.0, 0.0],[3.0,4.0]]
+         # edges
+         self.e1 = [self.origin, [1.0, 0.0]]
+         self.e2 = [[2.0,1.0], [2.0, 2.0]]
+         self.maxDiff = None
 
-#         # square on xy axis
-#         self.p1 = [ 10.0,   0.0]
-#         self.p2 = [-10.0,   0.0]
-#         self.p3 = [  0.0,  10.0]
-#         self.p4 = [  0.0, -10.0]
+     def test_left(self):
+         v1 = IsLeftTurn(self.p1, self.p2, self.p4)
+         v2 = IsLeftTurn(self.p2, self.p1, self.p3)
+         self.assertTrue(v1 and v2)
 
-#         # right triangle
-#         self.t1 = [6.0, 0.0]
-#         self.t2 = [3.0, 4.0]
-#         self.x3 = [[0.0, 0.0],[3.0,0.0]]
-#         self.y4 = [[3.0, 0.0],[3.0,4.0]]
+     def test_right(self):
+         v1 = IsRightTurn(self.p1, self.p2, self.p3)
+         v2 = IsRightTurn(self.p2, self.p1, self.p4)
+         self.assertTrue(v1 and v2)
 
-#         # edges
-#         self.e1 = [self.origin, [1.0, 0.0]]
-#         self.e2 = [[2.0,1.0], [2.0, 2.0]]
+     def test_contains(self):
+         self.assertTrue(IsInPoly((0.0,0.0), poly1))
 
-#         self.maxDiff = None
+     def test_notIn(self):
+         self.assertFalse(IsInPoly((500.0,0.0), poly1))
 
-#     def test_left(self):
-#         v1 = IsLeftTurn(self.p1, self.p2, self.p4)
-#         v2 = IsLeftTurn(self.p2, self.p1, self.p3)
-#         self.assertTrue(v1 and v2)
+     def test_shootRayFromVect(self):
+         t, (x,y) = ShootRayFromVect(self.t1, self.t2, self.origin, self.p3)
+         self.assertAlmostEqual(x, 0.0)
+         self.assertAlmostEqual(y, 8.0)
 
-#     def test_right(self):
-#         v1 = IsRightTurn(self.p1, self.p2, self.p3)
-#         v2 = IsRightTurn(self.p2, self.p1, self.p4)
-#         self.assertTrue(v1 and v2)
+     def test_intersect_interior(self):
+         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, poly1)
+         self.assertAlmostEqual(x, 139.1304347826087)
+         self.assertAlmostEqual(y, 0.0)
 
-#     def test_contains(self):
-#         self.assertTrue(IsInPoly((0.0,0.0), poly1))
+     def test_intersect_thru_vertex(self):
+         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), poly1)
+         self.assertAlmostEqual(x, 198.21428571428572)
+         self.assertAlmostEqual(y, 66.07142857142857)
 
-#     def test_notIn(self):
-#         self.assertFalse(IsInPoly((500.0,0.0), poly1))
-
-#     def test_shootRayFromVect(self):
-#         t, (x,y) = ShootRayFromVect(self.t1, self.t2, self.origin, self.p3)
-#         self.assertAlmostEqual(x, 0.0)
-#         self.assertAlmostEqual(y, 8.0)
-
-#     def test_intersect_interior(self):
-#         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, poly1)
-#         self.assertAlmostEqual(x, 139.1304347826087)
-#         self.assertAlmostEqual(y, 0.0)
-
-#     def test_intersect_thru_vertex(self):
-#         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), poly1)
-#         self.assertAlmostEqual(x, 198.21428571428572)
-#         self.assertAlmostEqual(y, 66.07142857142857)
-
-#     def test_reflex(self):
-#         rfverts = FindReflexVerts(poly1)
-#         self.assertEqual([3,7,10], rfverts)
+     def test_reflex(self):
+         rfverts = FindReflexVerts(poly1)
+         self.assertEqual([3,7,10], rfverts)
 
 #     def test_transition_pts(self):
 #         t3 = ShootRaysToReflexFromVerts(poly1, 3)
