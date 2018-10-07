@@ -12,6 +12,8 @@ with pkgs.python35Packages;
         ps.matplotlib 
         ps.networkx 
         ps.pygame
+        ps.sphinx
+        ps.sphinx_rtd_theme
         visilibity
         ])
 ).env
