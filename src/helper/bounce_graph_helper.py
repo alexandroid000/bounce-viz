@@ -18,8 +18,8 @@ def AnglesBetweenSegs(e1, e2):
     if DEBUG:
         print('finding angle between',e1,'and',e2)
 
-    min_ang = GetVector2Angle(p2-p1,p3-p1)
-    max_ang = GetVector2Angle(p2-p1,p4-p2)
+    min_ang = AngleBetween(p2-p1,p3-p1)
+    max_ang = AngleBetween(p2-p1,p4-p2)
 
     return min_ang, max_ang
 
@@ -32,13 +32,13 @@ def SafeAngles(e1, e2):
     (p3,p4) = e2
     if (p1 == p4).all():
         theta_l = np.pi
-        theta_r = GetVector2Angle(p2-p1, p3-p2)
+        theta_r = AngleBetween(p2-p1, p3-p2)
     elif (p2 == p3).all():
         theta_r = 0.0
-        theta_l = GetVector2Angle(p2-p1, p4-p1)
+        theta_l = AngleBetween(p2-p1, p4-p1)
     else:
-        theta_l = GetVector2Angle(p2-p1, p4-p1)
-        theta_r = GetVector2Angle(p2-p1, p3-p2)
+        theta_l = AngleBetween(p2-p1, p4-p1)
+        theta_r = AngleBetween(p2-p1, p3-p2)
     not_parallel = abs(theta_l - theta_r) > 0.01
     if theta_l > theta_r and not_parallel: # declare lines parallel if within 1 deg
         return (theta_l, theta_r)
@@ -51,7 +51,7 @@ def angleBound(poly, i, j):
     n = len(poly)
     v1 = poly[i] - poly[(i+1) % n]
     v2 = poly[j] - poly[(j+1) % n]
-    phi = GetVector2Angle(v1, v2)
+    phi = AngleBetween(v1, v2)
     return phi/2
 
 def intersect_intervals(i1, i2):
@@ -118,10 +118,6 @@ def allCycles(G):
 # Maybe we can start by find all cycles of length up to some bound and
 # exhaustively search.
 # def allLimitCycles
-
-# find all shortest paths (from start segment to end segment)
-def get_shortest_path_helper(G, start, goal):
-    return nx.all_shortest_paths(G, source=start, target=goal)
 
 # return G given a range of bounce angles smaller than 0 to pi
 def reduceGraphWrtAngle(G, theta_min, theta_max):

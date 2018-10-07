@@ -1,6 +1,6 @@
-from src.settings import *
-from src.simple_polygon import Simple_Polygon
-from src.helper.shoot_ray_helper import *
+from settings import *
+from simple_polygon import Simple_Polygon
+from helper.shoot_ray_helper import *
 
 class Partial_Local_Sequence(object):
     ''' Partial local sequence is a sequence of points on the boundary of P associated with a vertex v0, and is constructed by shooting a ray through a reflex vertex v0 from every visible vertex and keeping the resulting sequence of intersections with the boundary of P. The partial local sequence for a convex vertex is empty.
@@ -28,6 +28,7 @@ class Partial_Local_Sequence(object):
             transition_pts.extend(r_children)
             sequence_info.append(transition_pts)
         return sequence_info
+
 
     def compute_inserted_polygon(self, polygon, sequence_info):
         ''' Compute the polygon with all new vertices from the partial local sequence inserted

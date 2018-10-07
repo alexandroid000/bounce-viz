@@ -1,6 +1,6 @@
 import numpy as np
-from src.helper.visibility_helper import *
-from src.helper.point_helper import *
+
+from helper.visibility_helper import *
 
 
 class Bounce_Visibility_Diagram(object):

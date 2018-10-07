@@ -1,4 +1,5 @@
 import numpy as np
+
 def IsThreePointsOnLine(p1, p2, p3):
     ''' Check whether the input three points are colinear
     '''

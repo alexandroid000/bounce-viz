@@ -2,10 +2,10 @@
 
 import visilibity as vis
 from copy import copy
-from src.settings import *
+from settings import *
 # for polygons not in general position: returns all visible vertices along a ray
 
-def get_visible_vertices(poly, j):
+def visibleVertices(poly, j):
     #print('At vertex',j)
     psize = poly.shape[0]
 
@@ -43,7 +43,7 @@ def get_all_edge_visible_vertices(poly):
     ''' make all sets of vertices visible from everywhere along edge
     '''
     psize = poly.shape[0]
-    all_viz_vxs = [get_visible_vertices(poly, i) for i in range(psize)]
+    all_viz_vxs = [visibleVertices(poly, i) for i in range(psize)]
     if DEBUG:
         print('All visible verts:\n{}\n'.format(all_viz_vxs))
 

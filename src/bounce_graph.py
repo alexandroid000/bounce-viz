@@ -1,5 +1,9 @@
 import networkx as nx
 
+from helper.polygon_helper import FindReflexVerts
+from helper.visibility_helper import visibleVertices
+from helper.bounce_graph_helper import check_valid_transit, validAnglesForContract, SafeAngles
+
 class Bounce_Graph(object):
     ''' Bounce visibility diagram is the directed edge visibility graph a partitioned polygon
     Attributes
@@ -14,7 +18,8 @@ class Bounce_Graph(object):
         bvg = nx.DiGraph()
         r_vs = FindReflexVerts(poly.vertices)
         for start in range(poly.size):
-            edges = [(start,v,validAnglesForContract(poly.vertices, start, v)) for v in get_visible_vertices(poly.vertices, start) if check_valid_transit(v, r_vs, start, poly.size, poly.vertices)]
+            edges = [(start,v,validAnglesForContract(poly.vertices, start, v)) for v in
+            visibleVertices(poly.vertices, start) if check_valid_transit(v, r_vs, start, poly.size, poly.vertices)]
             if requireContract:
                 c_edges = [(i,j, angs) for (i,j,angs) in edges if angs != []]
                 bvg.add_weighted_edges_from(c_edges)
@@ -50,7 +55,7 @@ class Bounce_Graph(object):
             graph = self.safe_action_graph
         else:
             graph = self.visibility_graph
-        return get_shortest_path_helper(graph, start_set, goal_set)
+        return nx.all_shortest_paths(graph, start_set, goal_set)
 
     def __init__(self, bvd):
         self.bounce_visibility_diagram = bvd

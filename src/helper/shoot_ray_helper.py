@@ -1,7 +1,7 @@
-from src.helper.geometry_helper import *
-from src.helper.visibility_helper import *
-from src.helper.polygon_helper import *
-from src.settings import *
+from helper.geometry_helper import *
+from helper.visibility_helper import *
+from helper.polygon_helper import *
+from settings import *
 
 # find line intersection parameter of edge (v1,v2)
 # state :: (x,y,theta) initial point and angle of ray
@@ -37,6 +37,14 @@ def ShootRayFromVect(p1, p2, v1, v2):
     state = (p2[0], p2[1], theta)
     return ShootRay(state, v1, v2)
 
+# checks if vector sp->bp points within edge p1p2
+# start point, boundary point, edge p1, edge p2
+def RayInEdge(sp,bp,ep1,ep2):
+    return ((IsLeftTurn(sp,bp,ep2) and
+             IsRightTurn(sp,bp,ep1)) or
+            (IsRightTurn(sp,bp,ep2) and
+             IsLeftTurn(sp,bp,ep1)))
+
 # shoot ray from p1 toward p2 in poly, return closest intersect point
 # will not return point on 'last_bounce_edge'
 def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
@@ -58,7 +66,7 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
                 # Find closest bounce for which t > 0
                 pdist = la.norm(pt-p2)
                 if ((t > 0) and (pdist < closest_bounce) and
-                    BouncePointInEdge((x1,y1),pt,v1,v2)):
+                    RayInEdge((x1,y1),pt,v1,v2)):
                     found_coll = True
                     bounce_point = pt
                     closest_bounce = pdist
@@ -103,7 +111,7 @@ def ShootRaysToReflexFromVerts(poly, j):
     psize = poly.shape[0]
     r_v = poly[j]
     pts = []
-    visible_verts = get_visible_vertices(poly,j)
+    visible_verts = visibleVertices(poly,j)
 
     # only ray shoot from non-adjacent vertices
     # previous and next neighbors always visible
