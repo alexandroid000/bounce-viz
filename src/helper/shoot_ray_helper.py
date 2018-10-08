@@ -66,7 +66,6 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
         if (j != last_bounce_edge):
             v1, v2 = poly[j], poly[(j+1) % psize]
             x1, y1 = p2[0], p2[1]
-            # The line parameter t; needs divide by zero check!
             try:
                 t,u,pt = ShootRayFromVect(p1, p2, v1, v2)
                 
@@ -132,3 +131,21 @@ def ShootRaysToReflexFromVerts(poly, j):
                     #print('successful insert')
                     pts.append((pt,k, v))
     return pts
+
+def IsInPoly(p, poly):
+    ''' test if point p is in poly using crossing number
+    '''
+    intersects = 0
+    theta = np.random.rand()*2*np.pi
+    state=(p[0],p[1],theta)
+    psize = len(poly)
+    for j in range(psize):
+        v1, v2 = poly[j], poly[(j+1) % psize]
+        try:
+            t, u, pt = ShootRay(state, v1, v2)
+            if t>0 and (0 < u) and (u < 1):
+                intersects += 1
+        except:
+            pass
+    return not (intersects%2 == 0)
+
