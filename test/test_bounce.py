@@ -6,6 +6,7 @@ from src.bounce_visibility_diagram import *
 from src.partial_local_sequence import *
 from src.navigation import *
 from src.maps import *
+from math import pi
 
 class TestGeomUtils(unittest.TestCase):
 
@@ -37,13 +38,23 @@ class TestGeomUtils(unittest.TestCase):
          self.assertTrue(v1 and v2)
 
      def test_contains(self):
-         self.assertTrue(IsInPoly((0.0,0.0), poly1))
+         self.assertTrue(IsInPoly((0.0,0.0), square))
 
      def test_notIn(self):
          self.assertFalse(IsInPoly((500.0,0.0), poly1))
 
+    # def ShootRay(state, v1, v2):
+     def test_shootRay(self):
+         p1 = (-10.0, 10.0)
+         p2 = (-10.0, -10.0)
+         state = (0.0, 0.0, pi)
+         t, u, (x,y) = ShootRay(state, p1, p2)
+         self.assertAlmostEqual(u, 0.5)
+         self.assertAlmostEqual(x, -10.0)
+         self.assertAlmostEqual(y, 0.0)
+
      def test_shootRayFromVect(self):
-         t, (x,y) = ShootRayFromVect(self.t1, self.t2, self.origin, self.p3)
+         t, u, (x,y) = ShootRayFromVect(self.t1, self.t2, self.origin, self.p3)
          self.assertAlmostEqual(x, 0.0)
          self.assertAlmostEqual(y, 8.0)
 

@@ -3,38 +3,45 @@ from helper.visibility_helper import *
 from helper.polygon_helper import *
 from settings import *
 
+
+
 # find line intersection parameter of edge (v1,v2)
 # state :: (x,y,theta) initial point and angle of ray
+# (x,y,theta) -> Point -> Point -> Maybe (Double, Point)
+# theta is defined with 0 along the y axis
+# https://stackoverflow.com/questions/14307158/how-do-you-check-for-intersection-between-a-line-segment-and-a-line-ray-emanatin/32146853
+# https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
 def ShootRay(state, v1, v2):
-    x1 = state[0]
-    y1 = state[1]
+    x1, y1 = state[0], state[1]
     theta = state[2]
-    x2 = v1[0]
-    y2 = v1[1]
-    x3 = v2[0]
-    y3 = v2[1]
-    a = y3 - y2
-    b = x2 - x3
-    c = y2*(x3-x2) - x2*(y3-y2)
-    den = (a*np.cos(theta)+b*np.sin(theta))
-    # case when lines are parallel
-    if abs(den) < 0.000001:
+    x2, y2 = v1[0], v1[1]
+    x3, y3 = v2[0], v2[1]
+
+    # points on ray are (x1,y1) + t*r
+    r = (np.cos(theta), np.sin(theta))
+    # points on segment are (x2,y2) + u*s
+    s = (x3 - x2, y3 - y2)
+    rXs = Cross2d(r,s)
+    u = Cross2d((x2-x1, y2-y1), r)/rXs
+    t = Cross2d((x2-x1, y2-y1), s)/rXs
+    # if ray and target edge are parallel, will get divide by zero
+    if abs(rXs) < EPSILON:
         if DEBUG:
             print('divide by zero in ray shoot')
             print('shot from ',state,'to',v1,v2)
         raise ValueError
     else:
-        t = (-c - b*y1 - a*x1)/den
         pint = (x1 + np.cos(theta)*t, y1 + np.sin(theta)*t)
-    return t, pint
+    return t, u, pint
 
 # shoot a ray starting at p1, along vector p1->p2
 # find intersection with edge v1,v2
 # will return first intersection *after* p2
 def ShootRayFromVect(p1, p2, v1, v2):
-    [x,y] = p2-p1# recenter points so p1 is at origin
+    (x1, y1), (x2, y2) = p1, p2
+    [x,y] = (x2 - x1, y2 - y1) # recenter points so p1 is at origin
     theta = FixAngle(np.arctan2(y,x))
-    state = (p2[0], p2[1], theta)
+    state = (x2, y2, theta)
     return ShootRay(state, v1, v2)
 
 # checks if vector sp->bp points within edge p1p2
@@ -61,12 +68,11 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
             x1, y1 = p2[0], p2[1]
             # The line parameter t; needs divide by zero check!
             try:
-                t,pt = ShootRayFromVect(p1, p2, v1, v2)
+                t,u,pt = ShootRayFromVect(p1, p2, v1, v2)
                 
                 # Find closest bounce for which t > 0
                 pdist = la.norm(pt-p2)
-                if ((t > 0) and (pdist < closest_bounce) and
-                    RayInEdge((x1,y1),pt,v1,v2)):
+                if (t > 0) and (0 < u) and (u < 1) and (pdist < closest_bounce):
                     found_coll = True
                     bounce_point = pt
                     closest_bounce = pdist

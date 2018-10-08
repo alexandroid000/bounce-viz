@@ -13,6 +13,9 @@ def AngleBetween(v1, v2):
     ratio = max(min(np.dot(v1, v2)/(la.norm(v1)*la.norm(v2)), 1), -1)
     return np.arccos(ratio)
 
+def Cross2d(p,q):
+        return p[0]*q[1] - p[1]*q[0]
+
 # r is left of the vector formed by p->q
 def IsLeftTurn(p,q,r):
     return q[0]*r[1] + p[0]*q[1] + r[0]*p[1] - \

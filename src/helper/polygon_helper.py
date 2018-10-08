@@ -12,8 +12,8 @@ def IsInPoly(p, poly):
     for j in range(psize):
         v1, v2 = poly[j], poly[(j+1) % psize]
         try:
-            t, pt = ShootRay(state, v1, v2)
-            if t>0 and BouncePointInEdge(p, pt, v1, v2):
+            t, u, pt = ShootRay(state, v1, v2)
+            if t>0 and (0 < u) and (u < 1):
                 intersects += 1
         except:
             pass
