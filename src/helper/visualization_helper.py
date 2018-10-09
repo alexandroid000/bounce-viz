@@ -1,6 +1,6 @@
 from helper.geometry_helper import *
 from maps import *
-from partial_local_sequence import FindReflexVerts, ShootRaysFromReflex, ShootRaysToReflexFromVerts
+from partial_local_sequence import ShootRaysFromReflex, ShootRaysToReflexFromVerts
 from settings import *
 from partial_local_sequence import Partial_Local_Sequence
 

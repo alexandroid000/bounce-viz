@@ -17,14 +17,14 @@ class Partial_Local_Sequence(object):
     def compute_sequence(self, input_polygon):
         ''' Compute the partial local sequence for all vertices of the polygon
         '''
-        rvs = FindReflexVerts(input_polygon.vertices)
+        rvs = input_polygon.rverts
         sequence_info = []
         for i in range(input_polygon.size):
             if not i in rvs:
                 sequence_info.append([])
                 continue
-            r_children = ShootRaysFromReflex(input_polygon.vertices, i)
-            transition_pts = ShootRaysToReflexFromVerts(input_polygon.vertices, i)
+            r_children = ShootRaysFromReflex(input_polygon, i)
+            transition_pts = ShootRaysToReflexFromVerts(input_polygon, i)
             transition_pts.extend(r_children)
             sequence_info.append(transition_pts)
         return sequence_info
@@ -53,6 +53,6 @@ class Partial_Local_Sequence(object):
         return inserted_polygon
 
     def __init__(self, polygon_vx):
-        self.polygon = Simple_Polygon(polygon_vx)
+        self.polygon = polygon_vx
         self.sequence_info = self.compute_sequence(self.polygon)
         self.inserted_polygon = self.compute_inserted_polygon(self.polygon, self.sequence_info) 

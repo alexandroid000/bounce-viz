@@ -1,6 +1,5 @@
 import networkx as nx
 
-from helper.polygon_helper import FindReflexVerts
 from helper.visibility_helper import visibleVertices
 from helper.bounce_graph_helper import check_valid_transit, validAnglesForContract, SafeAngles
 
@@ -16,7 +15,7 @@ class Bounce_Graph(object):
         ''' creates directed edge-to-edge visibility graph; edge information is angle ranges which create contraction mapping
         '''
         bvg = nx.DiGraph()
-        r_vs = FindReflexVerts(poly.vertices)
+        r_vs = poly.rverts
         for start in range(poly.size):
             edges = [(start,v,validAnglesForContract(poly.vertices, start, v)) for v in
             visibleVertices(poly.vertices, start) if check_valid_transit(v, r_vs, start, poly.size, poly.vertices)]

@@ -1,6 +1,7 @@
 import numpy as np
 
 from helper.visibility_helper import *
+from helper.geometry_helper import *
 
 
 class Bounce_Visibility_Diagram(object):

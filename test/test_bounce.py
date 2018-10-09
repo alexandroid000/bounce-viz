@@ -1,30 +1,34 @@
 # #! /usr/bin/env python
-
+import sys
+sys.path.append("./src")
 import unittest
-from src.bounce_graph import *
-from src.bounce_visibility_diagram import *
-from src.partial_local_sequence import *
-from src.navigation import *
-from src.maps import *
+from bounce_graph import *
+from bounce_visibility_diagram import *
+from partial_local_sequence import *
+from helper.visibility_helper import *
+from navigation import *
+from maps import *
 from math import pi
+import numpy as np
 
 class TestGeomUtils(unittest.TestCase):
 
      def setUp(self):
-         self.origin = [0.0, 0.0]
+         self.origin = np.array([0.0, 0.0])
          # square on xy axis
-         self.p1 = [ 10.0,   0.0]
-         self.p2 = [-10.0,   0.0]
-         self.p3 = [  0.0,  10.0]
-         self.p4 = [  0.0, -10.0]
+         self.p1 = np.array([ 10.0,   0.0])
+         self.p2 = np.array([-10.0,   0.0])
+         self.p3 = np.array([  0.0,  10.0])
+         self.p4 = np.array([  0.0, -10.0])
          # right triangle
-         self.t1 = [6.0, 0.0]
-         self.t2 = [3.0, 4.0]
-         self.x3 = [[0.0, 0.0],[3.0,0.0]]
-         self.y4 = [[3.0, 0.0],[3.0,4.0]]
+         self.t1 = np.array([6.0, 0.0])
+         self.t2 = np.array([3.0, 4.0])
+         self.t3 = np.array([3.0,0.0])
+         self.x3 = [self.origin, self.t3]
+         self.y4 = [self.t3,self.t2]
          # edges
-         self.e1 = [self.origin, [1.0, 0.0]]
-         self.e2 = [[2.0,1.0], [2.0, 2.0]]
+         self.e1 = [self.origin, np.array([1.0, 0.0])]
+         self.e2 = [np.array([2.0,1.0]), np.array([2.0, 2.0])]
          self.maxDiff = None
 
      def test_left(self):
@@ -45,8 +49,8 @@ class TestGeomUtils(unittest.TestCase):
 
     # def ShootRay(state, v1, v2):
      def test_shootRay(self):
-         p1 = (-10.0, 10.0)
-         p2 = (-10.0, -10.0)
+         p1 = np.array([-10.0, 10.0])
+         p2 = np.array([-10.0, -10.0])
          state = (0.0, 0.0, pi)
          t, u, (x,y) = ShootRay(state, p1, p2)
          self.assertAlmostEqual(u, 0.5)
@@ -69,30 +73,34 @@ class TestGeomUtils(unittest.TestCase):
          self.assertAlmostEqual(y, 66.07142857142857)
 
      def test_reflex(self):
-         rfverts = FindReflexVerts(poly1)
-         self.assertEqual([3,7,10], rfverts)
+         self.assertEqual([3,7,10], poly1.rverts)
 
-#     def test_transition_pts(self):
-#         t3 = ShootRaysToReflexFromVerts(poly1, 3)
-#         t7 = ShootRaysToReflexFromVerts(poly1, 7)
-#         t9 = ShootRaysToReflexFromVerts(poly1, 9)
-#         t10 = ShootRaysToReflexFromVerts(poly1, 10)
-#         ts3 = [((-67.74193548387098, 182.25806451612902), 4), ((109.82142857142857, 186.60714285714286), 1), ((-60.0, 190.0), 4)]
-#         ts7 = [((-206.18384401114204, -199.13649025069637), 8), ((-127.36842105263163, -194.21052631578948), 8)]
-#         ts10 = [((-177.77777777777777, 50.00000000000004), 5), ((207.44680851063828, 11.70212765957443), 0), ((209.34065934065933, 40.10989010989009), 0), ((205.3602811950791, 56.32688927943761), 1), ((199.90439770554494, 63.76673040152964), 1), ((190.12048192771084, 77.10843373493977), 1)]
-#         self.assertEqual(ts3, t3)
-#         self.assertEqual(ts7, t7)
-#         self.assertEqual([], t9)
-#         self.assertEqual(ts10, t10)
+     def test_transition_pts(self):
+         t3 = ShootRaysToReflexFromVerts(poly1, 3)
+         t7 = ShootRaysToReflexFromVerts(poly1, 7)
+         t9 = ShootRaysToReflexFromVerts(poly1, 9)
+         t10 = ShootRaysToReflexFromVerts(poly1, 10)
+         ts3 = np.array([(np.array([-67.74193548, 182.25806452]), 4, 1), (np.array([109.82142857, 186.60714286]), 1, 5),
+         (np.array([-60., 190.]), 4, 10)])
+         ts7 = np.array([(np.array([-206.18384401, -199.13649025]), 8, 4), (np.array([-127.36842105, -194.21052632]), 8,
+         5)])
+         ts10 = np.array([(np.array([-177.77777778,   50.        ]), 5, 1), (np.array([207.44680851,  11.70212766]), 0, 3),
+         (np.array([209.34065934,  40.10989011]), 0, 5), (np.array([205.3602812 ,  56.32688928]), 1, 6),
+         (np.array([199.90439771,  63.7667304 ]), 1, 7), (np.array([190.12048193,  77.10843373]), 1,
+         8)])
+         np.testing.assert_allclose(ts3, t3)
+         np.testing.assert_allclose(ts7, t7)
+         np.testing.assert_allclose([], t9)
+         np.testing.assert_allclose(ts10, t10)
 
-#     def test_viz_verts(self):
-#         p = InsertAllTransitionPts(simple_bit)
-#         self.assertEqual([2, 4, 5, 6, 7], GetVisibleVertices(p,3))
-#         self.assertEqual([0, 1, 3, 4, 5, 6, 7, 8, 10, 11], GetVisibleVertices(p,2))
+     def test_viz_verts(self):
+         p = Partial_Local_Sequence(simple_bit).inserted_polygon
+         self.assertEqual([2, 4, 5, 6, 7], visibleVertices(p,3))
+         self.assertEqual([0, 1, 3, 4, 5, 6, 7, 8, 10, 11], visibleVertices(p,2))
 
-#     def test_viz_gp(self):
-#         p = InsertAllTransitionPts(tworooms)
-#         self.assertEqual([1, 2, 11, 12, 13, 14, 15], GetVisibleVertices(p, 0))
+     def test_viz_gp(self):
+         p = Partial_Local_Sequence(tworooms).inserted_polygon
+         self.assertEqual([1, 2, 11, 12, 13, 14, 15], visibleVertices(p, 0))
 
 #     def test_angle_parallel(self):
 #         a = angleBound(square, 1, 3)

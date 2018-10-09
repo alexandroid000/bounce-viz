@@ -7,17 +7,17 @@ from settings import *
 
 def visibleVertices(poly, j):
     #print('At vertex',j)
-    psize = poly.shape[0]
+    vs = poly.vertices
 
     # Outer boundary polygon must be COUNTER-CLOCK-WISE(ccw)
     # Create the outer boundary polygon
     # Define an epsilon value (should be != 0.0)
-    vpoly = list(map(lambda x: vis.Point(x[0], x[1]), poly))
+    vpoly = list(map(lambda x: vis.Point(x[0], x[1]), vs))
     walls = vis.Polygon(vpoly)
     walls.enforce_standard_form()
 
     # point from which to calculate visibility
-    p1 = poly[j]
+    p1 = vs[j]
     vp1 = vis.Point(*p1)
 
     # Create environment, wall will be the outer boundary because
@@ -30,8 +30,8 @@ def visibleVertices(poly, j):
     vvs = [(isovist[i].x(), isovist[i].y()) for i in range(isovist.n())]
     #print(vvs)
     visibleVertexSet = []
-    for i in range(psize):
-        p = vis.Point(*poly[i])
+    for i in range(poly.size):
+        p = vis.Point(*vs[i])
         vp = copy(p).projection_onto_boundary_of(isovist)
         if (vis.distance(vp, p) < EPSILON) and i != j:
             visibleVertexSet.append(i)
@@ -42,8 +42,7 @@ def visibleVertices(poly, j):
 def get_all_edge_visible_vertices(poly):
     ''' make all sets of vertices visible from everywhere along edge
     '''
-    psize = poly.shape[0]
-    all_viz_vxs = [visibleVertices(poly, i) for i in range(psize)]
+    all_viz_vxs = [visibleVertices(poly, i) for i in range(poly.size)]
     if DEBUG:
         print('All visible verts:\n{}\n'.format(all_viz_vxs))
 
@@ -51,12 +50,12 @@ def get_all_edge_visible_vertices(poly):
     vizSets = []
 
     # get vertices that are visible to the current vertex and the next vertex
-    for i in range(psize):
-        viz_vxs = list(set(all_viz_vxs[i]) & set(all_viz_vxs[(i+1)%psize]))
+    for i in range(poly.size):
+        viz_vxs = list(set(all_viz_vxs[i]) & set(all_viz_vxs[(i+1)%poly.size]))
         # if the following line included, allows transition to next edge by wall
         # following, even if reflex angle
         # TODO: figure out if we want to allow this behavior
-        viz_vxs.append((i+1)%psize) 
+        viz_vxs.append((i+1)%poly.size) 
         # vizSets[i] = viz_vxs
         vizSets.append(viz_vxs)
 
