@@ -11,6 +11,18 @@ from maps import *
 from math import pi
 import numpy as np
 
+def compare(a,b):
+    if not isinstance(b, type(a)):
+        raise TypeError("The two input object must be of same type")
+    else:
+        if isinstance(a, (list, tuple)):
+            for aa, bb in zip(a,b):
+                if not compare(aa, bb):
+                    return False
+            return True
+        else:
+            return np.allclose(a,b)
+
 class TestGeomUtils(unittest.TestCase):
 
      def setUp(self):
@@ -80,18 +92,19 @@ class TestGeomUtils(unittest.TestCase):
          t7 = ShootRaysToReflexFromVerts(poly1, 7)
          t9 = ShootRaysToReflexFromVerts(poly1, 9)
          t10 = ShootRaysToReflexFromVerts(poly1, 10)
-         ts3 = np.array([(np.array([-67.74193548, 182.25806452]), 4, 1), (np.array([109.82142857, 186.60714286]), 1, 5),
-         (np.array([-60., 190.]), 4, 10)])
-         ts7 = np.array([(np.array([-206.18384401, -199.13649025]), 8, 4), (np.array([-127.36842105, -194.21052632]), 8,
-         5)])
-         ts10 = np.array([(np.array([-177.77777778,   50.        ]), 5, 1), (np.array([207.44680851,  11.70212766]), 0, 3),
+         ts3 = [(np.array([-67.74193548, 182.25806452]), 4, 1), (np.array([109.82142857, 186.60714286]), 1, 5),
+         (np.array([-60., 190.]), 4, 10)]
+         ts7 = [(np.array([-206.18384401, -199.13649025]), 8, 4), (np.array([-127.36842105, -194.21052632]), 8,
+         5)]
+         ts10 = [(np.array([-177.77777778, 50.]), 5, 1), (np.array([207.44680851,  11.70212766]), 0, 3),
          (np.array([209.34065934,  40.10989011]), 0, 5), (np.array([205.3602812 ,  56.32688928]), 1, 6),
          (np.array([199.90439771,  63.7667304 ]), 1, 7), (np.array([190.12048193,  77.10843373]), 1,
-         8)])
-         np.testing.assert_allclose(ts3, t3)
-         np.testing.assert_allclose(ts7, t7)
-         np.testing.assert_allclose([], t9)
-         np.testing.assert_allclose(ts10, t10)
+         8)]
+
+         compare(ts3, t3)
+         compare(ts7, t7)
+         compare([], t9)
+         compare(ts10, t10)
 
      def test_viz_verts(self):
          p = Partial_Local_Sequence(simple_bit).inserted_polygon
