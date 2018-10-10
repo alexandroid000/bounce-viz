@@ -1,4 +1,5 @@
 import numpy as np
+from itertools import combinations
 
 def IsThreePointsOnLine(p1, p2, p3):
     ''' Check whether the input three points are colinear
@@ -40,7 +41,7 @@ def SegsInGeneralPos(p1, p2, q1, q2):
 def PolyInGeneralPos(poly):
     ''' Check whether the input polygon is in general position
     '''
-    for (a,b,c) in combinations(poly,3):
+    for (a,b,c) in combinations(poly.vertices,3):
         if IsThreePointsOnLine(a,b,c):
             return False
     return True

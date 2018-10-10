@@ -61,5 +61,5 @@ class Bounce_Visibility_Diagram(object):
     def __init__(self, pls):
         self.resolution = 15
         self.partial_local_sequence = pls
-        self.visible_vx_set_for_edges = get_all_edge_visible_vertices(pls.inserted_polygon.vertices)
+        self.visible_vx_set_for_edges = get_all_edge_visible_vertices(pls.inserted_polygon)
         self.visible_angle_info = self.compute_visible_angle_info(pls, self.visible_vx_set_for_edges, self.resolution)

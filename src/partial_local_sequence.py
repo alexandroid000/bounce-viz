@@ -52,7 +52,8 @@ class Partial_Local_Sequence(object):
         inserted_polygon = Simple_Polygon(np.array(new_vertices))
         return inserted_polygon
 
-    def __init__(self, polygon_vx):
-        self.polygon = polygon_vx
+    # initialized with Simple_Polygon instance
+    def __init__(self, polygon):
+        self.polygon = polygon
         self.sequence_info = self.compute_sequence(self.polygon)
         self.inserted_polygon = self.compute_inserted_polygon(self.polygon, self.sequence_info) 

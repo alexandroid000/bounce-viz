@@ -48,9 +48,9 @@ def SafeAngles(e1, e2):
 def angleBound(poly, i, j):
     ''' the coefficent of 'contraction' for the mapping from edge i to edge j `|f(x) - f(y)| = |x - y| * sin(theta) / sin (theta-phi) -1 < |f(x) - f(y)| < 1` leads to `theta > phi/2 theta < -phi/2` for contraction mapping
     '''
-    n = len(poly)
-    v1 = poly[i] - poly[(i+1) % n]
-    v2 = poly[j] - poly[(j+1) % n]
+    vs = poly.vertices
+    v1 = vs[i] - vs[(i+1) % poly.size]
+    v2 = vs[j] - vs[(j+1) % poly.size]
     phi = AngleBetween(v1, v2)
     return phi/2
 
@@ -68,10 +68,11 @@ def validAnglesForContract(poly, i, j):
     Poly -> Int -> Int -> [(Angle, Angle)]
     '''
     epsilon = 0.0001
-    n = len(poly)
+    n = poly.size
+    vs = poly.vertices
     phi = angleBound(poly, i, j)
-    e1 = (poly[i], poly[(i+1) % n])
-    e2 = (poly[j], poly[(j+1) % n])
+    e1 = (vs[i], vs[(i+1) % n])
+    e2 = (vs[j], vs[(j+1) % n])
     min_a, max_a = AnglesBetweenSegs(e1, e2)
     overlap_1 = intersect_intervals((0,phi),(min_a, max_a))
     overlap_2 = intersect_intervals((np.pi-phi,np.pi),(min_a, max_a))

@@ -17,8 +17,8 @@ class Bounce_Graph(object):
         bvg = nx.DiGraph()
         r_vs = poly.rverts
         for start in range(poly.size):
-            edges = [(start,v,validAnglesForContract(poly.vertices, start, v)) for v in
-            visibleVertices(poly.vertices, start) if check_valid_transit(v, r_vs, start, poly.size, poly.vertices)]
+            edges = [(start,v,validAnglesForContract(poly, start, v)) for v in
+            visibleVertices(poly, start) if check_valid_transit(v, r_vs, start, poly.size, poly.vertices)]
             if requireContract:
                 c_edges = [(i,j, angs) for (i,j,angs) in edges if angs != []]
                 bvg.add_weighted_edges_from(c_edges)
