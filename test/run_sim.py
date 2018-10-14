@@ -4,7 +4,7 @@ sys.path.append('../src')
 from helper.visualization_helper import *
 from bounce_visibility_diagram import Bounce_Visibility_Diagram
 from bounce_graph import Bounce_Graph
-from navigation import Navigation
+from navigation import Navigation, ConstantStrategy
 
 if __name__ == '__main__':
     poly = simple_bit
@@ -17,12 +17,18 @@ if __name__ == '__main__':
     pls2 = Partial_Local_Sequence(poly2)
     origin = poly2.vertices[10]
     sequence = pls2.sequence_info[10]
-    
+
+
     start = (0.1, 0.15)
     goal = (0.51, 0.66)
+    print("Navigating from",start,"to",goal)
     nav_task = Navigation(start, goal, bounce_graph)
     path = nav_task.navigate()
-    print(path)
+    print("Path:",path)
+
+    print("Safe BVG:")
+    print(bounce_graph.safe_action_graph.edges)
+    strat = ConstantStrategy(start, goal, bounce_graph)
 
     visualize_all_partial_order_sequence(pls.polygon.vertices, pls.inserted_polygon.vertices, pls.sequence_info)
     visualize_polygon(poly_vx, poly_name)

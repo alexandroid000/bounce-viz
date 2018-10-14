@@ -144,6 +144,19 @@ class TestGeomUtils(unittest.TestCase):
         self.assertAlmostEqual(min_c, min_a)
         self.assertAlmostEqual(max_c, max_a)
 
+    def test_takestep(self):
+        poly = simple_bit
+        poly_vx = poly.vertices
+        pls = Partial_Local_Sequence(poly)
+        bvd = Bounce_Visibility_Diagram(pls)
+        bounce_graph = Bounce_Graph(bvd)
+        start = (0.1, 0.15)
+        goal = (0.51, 0.66)
+        strat = ConstantStrategy(start, goal, bounce_graph)
+        start_nodes = get_vertices_in_interval(strat.polygon.unit_interval_mapping, start)
+        step = strat.take_step(strat.sbvg, start_nodes[0], [(0, 3.14)])
+        expected_step = [(11, (2.344634311536935, 3.14)), (5, (0, 0.27002561614486065)), (6, (0.4101273405414904, 0.8324325272772132)), (7, (1.4909663410826588, 1.5385494443596421))]
+        compare(step, expected_step)
 
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)

@@ -60,3 +60,40 @@ class Navigation(object):
         self.inserted_polygon = self.pls.inserted_polygon
 
 
+# strategy is a function which performs BFS
+class ConstantStrategy():
+    ''' Navigation assuming our robot can only perform one type of bounce, with
+    uncertainty. Searches safe bounce visibility graph.
+    Attributes
+    ----------
+    start_interval : (float, float)
+        The range of starting position in the unit interval mapping of the polygon
+    end_interval : (float, float)
+        The range of ending position in the unit interval mapping of the polygon
+    bvg : :obj:`Bounce_Visibility_Graph`
+    bvd: :obj:`Bounce_Visibility_Diagram`
+    pls: :obj:`Partial_Local_Sequence`
+    polygon: :obj:`Simple_Polygon`
+    '''
+
+    def __init__(self, start, end, bvg):
+        self.start_interval = start 
+        self.end_interval = end  
+        self.sbvg = bvg.safe_action_graph
+        self.bvd = bvg.bounce_visibility_diagram
+        self.pls = self.bvd.partial_local_sequence
+        self.polygon = self.pls.inserted_polygon
+
+
+    def take_step(self, G, s, angranges):
+        succs = nx.neighbors(G, s)
+        valid_neighbors = []
+        for n in succs:
+            safe_bounce_interval = G[s][n]['weight']
+            res_aranges = [intersect_intervals(i, safe_bounce_interval) for i in angranges]
+            nonempty_ranges = [(n,i) for i in res_aranges if interval_len(i) > EPSILON]
+            if nonempty_ranges != []:
+                valid_neighbors.extend(nonempty_ranges)
+
+        return valid_neighbors
+
