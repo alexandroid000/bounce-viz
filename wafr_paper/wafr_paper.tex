@@ -379,6 +379,7 @@ all partial local sequence points added as new vertices.
 \end{algorithmic}
 \end{algorithm}
 
+The $\textsc{ShootRay}$ function takes two visible vertices $v_{1}$ and $v_{2}$ and compute the first intersection of $\Delta P$ and ray $v_{1}v_{2}$. This operation will take $O(\log n)$ time after preprocessing the polygon $P$ in $O(n)$ \cite{Szirmay-Kalos:1998:WVA:297217.297219}. The $\textsc{VisibleVerts}$ function computes all visible vertices in the polygon given an input query vertex, and takes $O(n)$ \cite{ElGindy1981ALA}. So the total runtime of Algorithm 1 is $O(n^2\log n)$. 
 
 \begin{definition}
 The \textbf{edge visibility graph} of a polygon $P$ has a node for each edge of
