@@ -3,3 +3,4 @@ images/
 docs/
 write_up/*.log
 write_up/*.pdf
+write_up/*.aux
