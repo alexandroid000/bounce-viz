@@ -3,6 +3,7 @@
 from settings import *
 from helper.geometry_helper import *
 from partial_local_sequence import *
+from math import pi
 
 import networkx as nx
 import os
@@ -31,7 +32,7 @@ def SafeAngles(e1, e2):
     (p1,p2) = e1
     (p3,p4) = e2
     if (p1 == p4).all():
-        theta_l = np.pi
+        theta_l = pi
         theta_r = AngleBetween(p2-p1, p3-p2)
     elif (p2 == p3).all():
         theta_r = 0.0
@@ -41,7 +42,7 @@ def SafeAngles(e1, e2):
         theta_r = AngleBetween(p2-p1, p3-p2)
     not_parallel = abs(theta_l - theta_r) > 0.01
     if theta_l > theta_r and not_parallel: # declare lines parallel if within 1 deg
-        return (theta_l, theta_r)
+        return (float(theta_r), float(theta_l))
     else:
         return None
 

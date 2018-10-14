@@ -1,3 +1,7 @@
+import networkx as nx
+from helper.bounce_graph_helper import *
+from math import pi
+
 def get_vertices_in_interval(poly_unit_map, interval):
     ''' Find vertices on the polygon that are in the range specified
     '''
@@ -25,10 +29,10 @@ class Navigation(object):
     ''' Description of a navigation task for a given polygon
     Attributes
     ----------
-    start_position : (float, float)
-        The range of starting position in the unit interval mapping of the polygon
-    end_position : (float, float)
-        The range of ending position in the unit interval mapping of the polygon
+    start_interval : (float, float)
+        The range of starting interval in the unit interval mapping of the polygon
+    end_interval : (float, float)
+        The range of ending interval in the unit interval mapping of the polygon
     bvg : :obj:`Bounce_Visibility_Graph`
     bvd: :obj:`Bounce_Visibility_Diagram`
     pls: :obj:`Partial_Local_Sequence`
@@ -39,16 +43,20 @@ class Navigation(object):
         ''' Executing the navigation task with a given strategy
         '''
         paths = []
-        for g in get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping, self.end_position):
-            for s in get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping, self.start_position):
+        for g in get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping,
+        self.end_interval):
+            for s in get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping,
+            self.start_interval):
                 paths.append(self.bvg.get_shortest_path(s, g, 'safe'))
         return get_transition_over_path(paths[0], self.bvg.safe_action_graph)
 
-    def __init__(self, start_position, end_position, bvg):
-        self.start_position = start_position 
-        self.end_position = end_position  
+    def __init__(self, start_interval, end_interval, bvg):
+        self.start_interval = start_interval 
+        self.end_interval = end_interval  
         self.bvg = bvg
         self.bvd = bvg.bounce_visibility_diagram
         self.pls = self.bvd.partial_local_sequence
         self.polygon = self.pls.polygon
         self.inserted_polygon = self.pls.inserted_polygon
+
+
