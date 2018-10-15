@@ -25,7 +25,7 @@ def get_transition_over_path(path, safe_action_graph):
         transitions.append((i,j,ang_range))
     return transitions
 
-class Navigation(object):
+class FewestBouncesStrategy(object):
     ''' Description of a navigation task for a given polygon
     Attributes
     ----------
@@ -107,12 +107,9 @@ class ConstantStrategy():
 
         for n in nx.neighbors(G, s):
             safe_interval = G[s][n]['weight']
-            print("safe interval", safe_interval)
             resulting_intervals = self.path_filter(angranges, safe_interval)
             if resulting_intervals != []:
-                print("neighbor",n,"ranges", resulting_intervals)
                 valid_neighbors.append( (n, resulting_intervals) )
-        print("found all valid neighbors", valid_neighbors)
         return valid_neighbors
 
 
@@ -122,9 +119,7 @@ class ConstantStrategy():
     # coming soon: union resulting projection of robot state, vizualize estimate
     # [(Angle, Angle)] -> (Angle, Angle) -> [(Angle, Angle)]
     def path_filter(self, old_aranges, safe_interval):
-        print(old_aranges)
         iis = [intersect_intervals(angrange, safe_interval) for angrange in old_aranges]
-        print("new intervals", iis)
         return [i for i in iis if interval_len(i) > EPSILON]
 
 
@@ -132,7 +127,6 @@ class ConstantStrategy():
     def atGoal(self, frontier):
         curr_nodes = [v for (v, angs) in frontier]
         goal = set(self.end)
-        print("curr", curr_nodes)
         curr = set(curr_nodes)
         return goal.issubset(curr)
 
