@@ -155,7 +155,10 @@ class TestGeomUtils(unittest.TestCase):
         strat = ConstantStrategy(start, goal, bounce_graph)
         start_nodes = get_vertices_in_interval(strat.polygon.unit_interval_mapping, start)
         step = strat.take_step(strat.sbvg, start_nodes[0], [(0, 3.14)])
-        expected_step = [(11, (2.344634311536935, 3.14)), (5, (0, 0.27002561614486065)), (6, (0.4101273405414904, 0.8324325272772132)), (7, (1.4909663410826588, 1.5385494443596421))]
+        expected_step = [ (11, [(2.344634311536935, 3.141592653589793)])
+                        , (5, [(0.0, 0.27002561614486065)])
+                        , (6, [(0.4101273405414904, 0.8324325272772132)])
+                        , (7, [(1.4909663410826588, 1.5385494443596421)])]
         compare(step, expected_step)
 
 #    def test_graph_reduce(self):

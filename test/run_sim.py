@@ -29,6 +29,8 @@ if __name__ == '__main__':
     print("Safe BVG:")
     print(bounce_graph.safe_action_graph.edges)
     strat = ConstantStrategy(start, goal, bounce_graph)
+    final_search_state = strat.navigate()
+    print("Results of search:", final_search_state)
 
     visualize_all_partial_order_sequence(pls.polygon.vertices, pls.inserted_polygon.vertices, pls.sequence_info)
     visualize_polygon(poly_vx, poly_name)
