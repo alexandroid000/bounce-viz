@@ -51,59 +51,57 @@ def RayInEdge(sp,bp,ep1,ep2):
 
 # shoot ray from p1 toward p2 in poly, return closest intersect point
 # will not return point on 'last_bounce_edge'
-def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
-    psize = poly.size
-    vs = poly.vertices
+def ClosestPtAlongRay(p1, p2, all_poly_vxs, last_bounce_edge=-1):
     closest_bounce = 100000000000
     bounce_point = np.array([0.0, 0.0])
     found_coll = False
     bounce_edge = last_bounce_edge
-
-    # check each edge for collision
-    for j in range(psize):
-        if (j != last_bounce_edge):
-            v1, v2 = vs[j], vs[(j+1) % psize]
-            try:
-                t,u,pt = ShootRayFromVect(p1, p2, v1, v2)
-                
-                # Find closest bounce for which t > 0
-                pdist = np.linalg.norm(pt-p2)
-                if (t > 0) and (0 < u) and (u < 1) and (pdist < closest_bounce):
-                    found_coll = True
-                    bounce_point = pt
-                    closest_bounce = pdist
-                    bounce_edge = j
-            # bounce was parallel to edge j
-            # check if it's parallel and overlapping for degenerate polys
-            except:
-                pass
+    for poly_vxs in all_poly_vxs:
+        psize = len(poly_vxs)
+        # check each edge for collision
+        for j in range(psize):
+            if (j != last_bounce_edge):
+                v1, v2 = poly_vxs[j][1], poly_vxs[(j+1) % psize][1]
+                try:
+                    t,u,pt = ShootRayFromVect(p1, p2, v1, v2)
+                    print(t, u, pt)
+                    # Find closest bounce for which t > 0
+                    pdist = np.linalg.norm(pt-p2)
+                    if (t > 0) and (0 < u) and (u < 1) and (pdist < closest_bounce):
+                        found_coll = True
+                        bounce_point = pt
+                        closest_bounce = pdist
+                        bounce_edge = poly_vxs[j][0]
+                # bounce was parallel to edge j
+                # check if it's parallel and overlapping for degenerate polys
+                except:
+                    pass
     if found_coll:
         return bounce_point, bounce_edge
     else:
         return False
 
-def ShootRaysFromReflex(poly, j):
+def ShootRaysFromReflex(curr_poly_vxs, all_poly_vxs, j):
     ''' shoot two rays from each reflex vertex, along incident edges
         group by edge so we can insert them in correct order
     '''
-    psize = poly.size
-    vs = poly.vertices
-    p2 = vs[j]
-    p1_ccw = vs[(j+1) % psize]
-    p1_cw = vs[(j-1) % psize]
+    curr_poly_size = len(curr_poly_vxs)
+    p2 = curr_poly_vxs[j][1]
+    p1_ccw = curr_poly_vxs[(j+1) % curr_poly_size][1]
+    p1_cw = curr_poly_vxs[(j-1) % curr_poly_size][1]
 
     int_pts = []
 
     # ClosestPtAlongRay returns False if we shoot ray into existing vertex
-    if ClosestPtAlongRay(p1_ccw,p2,poly,j):
-        pt, k = ClosestPtAlongRay(p1_ccw,p2,poly,j)
-        if not VertexExists(pt, poly):
-            int_pts.append((pt,k, (j+1) % psize))
+    if ClosestPtAlongRay(p1_ccw, p2, all_poly_vxs, j):
+        pt, k = ClosestPtAlongRay(p1_ccw, p2, all_poly_vxs, j)
+        if not VertexExists(pt, all_poly_vxs):
+            int_pts.append((pt,k, (j+1) % curr_poly_size))
 
-    if ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize)):
-        pt, k = ClosestPtAlongRay(p1_cw,p2,poly,((j-1) % psize))
-        if not VertexExists(pt, poly):
-            int_pts.append((pt,k, (j-1) % psize))
+    if ClosestPtAlongRay(p1_cw, p2, all_poly_vxs, ((j-1) % curr_poly_size)):
+        pt, k = ClosestPtAlongRay(p1_cw, p2, all_poly_vxs, ((j-1) % curr_poly_size))
+        if not VertexExists(pt, all_poly_vxs):
+            int_pts.append((pt, k, (j-1) % curr_poly_size))
 
     return int_pts
 

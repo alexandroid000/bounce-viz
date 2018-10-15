@@ -19,14 +19,22 @@ class Partial_Local_Sequence(object):
         '''
         rvs = input_polygon.rverts
         sequence_info = []
-        for i in range(input_polygon.size):
-            if not i in rvs:
-                sequence_info.append([])
-                continue
-            r_children = ShootRaysFromReflex(input_polygon, i)
-            transition_pts = ShootRaysToReflexFromVerts(input_polygon, i)
-            transition_pts.extend(r_children)
-            sequence_info.append(transition_pts)
+        def compute_seq_for_single_polygon(curr_polygon_vx):
+            curr_seq_info = []
+            for i in range(len(curr_polygon_vx)):
+                if not i in rvs:
+                    curr_seq_info.append([])
+                    continue
+                r_children = ShootRaysFromReflex(curr_polygon_vx, input_polygon.all_poly_vx, i)
+                print(r_children)
+                # transition_pts = ShootRaysToReflexFromVerts(input_polygon, i)
+                transition_pts = []
+                transition_pts.extend(r_children)
+                curr_seq_info.append(transition_pts)
+            return curr_seq_info
+        sequence_info.extend(compute_seq_for_single_polygon(input_polygon.outer_boundary_vertices))
+        for hole in input_polygon.holes:
+            sequence_info.extend(compute_seq_for_single_polygon(hole))
         return sequence_info
 
 
@@ -38,22 +46,29 @@ class Partial_Local_Sequence(object):
             for (pt, edge, _) in sequence_info[i]:
                 t_pts_grouped[edge].append(pt)
         
-        # sort transition points along edge
-        new_poly_grouped = {}
-        for i in range(polygon.size):
-            new_poly_grouped[i] = sort_by_distance(polygon.vertices[i], np.array(t_pts_grouped[i]))
-            if DEBUG:
-                print('Inserted verts', new_poly_grouped[i], 'on edge',i)
+        def get_new_vertices_for_single_polygon(curr_polygon_vx):
+            # sort transition points along edge
+            new_poly_grouped = {}
+            for i in range(len(curr_polygon_vx)):
+                new_poly_grouped[i] = sort_by_distance(curr_polygon_vx[i][1], np.array(t_pts_grouped[curr_polygon_vx[i][0]]))
+                if DEBUG:
+                    print('Inserted verts', new_poly_grouped[i], 'on edge',i)
 
-        inserted_polygon = []
-        new_vertices = []
-        for i in range(polygon.size):
-            new_vertices.extend(new_poly_grouped[i])
-        inserted_polygon = Simple_Polygon(np.array(new_vertices))
+            inserted_polygon = []
+            new_vertices = []
+            for i in range(len(curr_polygon_vx)):
+                new_vertices.extend(new_poly_grouped[i])
+            return new_vertices
+        new_vertices = get_new_vertices_for_single_polygon(polygon.outer_boundary_vertices)
+        new_holes = []
+        for hole in polygon.holes:
+            new_holes.append(get_new_vertices_for_single_polygon(hole))
+        inserted_polygon = Simple_Polygon('inserted_' + polygon.name, np.array(new_vertices), new_holes)
         return inserted_polygon
 
     # initialized with Simple_Polygon instance
     def __init__(self, polygon):
         self.polygon = polygon
         self.sequence_info = self.compute_sequence(self.polygon)
+        print(self.sequence_info)
         self.inserted_polygon = self.compute_inserted_polygon(self.polygon, self.sequence_info) 
