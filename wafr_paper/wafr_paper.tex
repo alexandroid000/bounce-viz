@@ -29,6 +29,7 @@
 % skeptical questions:
 
 % - what if the robot starts very near to a boundary of equivalence classes?
+% - why not just use wall-following?
 
 % Using Visibility Equivalence Classes for High-Level Dynamical Path Synthesis
 
@@ -83,7 +84,7 @@ Inspired by motion patterns of some commercially available mobile robots, we
 investigate the power of robots that move forward in straight lines until
 colliding with an environment boundary, at which point they can rotate in place
 and move forward again; we visualize this as the robot ``bouncing'' off
-boundaries. Different boundary interaction laws can be defined for such robots,
+boundaries. Different boundary interaction rules can be defined for such robots,
 such as one that orients the robot relative to its heading prior to collision,
 or relative to the normal of the boundary. We introduce a new data structure,
 the {\em bounce visibility graph}, which is generated from a polygonal
@@ -273,13 +274,13 @@ moves forward until the next contact with the boundary at stage $k+1$.
 \begin{figure}
     \includegraphics[width=0.8\linewidth]{figures/bounce_examples.pdf}
     \centering
-    \caption[test]{\label{fig:bex}Examples of different ``bounce laws'' that can be implemented on
+    \caption[test]{\label{fig:bex}Examples of different ``bounce rules'' that can be implemented on
 mobile robots. In the first row, $b(\alpha, \theta) = \theta$, which we refer to
-as a \textbf{fixed} bounce law. In the second row, we have a \textbf{monotonic
-fixed} bounce law, in which
+as a \textbf{fixed} bounce rule. In the second row, we have a \textbf{monotonic
+fixed} bounce rule, in which
 $b(\alpha, \theta) = \theta$ or $\pi-\theta$, depending on what is necessary to
 preserve monotonicity of travel direction along the $x$ axis. In the third
-row, we have a \textbf{relative} bounce law, $b(\alpha, \theta) = \alpha - \theta$, rotating $\alpha$ through $\theta$ in the clockwise
+row, we have a \textbf{relative} bounce rule, $b(\alpha, \theta) = \alpha - \theta$, rotating $\alpha$ through $\theta$ in the clockwise
 direction. It is possible that this rotation will cause the 
 heading of the robot to still be facing into the boundary, in which case the robot 
 performs the rotation again until its heading points into the free space.
@@ -289,24 +290,24 @@ performs the rotation again until its heading points into the free space.
 \begin{definition}
 Let $\alpha \in (0,\pi)$ be the robot's incoming heading relative to the
 environment boundary at the point of contact. Let $\theta \in (0,\pi)$ be a control parameter. A 
-\textbf{bounce law} $b$ maps $\alpha$ and $\theta$ to an action
+\textbf{bounce rule} $b$ maps $\alpha$ and $\theta$ to an action
 $u$, and determines how the robot will reorient itself when it collides with a
-boundary. Bounce laws are defined in the
+boundary. Bounce rules are defined in the
 frame in which the environment normal is aligned with the positive $y$ axis and the
 robot's point of contact with the boundary is the origin.
 \end{definition}
 \begin{definition}
-A \textbf{nondeterministic bounce law} is a bounce law lifted to return a set of actions. 
-In this paper, we will restrict nondeterministic bounce laws to
+A \textbf{nondeterministic bounce rule} is a bounce rule lifted to return a set of actions. 
+In this paper, we will restrict nondeterministic bounce rules to
 return a convex set of actions (a single interval in $(0, \pi)$).
 \end{definition}
 
-For example, a specular bounce (laser beams, billiard balls) has bounce law
+For example, a specular bounce (laser beams, billiard balls) has bounce rule 
 $b(\alpha, \theta) = \pi - \alpha$. See Figure \ref{fig:bex} for more
-examples of bounce laws. 
+examples of bounce rules. 
 
 \begin{definition}
-A \textbf{bounce strategy} is a sequence of nondeterministic bounce laws.
+A \textbf{bounce strategy} is a sequence of nondeterministic bounce rules.
 \end{definition}
 Uncertainty is modelled by computing strategies which result in the robot achieving its goal as long as it executes an
 action in the specified \emph{interval} at each stage.
@@ -535,7 +536,7 @@ The proof of Proposition \ref{prop:complexity} is left to the Appendix.
 One major advantage of this approach is that it allows us to characterize
 properties of families of paths the robot may take. For example, the  
 two paths in Figure \ref{fig:twopaths} are produced by different sequences of
-bounce laws and visit different points of $\partial P$, but have the same sequence of edge collisions and have the same overall
+bounce rules and visit different points of $\partial P$, but have the same sequence of edge collisions and have the same overall
 dynamical behavior (escape the room on the left, travel through hallway, then
 patrol the room on the right in a periodic orbit).
 
@@ -786,7 +787,8 @@ Without loss of generality, assume $\theta \in (0, \frac{\pi}{2}]$. The robot wi
 to the next adjacent edge if and only if
 $\theta \in (0, \min_{i}(\angle v_{i+2}v_{i}v_{i+1}))$.
 
-Suppose we have two start positions $s_1$ and $s_2$ on edge $e_0$ and a constant fixed bounce law $b(\alpha, \theta) = \theta$.
+Suppose we have two start positions $s_1$ and $s_2$ on edge $e_0$ and a constant fixed bounce r
+ule$b(\alpha, \theta) = \theta$.
 At stage $k$, $s_1$ and $s_2$ will be located at $f^{k}(s_1,\theta)$ and
 $f^{k}(s_2,\theta)$. 
 
@@ -838,7 +840,7 @@ controller must result in limit cycle from every point in $P$. \qed
 \subsection{Navigation}
 
 Here, we define the \emph{navigation} task. Informally, we wish to compute a strategy 
-of nondeterministic bounce laws taking a robot
+of nondeterministic bounce rules taking a robot
 from any point in a starting set to a point in a goal set. We require that the start and goal sets are
 convex (single intervals $[s_1, s_2] \subset \partial P$).
 
@@ -871,7 +873,7 @@ we will describe a few options.
 \label{algo:nav}
 \hspace*{\algorithmicindent} \textbf{Input:} A polygon $P$, intervals $S$ and
 $G$ in $\partial P$, and an integer bound $k$.\\
-\hspace*{\algorithmicindent} \textbf{Output:} A strategy (list of bounce laws),
+\hspace*{\algorithmicindent} \textbf{Output:} A strategy (list of bounce rules),
 or a special value \textsc{None} if no strategy can be found.
 \begin{algorithmic}[1]
 \State $P' \gets$ \Call{PartitionPoly}{$P$}
@@ -941,12 +943,12 @@ question.
 \textbf{Making Concise Strategies:}
 The edge
 information along the paths can be used to create concise strategies which require 
-only a few bounce laws. The most concise strategy is
+only a few bounce rules. The most concise strategy is
 a constant controller $b(\alpha,
 \theta) = \theta$. To determine if such a strategy is possible for a given path, 
 intersect all safe action intervals along the path and check if the
 resulting interval is nonempty. In general, deciding whether a given path may be
-executed with $k$ constant fixed bounce law controllers is the interval
+executed with $k$ constant fixed bounce rule controllers is the interval
 hitting-set problem, which is NP-hard, though in practice we are mostly
 interested in small $k$. Perhaps some geometric heuristics can be found to solve
 the problem more efficiently in certain cases.
@@ -980,7 +982,8 @@ cycle reachable from all points in $S$.
 \end{definition}
 
 To solve this patrolling task, we leverage Proposition \ref{prop:cycle} which
-states that a limit cycle is reachable under some constant fixed-angle bounce law
+states that a limit cycle is reachable under some constant fixed-angle bounceru
+le
 from all points in $\partial P$. To determine if a single strategy will hold 
 for all $s \in S$, if $S$ spans multiple partitions in $\partial P'$, we can intersect
 the angle constraints for paths to cycles from $S$, and check for a non-empty intersection.
@@ -1037,19 +1040,19 @@ paths and strategies for a class of mobile robots. This approach gives insights
  into the feasibility of nondeterministic control of such robots; however, many open
 questions remain!
 
-\textbf{Comparing bounce laws.} Our approach can be used to compare different families of
+\textbf{Comparing bounce rules.} Our approach can be used to compare different families of
 bounce strategies in a given polygon, by comparing the reachability of the
 transition systems induced by each strategy family. This would require 
 either reducing the full bounce visibility graph given constraints on
 possible bounces, or constructing a more appropriate transition
-system. It is not clear the best way to analyze relative bounce laws, in which the
+system. It is not clear the best way to analyze relative bounce rules, in which the
 outgoing angle of a robot after a collision is a function of the incoming angle.
 One method would be to choose a subset of configuration space to be the initial
 conditions of such a robot, and then propagate this set forward.
 
 \textbf{Optimal Strategies.} Say we wish to
 find the strategy taking the robot from region $S$ to region $G$ with the
-maximum amount of allowed uncertainty in the bounce laws (the sum of the
+maximum amount of allowed uncertainty in the bounce rules (the sum of the
 interval sizes of each action set along the path). This problem can be framed as
 an optimization problem over the space of all transition function compositions.
 
