@@ -85,8 +85,8 @@ class Simple_Polygon(object):
         def plot_vertices(vertices):
             for vx in vertices:
                 point = vx[1]
-                plt.scatter(point[0], point[1], color=colors[vx[0]], s=100)
-                plt.annotate(str(vx[0]), (point[0]+5, point[1]+20), size = 20)
+                plt.scatter(point[0], point[1], color=colors[vx[0]], s=60)
+                plt.annotate(str(vx[0]), (point[0], point[1]), size = 10)
 
         plot_vertices(self.outer_boundary_vertices)
         for hole in self.holes:
