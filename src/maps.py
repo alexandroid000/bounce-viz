@@ -6,7 +6,8 @@ import numpy as np
 from simple_polygon import Simple_Polygon
 # Some initial polygons
 # Use these below (inside main() to set the initial shape poly
-median_holes = Simple_Polygon('median_holes', np.array([(0.0, 0.0), (7.0, 0.0), (7.0, 2.0), (6.0, 2.0), (6.0, 4.0), (7.0, 4.0), (7.0, 7.0), (0.0, 7.0)]), [np.array([(1.0, 1.0), (2.0, 5.0), (4.0, 1.0)])])
+small_holes = Simple_Polygon('small_holes', np.array([(0., 4.), (8.,0.), (7., 5.), (8., 8.)]), [np.array([(3., 5.), (6., 6.), (6., 3.)])])
+# median_holes = Simple_Polygon('median_holes', np.array([(0.0, 0.0), (7.0, 0.0), (7.0, 2.0), (6.0, 2.0), (6.0, 4.0), (7.0, 4.0), (7.0, 7.0), (0.0, 7.0)]), [np.array([(1.0, 1.0), (2.0, 5.0), (4.0, 1.0)])])
 # simple_holes = Simple_Polygon('simple_holes', np.array([(0.0, 0.0), (7.0, 0.0), (7.0, 7.0), (0.0, 7.0)]), [np.array([(1.0, 1.0), (2.0, 5.0), (4.0, 1.0)])])
 # orthogonal_env_1 = Simple_Polygon('orthogonal_env_1', np.array([(5.0, 2.0), (4.0, 2.0), (4.0, 3.0), (5.0, 3.0), (5.0, 5.0), (4.0, 5.0), (4.0, 4.0), (3.0, 4.0), (3.0, 5.0), (2.0, 5.0), (2.0, 4.0), (1.0, 4.0), (1.0, 3.0), (3.0, 3.0), (3.0, 1.0), (5.0, 1.0)]))
 # orthogonal_env_holes = Simple_Polygon('orthogonal_env_holes', np.array([(5.0, 2.0), (4.0, 2.0), (4.0, 3.0), (5.0, 3.0), (5.0, 5.0), (4.0, 5.0), (4.0, 4.0), (3.0, 4.0), (3.0, 5.0), (2.0, 5.0), (2.0, 4.0), (1.0, 4.0), (1.0, 3.0), (3.0, 3.0), (3.0, 1.0), (5.0, 1.0), ]), [np.array([(3.5, 2.8), (2.8, 3.5), (4.2, 3.5)])])

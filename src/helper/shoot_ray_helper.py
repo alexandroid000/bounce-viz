@@ -146,8 +146,6 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, all_poly_vxs, j):
                 if res:
                     pt, k = res
                     if not VertexExists(pt, all_poly_vxs):
-                        # (IsInPoly((pt+r_v)/2, vis_poly_vx) and
-                        #print('successful insert')
                         pts.append((pt, k, v))
     return pts
 
@@ -156,7 +154,8 @@ def vector_bwt_two_vector(input_vector, bv1, bv2):
         return (np.cross(bv1, input_vector) >= 0 and np.cross(bv2, input_vector) <= 0)
     else:
         return (np.cross(bv1, input_vector) < 0 and np.cross(bv2, input_vector) > 0)
-# TODO: fix is in poly to accept polygons with holes
+
+# this does not work with holes
 def IsInPoly(p, poly_vx):
     ''' test if point p is in poly using crossing number
     '''

@@ -34,8 +34,8 @@ class Bounce_Visibility_Diagram(object):
         np.array
             The visible angle info for the input polygon
         '''
-        i_poly_vx = pls.inserted_polygon.vertices
-        psize =  pls.inserted_polygon.size
+        i_poly_vx = pls.inserted_polygon.outer_boundary_vertices
+        psize =  len(i_poly_vx)
         visible_angle_info = np.nan*np.ones((psize, resolution*psize))
         for i, visible_vxs in enumerate(visible_vx_set_for_edges):
             for vx_index in visible_vxs:

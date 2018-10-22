@@ -49,23 +49,33 @@ def visibleVertices(curr_poly_vx, all_poly_vx, j):
 def get_all_edge_visible_vertices(poly):
     ''' make all sets of vertices visible from everywhere along edge
     '''
-    all_viz_vxs = [visibleVertices(poly, i) for i in range(poly.size)]
-    if DEBUG:
-        print('All visible verts:\n{}\n'.format(all_viz_vxs))
+    for index, curr_poly_vx in enumerate(poly.all_poly_vx):
+        curr_viz_vxs = [visibleVertices(curr_poly_vx, poly.all_poly_vx, i) for i in range(len(curr_poly_vx))]
+        # if DEBUG:
+        print('All visible verts:\n{}\n'.format(curr_viz_vxs))
 
-    # each element in the map is indexed by its clockwise vertex (smaller index)
-    vizSets = []
+        # each element in the map is indexed by its clockwise vertex (smaller index)
+        vizSets = []
 
-    # get vertices that are visible to the current vertex and the next vertex
-    for i in range(poly.size):
-        viz_vxs = list(set(all_viz_vxs[i]) & set(all_viz_vxs[(i+1)%poly.size]))
-        # if the following line included, allows transition to next edge by wall
-        # following, even if reflex angle
-        # TODO: figure out if we want to allow this behavior
-        viz_vxs.append((i+1)%poly.size) 
-        # vizSets[i] = viz_vxs
-        vizSets.append(viz_vxs)
+        # get vertices that are visible to the current vertex and the next vertex
+        for i in range(len(curr_poly_vx)):
+            viz_vxs = get_common_list_of_list(curr_viz_vxs[i], curr_viz_vxs[(i+1)%len(curr_poly_vx)])
+            # if the following line included, allows transition to next edge by wall
+            # following, even if reflex angle
+            # TODO: figure out if we want to allow this behavior
+            viz_vxs[index].append((i+1)%len(curr_poly_vx)) 
+            # vizSets[i] = viz_vxs
+            vizSets.append(viz_vxs)
 
-    if DEBUG:
+        # if DEBUG:
         print('viz sets\n--------\n{}\n'.format(vizSets))
     return vizSets 
+
+def get_common_list_of_list(ll_1, ll_2):
+    # ll_1 and ll_2 should have the same size
+    l_size = len(ll_1)
+    common_list = []
+    for i in range(l_size):
+        common_list.append(list(set(ll_1[i]) & set(ll_2[i])))
+    return common_list
+
