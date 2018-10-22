@@ -120,6 +120,11 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, all_poly_vxs, j):
         Poly -> Int -> [(Point, Int)]
     '''
     r_v = curr_poly_vxs[j][1]
+    prev_r_v = curr_poly_vxs[j-1][1]
+    next_r_v = curr_poly_vxs[(j+1)%len(curr_poly_vxs)][1]
+    bv1 = r_v - prev_r_v
+    bv2 = r_v - next_r_v
+
     pts = []
     # TODO: fix visible vertices to accept polygons with holes
     visible_verts = visibleVertices(curr_poly_vxs, all_poly_vxs, j)
@@ -128,21 +133,29 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, all_poly_vxs, j):
     # only ray shoot from non-adjacent vertices
     # previous and next neighbors always visible
     for index, curr_vis_vx_set in enumerate(visible_verts):
-        curr_poly_vx = all_poly_vxs[index]
-        curr_poly_size = len(curr_poly_vx)
+        vis_poly_vx = all_poly_vxs[index]
+        vis_poly_size = len(vis_poly_vx)
         for v in curr_vis_vx_set:
             print('vis vx: ', v)
-            if (curr_poly_index == index and v != (j-1)%curr_poly_size) and (v != (j+1)%curr_poly_size) or (curr_poly_index != index):
+            if (curr_poly_index == index and v != (j-1)%vis_poly_size) and (v != (j+1)%vis_poly_size) or (curr_poly_index != index):
                 print('shooting ray from',v,'to',j)
-                res = ClosestPtAlongRay(curr_poly_vx[v][1], r_v, all_poly_vxs)
+                mid_vector = vis_poly_vx[v][1] - r_v
+                if (vector_bwt_two_vector(mid_vector, bv1, bv2)):
+                    continue
+                res = ClosestPtAlongRay(vis_poly_vx[v][1], r_v, all_poly_vxs)
                 if res:
                     pt, k = res
                     if not VertexExists(pt, all_poly_vxs):
-                        # (IsInPoly((pt+r_v)/2, curr_poly_vx) and
+                        # (IsInPoly((pt+r_v)/2, vis_poly_vx) and
                         #print('successful insert')
                         pts.append((pt, k, v))
     return pts
 
+def vector_bwt_two_vector(input_vector, bv1, bv2):
+    if np.cross(bv1, bv2) >= 0:
+        return (np.cross(bv1, input_vector) >= 0 and np.cross(bv2, input_vector) <= 0)
+    else:
+        return (np.cross(bv1, input_vector) < 0 and np.cross(bv2, input_vector) > 0)
 # TODO: fix is in poly to accept polygons with holes
 def IsInPoly(p, poly_vx):
     ''' test if point p is in poly using crossing number

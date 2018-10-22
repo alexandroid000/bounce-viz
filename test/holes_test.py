@@ -7,7 +7,7 @@ from bounce_graph import Bounce_Graph
 from navigation import Navigation
 
 if __name__ == '__main__':
-    poly = orthogonal_env_holes
+    poly = median_holes 
     pls = Partial_Local_Sequence(poly)
     # bvd = Bounce_Visibility_Diagram(pls)
     # bounce_graph = Bounce_Graph(bvd)
