@@ -591,20 +591,33 @@ how we generate constraints on robot uncertainty instead of assuming uncertainty
 bounds are an input to the algorithm.
 
 \begin{lemma}
-If two segments in $\partial P'$ are entirely visible to each other, then there will be at least one safe
+If two edges in $\partial P'$ are entirely visible to each other, then there will be at least one safe
 action between them.
 \end{lemma}
 
 See Appendix for proof.
 
 \begin{corollary} \label{coro:neighbor}
-If two segments in $\partial P'$ share a vertex that is not reflex, then there exist safe actions
+If two edges in $\partial P'$ share a vertex that is not reflex, and the two
+ edges are not collinear, then there exist safe actions
 from one to the other in both directions.
 \end{corollary}
 
 To see why Corollary \ref{coro:neighbor} holds, observe that a line drawn
-between the non-overlapping endpoints of the segments defines a family of safe
-actions between the line and the segments themselves.
+between the non-overlapping endpoints of the edges defines a family of safe
+actions: any action parallel to this line or at a shallower angle is guaranteed
+to transition between the edges.
+
+\begin{definition}
+Given two entirely visible segments $e_i$ and $e_j$,
+rotate frame such that $e_i$ is aligned with the $x-$axis with its normal pointing
+along the positive $y-$axis, such that 
+segment $e_j$ is above segment $e_i$. If the intersection of segment $e_i$ and
+$e_j$ would be on the left of segment $e_i$, then call the transition from $e_i$ to $e_j$ a
+\textbf{left
+transition}; if the intersection would be on the right of segment $e_i$, then call the
+transition a \textbf{right transition}.
+\end{definition}
 
 \begin{proposition} \label{prop:twosafe}
 For every simple polygon $P$ and the resulting partitioned polygon $P'$ under Algorithm
@@ -613,20 +626,35 @@ transitions away from $e$.
 \end{proposition}
 
 \begin{proof}
-By Corollary \ref{coro:neighbor}, if a segment
-$e_i$ has an adjacent segment not separated by a reflex angle, a safe
-transition exists between the segments.
 
-Otherwise, one or more of the adjacent edges to $e_i$ is
-separated by a reflex angle. By Algorithm \ref{algo:insert} a vertex
-will be inserted in line with $e_i$ on the closest visible edge. Call the
-segment counterclockwise from this inserted vertex $e_j$.
-$e_j$ must be entirely visible from $e_i$; otherwise, a vertex would have been
-inserted from whatever structure is blocking visibility. 
-Thus, there must be a safe action from $e_i$ to $e_j$, by the same argument as Corollary
-\ref{coro:neighbor}.
+Let $e_i = (v_i, v_{i+1})$. Consider first only right transitions from $e_i$,
+where the safe action interval $\tilde{\theta}$ begins at $\theta_r = 0$ and
+ends at some nonzero $\theta_l$. We will show that such a transition must exist.
 
-Thus, each endpoint of $e_i$ will induce a safe action, leading to two guaranteed safe actions.
+By Corollary \ref{coro:neighbor}, if an edge $e_i$ has an adjacent edge
+$e_{i+1}$ which is not collinear or separated by a reflex angle, a safe transition exists
+between $e_i$ and $e_{i+1}$.
+
+If the adjacent edge is at a reflex angle, Algorithm 
+\ref{algo:insert} will insert a vertex in line with $e_i$ on the closest visible edge. 
+This vertex will be one endpoint of an edge $e_k$. $e_k$ must be entirely
+visible from $e_i$, since Algorithm \ref{algo:insert} will insert a vertex for
+any obstruction visible from $v_i$.
+
+If the adjacent edge is collinear to $e_i$, the above reasoning can be extended
+to the next edge along $\partial P$ which is not collinear. If $e_i$ is an edge
+where both vertices were inserted by Algorithm \ref{algo:insert}, it is not
+immediately obvious that this will result in a safe transition, since $v_i$ will
+not have transition points inserted by Algorithm \ref{algo:insert}. 
+
+All the same arguments extend symmetrically to left transitions, which will have
+safe actions of the form $\tilde{\theta} = [\theta_l, \pi)$.
+
+Thus, each edge will have two guaranteed safe actions leading away from it, in
+some open interval of actions bordering the edge in each direction.
+
+{\color{red} TODO: replace with figure proof?}
+
 \qed
 \end{proof}
 
@@ -692,16 +720,6 @@ $x, y \in M$, $\lvert g(x) - g(y) \rvert \leq c \lvert x-y \rvert$, and $0 \leq 
 In our case, we will always take $M$ to be an interval in $\mathbb{R}$ and we
 will use the L1 norm.
 
-\begin{definition}
-Given two entirely visible segments $e_i$ and $e_j$,
-rotate frame such that $e_i$ is aligned with the $x-$axis with its normal pointing
-along the positive $y-$axis, such that 
-segment $e_j$ is above segment $e_i$. If the intersection of segment $e_i$ and
-$e_j$ would be on the left of segment $e_i$, then call the transition from $e_i$ to $e_j$ a
-\textbf{left
-transition}; if the intersection would be on the right of segment $e_i$, then call the
-transition a \textbf{right transition}.
-\end{definition}
 
 \begin{lemma} \label{lemma:angrange}
 If the transition from segment $e_i$ to segment $e_j$ is a left transition, then the
@@ -839,10 +857,12 @@ controller must result in limit cycle from every point in $P$. \qed
 
 \subsection{Navigation}
 
-Here, we define the \emph{navigation} task. Informally, we wish to compute a strategy 
-of nondeterministic bounce rules taking a robot
-from any point in a starting set to a point in a goal set. We require that the start and goal sets are
-convex (single intervals $[s_1, s_2] \subset \partial P$).
+Here, we define the \emph{navigation} task, which in our case will assume that
+our robot has unavoidable uncertainty in its actuation. Thus, we wish to compute 
+a strategy of \emph{nondeterministic bounce rules} guaranteed to take a robot
+from any point in a starting set to a point in a goal set, as long as some
+action in the bounce angle interval is successfully executed at each stage. 
+We require that the start and goal sets are convex (single intervals $[s_1, s_2] \subset \partial P$).
 
 \begin{definition}
 \textbf{Navigation}:
@@ -852,24 +872,26 @@ will be guaranteed to take the robot from any point in $S$ to a point in $G$, or
 determine that no such strategy exists.
 \end{definition}
 
-Using Definition \ref{def:sa}, we can create a \emph{safe roadmap}, $G_{safe}$,
-out of the 
-bounce visibility graph by traversing all edges and removing edges with an 
-empty $\tilde{\theta}_{max}$, and labelling the remaining edges with the interval 
-of safe actions.
+Using the formalisms built up so far, we can perform the navigation task as a
+search over a discrete bounce visibility graph. Shortest paths in the graph 
+will correspond to paths with the fewest number of bounces. Many different
+strategies for searching this graph could be defined; here, we will show how to
+search for a constant fixed-angle bounce controller, such as the one analyzed in
+\cite{NilBecLav17} for regular polygons.
 
-$G_{safe}$ can be used to generate strategies for the
-robot which take it from segment $e_{start} \subseteq S$ to segment $e_{end}
-\subseteq G$: each path in
-$G_{safe}$ from the nodes corresponding to $e_{start}$ to $e_{end}$ represents
-such a strategy. In general, one can find all paths (up to a bounded length)
-between start and goal node sets and then transform this
-path set into a strategy. See Algorithm \ref{algo:nav} for a pseudocode
-description of this process. The definition of \textsc{GetStrategy} can vary;
-we will describe a few options.
+We define a few helper functions:
+
+\begin{itemize}
+\item \textsc{mkBVG}: Uses the visibility information generated in Algorithm
+\ref{algo:insert} to generate the bounce visibility graph in $O(n^4)$ time.
+\item \textsc{mkSafeBVG}: Using Definition \ref{def:sa} and Proposition \ref{prop:saferange}, we can create a \emph{safe roadmap}, $G_{safe}$,
+        out of the bounce visibility graph by traversing all edges and removing edges with an 
+        empty $\tilde{\theta}_{max}$, and labelling the remaining edges with the interval 
+        of safe actions.
+\end{itemize}
 
 \begin{algorithm}
-\caption{\textsc{SafeNavigate}($P$, $S$, $G$, $k$)}
+\caption{\textsc{SafeConstantFixedNavigate}($P$, $S$, $G$, $k$)}
 \label{algo:nav}
 \hspace*{\algorithmicindent} \textbf{Input:} A polygon $P$, intervals $S$ and
 $G$ in $\partial P$, and an integer bound $k$.\\
@@ -877,10 +899,9 @@ $G$ in $\partial P$, and an integer bound $k$.\\
 or a special value \textsc{None} if no strategy can be found.
 \begin{algorithmic}[1]
 \State $P' \gets$ \Call{PartitionPoly}{$P$}
-\State $G_{safe} \gets$ \Call{mkSafeGraph}{$P'$}
-\State $paths \gets$ \Call{GetAllPaths}{$G_{safe}$, $S$, $k$}
-\Comment $k$ bounds the path length
-\State \textbf{return} \Call{GetStrategy}{$paths$}
+\State $BVG \gets$ \Call{mkBVG}{$P'$}
+\State $BVG_{safe} \gets$ \Call{mkSafeBVG}{$BVG$}
+\State \textbf{return} \Call{SearchConstantFixedStrats}{$BVG_{safe}$, $S$, $G$, $k$}
 \end{algorithmic}
 \end{algorithm}
 
