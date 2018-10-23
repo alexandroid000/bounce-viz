@@ -32,7 +32,6 @@ def visibleVertices(curr_poly_vx, all_poly_vx, j):
     vp1.snap_to_vertices_of(env, EPSILON)
     isovist = vis.Visibility_Polygon(vp1, env, EPSILON)
     vvs = [(isovist[i].x(), isovist[i].y()) for i in range(isovist.n())]
-    print('vvs: ', vvs)
     visibleVertexSet = []
     for poly_vx in all_poly_vx:
         curr_vis_vx = []
@@ -49,13 +48,14 @@ def visibleVertices(curr_poly_vx, all_poly_vx, j):
 def get_all_edge_visible_vertices(poly):
     ''' make all sets of vertices visible from everywhere along edge
     '''
+    total_viz_sets = []
     for index, curr_poly_vx in enumerate(poly.all_poly_vx):
         curr_viz_vxs = [visibleVertices(curr_poly_vx, poly.all_poly_vx, i) for i in range(len(curr_poly_vx))]
         # if DEBUG:
         print('All visible verts:\n{}\n'.format(curr_viz_vxs))
 
         # each element in the map is indexed by its clockwise vertex (smaller index)
-        vizSets = []
+        curr_viz_sets = []
 
         # get vertices that are visible to the current vertex and the next vertex
         for i in range(len(curr_poly_vx)):
@@ -65,11 +65,13 @@ def get_all_edge_visible_vertices(poly):
             # TODO: figure out if we want to allow this behavior
             viz_vxs[index].append((i+1)%len(curr_poly_vx)) 
             # vizSets[i] = viz_vxs
-            vizSets.append(viz_vxs)
+            curr_viz_sets.append(viz_vxs)
 
         # if DEBUG:
-        print('viz sets\n--------\n{}\n'.format(vizSets))
-    return vizSets 
+        print('viz sets\n--------\n{}\n'.format(curr_viz_sets))
+        total_viz_sets.append(curr_viz_sets)
+        
+    return total_viz_sets 
 
 def get_common_list_of_list(ll_1, ll_2):
     # ll_1 and ll_2 should have the same size

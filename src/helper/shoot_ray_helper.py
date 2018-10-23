@@ -64,12 +64,10 @@ def ClosestPtAlongRay(p1, p2, all_poly_vxs, last_bounce_edge=-1):
             # TODO: why is this line here???
             # if (j != last_bounce_edge):
             v1, v2 = poly_vxs[j][1], poly_vxs[(j+1) % psize][1]
-            print('check edge: ', v1, v2)
             try:
                 t,u,pt = ShootRayFromVect(p1, p2, v1, v2)
                 # Find closest bounce for which t > 0
                 pdist = np.linalg.norm(pt-p2)
-                print('edge stats: ', (t > 0) , (u > 0) , (u < 1) , (pdist < closest_bounce))
                 if (t > 0) and (u > 0) and (u < 1) and (pdist < closest_bounce):
                     found_coll = True
                     bounce_point = pt
@@ -136,9 +134,9 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, all_poly_vxs, j):
         vis_poly_vx = all_poly_vxs[index]
         vis_poly_size = len(vis_poly_vx)
         for v in curr_vis_vx_set:
-            print('vis vx: ', v)
+            # print('vis vx: ', v)
             if (curr_poly_index == index and v != (j-1)%vis_poly_size) and (v != (j+1)%vis_poly_size) or (curr_poly_index != index):
-                print('shooting ray from',v,'to',j)
+                # print('shooting ray from',v,'to',j)
                 mid_vector = vis_poly_vx[v][1] - r_v
                 if (vector_bwt_two_vector(mid_vector, bv1, bv2)):
                     continue

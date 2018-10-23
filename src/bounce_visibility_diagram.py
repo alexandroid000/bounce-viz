@@ -1,7 +1,10 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import os.path as osp
 
 from helper.visibility_helper import *
 from helper.geometry_helper import *
+import settings
 
 
 class Bounce_Visibility_Diagram(object):
@@ -13,8 +16,10 @@ class Bounce_Visibility_Diagram(object):
         the discretization constant for the angle function
     partial_local_sequence : :obj:`Partial_Local_Sequence`
         The partial local sequence for the polygon
-    visible_angle_info : numpy.array
-        The angle functions for each edge
+    visible_vx_set_for_edges : list of list of list of list
+        format: [poly1: [e1:[viz vx poly1:[], viz vx poly2:[]], e2:[viz vx poly1:[], viz vx poly2:[]]], poly2: [e1:[viz vx poly1:[], viz vx poly2:[]], e2:[viz vx poly1:[], viz vx poly2:[]]]]
+    visible_angle_info : list of numpy.array
+        The angle functions for each edge in each closed polygonal boundary
     '''
     def compute_visible_angle_info(self, pls, visible_vx_set_for_edges, resolution):
         ''' Compute the visible angle info for the input polygon
@@ -34,29 +39,83 @@ class Bounce_Visibility_Diagram(object):
         np.array
             The visible angle info for the input polygon
         '''
-        i_poly_vx = pls.inserted_polygon.outer_boundary_vertices
-        psize =  len(i_poly_vx)
-        visible_angle_info = np.nan*np.ones((psize, resolution*psize))
-        for i, visible_vxs in enumerate(visible_vx_set_for_edges):
-            for vx_index in visible_vxs:
-                curr_p = i_poly_vx[i]
-                next_p = i_poly_vx[(i+1)%psize]
-                interest_p = i_poly_vx[vx_index]
-                visible_angle_info[vx_index][resolution*i] = get_angle_from_three_pts(next_p, interest_p, curr_p)
-                visible_angle_info[vx_index][resolution*i+resolution-1] = np.nan
-                # the if case is for when we are considering the 'next vertex'
-                if (interest_p == next_p).all():
-                    for stride in range(resolution)[1:-1]:
-                        visible_angle_info[vx_index][resolution*i+stride] = visible_angle_info[vx_index][resolution*i]
-                    continue
-                for stride in range(resolution)[1:-1]:
-                    # this is the point on the same line of the current edge but in front of the next vertex.
-                    # Use this so that we don't get zero length vector from the next vertex perspective
-                    extended_point = curr_p+2*(next_p-curr_p)
-                    ratio = 1./(resolution-2)*stride
-                    origin = ratio*next_p+(1-ratio)*curr_p
-                    visible_angle_info[vx_index][resolution*i+stride] = get_angle_from_three_pts(interest_p, extended_point, origin)
+        def compute_visible_angle_info_single_polygon(curr_poly, viz_set_for_curr_poly, all_vertices, total_size):
+            psize =  len(curr_poly)
+            visible_angle_info = np.nan*np.ones((total_size, resolution*psize))
+            for i, edge_visible_vxs in enumerate(viz_set_for_curr_poly):
+                curr_p = curr_poly[i][1]
+                next_p = curr_poly[(i+1)%psize][1]
+                for poly_index, viz_poly_vx in enumerate(edge_visible_vxs):
+                    for vx_index in viz_poly_vx:
+                        interest_p = all_vertices[vx_index]
+                        visible_angle_info[vx_index][resolution*i] = get_angle_from_three_pts(next_p, interest_p, curr_p)
+                        visible_angle_info[vx_index][resolution*i+resolution-1] = np.nan
+                        # the if case is for when we are considering the 'next vertex'
+                        if (interest_p == next_p).all():
+                            for stride in range(resolution)[1:-1]:
+                                visible_angle_info[vx_index][resolution*i+stride] = visible_angle_info[vx_index][resolution*i]
+                            continue
+                        for stride in range(resolution)[1:-1]:
+                            # this is the point on the same line of the current edge but in front of the next vertex.
+                            # Use this so that we don't get zero length vector from the next vertex perspective
+                            extended_point = curr_p+2*(next_p-curr_p)
+                            ratio = 1./(resolution-2)*stride
+                            origin = ratio*next_p+(1-ratio)*curr_p
+                            visible_angle_info[vx_index][resolution*i+stride] = get_angle_from_three_pts(interest_p, extended_point, origin)
+            return visible_angle_info
+
+        visible_angle_info = [compute_visible_angle_info_single_polygon(pls.inserted_polygon.outer_boundary_vertices, visible_vx_set_for_edges[0], pls.inserted_polygon.all_vertices, pls.inserted_polygon.size)]
+
+        for index, hole in enumerate(pls.inserted_polygon.holes):
+            visible_angle_info.append(compute_visible_angle_info_single_polygon(hole, visible_vx_set_for_edges[index+1], pls.inserted_polygon.all_vertices, pls.inserted_polygon.size))
         return visible_angle_info
+    
+    def visualize(self, hline = None):
+        ''' Save the link diagram for a given polygon to image
+
+        Parameters
+        ----------
+        bvd: :obj:`Bounce_Visibility_Diagram`
+            The link diagram computed for the given polygon
+        hline:float
+            The angle of fix theta bouncing
+        fname:string
+            The output file name for the link diagram
+        '''
+        def visualize_single_close_boundary_bvd(curr_poly, acc_edge_len, index, curr_visible_angle_info, total_size):
+            # i_poly_vx = self.partial_local_sequence.inserted_polygon.holes[0]
+            psize = len(curr_poly)
+            # acc_edge_len = self.partial_local_sequence.inserted_polygon.unit_interval_mapping[1][0]
+            jet = plt.cm.jet
+            colors = jet(np.linspace(0, 1, total_size))
+            fig, ax = plt.subplots()
+            x = []
+            for i in range(psize):
+                x.extend(list(np.linspace(acc_edge_len[i], acc_edge_len[i+1], self.resolution-1)))
+                x.extend([acc_edge_len[i+1]])
+                plt.axvline(x=acc_edge_len[i], linestyle='--')
+            plt.axvline(x = acc_edge_len[-1], linestyle='--')
+
+            print(curr_visible_angle_info.shape)
+            for i in range(total_size):
+                plt.plot(x, curr_visible_angle_info[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
+            if hline != None:
+                plt.axhline(y = hline)
+            leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.15), ncol=5)
+            ax.set_xticks(acc_edge_len)
+            x_labels = [curr_poly[i][0] for i in range(psize)]
+            x_labels.append(curr_poly[0][0])
+            ax.set_xticklabels(x_labels)
+            ax.set_yticks([0., np.pi/6., np.pi/3., np.pi/2., 2*np.pi/3., 5*np.pi/6., np.pi])
+            ax.set_yticklabels(["$0$", r"$\frac{1}{6}\pi$", r"$\frac{1}{3}\pi$", r"$\frac{1}{2}\pi$", r"$\frac{2}{3}\pi$", r"$\frac{5}{6}\pi$", r"$\pi$"])
+            plt.xlabel(r"vertices on $\partial P'$", fontsize=15)
+            plt.ylabel(r"bounce angle $\theta$", fontsize=15)
+            plt.savefig(osp.join(settings.image_save_folder, 'bvd_'+self.partial_local_sequence.inserted_polygon.name+'_'+str(index)+'.png'), dpi = 300, bbox_inches='tight')
+            if DEBUG:
+                plt.show()
+        visualize_single_close_boundary_bvd(self.partial_local_sequence.inserted_polygon.outer_boundary_vertices, self.partial_local_sequence.inserted_polygon.unit_interval_mapping[0], 0, self.visible_angle_info[0], self.partial_local_sequence.inserted_polygon.size)
+        for index, hole in enumerate(self.partial_local_sequence.inserted_polygon.holes):
+            visualize_single_close_boundary_bvd(hole, self.partial_local_sequence.inserted_polygon.unit_interval_mapping[1][index], index+1, self.visible_angle_info[index+1], self.partial_local_sequence.inserted_polygon.size)
 
     def __init__(self, pls):
         self.resolution = 15

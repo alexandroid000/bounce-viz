@@ -21,23 +21,23 @@ class Partial_Local_Sequence(object):
         sequence_info = []
         def compute_seq_for_single_polygon(curr_polygon_vx, curr_polygon_index):
             curr_seq_info = []
-            print('curr poly size: ', len(curr_polygon_vx))
+            # print('curr poly size: ', len(curr_polygon_vx))
             for i in range(len(curr_polygon_vx)):
                 if not curr_polygon_vx[i][0] in rvs:
                     curr_seq_info.append([])
                     continue
                 # print('compute sequence for vertex: ', curr_polygon_vx[i][0])
                 r_children = ShootRaysFromReflex(curr_polygon_vx, input_polygon.all_poly_vx, i)
-                print('r_children', r_children)
-                print('compute from vert to reflex\n')
+                # print('r_children', r_children)
+                # print('compute from vert to reflex\n')
                 transition_pts = ShootRaysToReflexFromVerts(curr_polygon_vx, curr_polygon_index, input_polygon.all_poly_vx, i)
-                print('transition_pts: ', transition_pts)
+                # print('transition_pts: ', transition_pts)
                 # transition_pts = []
                 transition_pts.extend(r_children)
                 curr_seq_info.append(transition_pts)
             return curr_seq_info
         sequence_info.extend(compute_seq_for_single_polygon(input_polygon.outer_boundary_vertices, 0))
-        print('Start holes....\n\n')
+        # print('Start holes....\n\n')
         for index, hole in enumerate(input_polygon.holes):
             sequence_info.extend(compute_seq_for_single_polygon(hole, index+1))
         return sequence_info

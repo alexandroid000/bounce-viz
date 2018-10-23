@@ -74,47 +74,6 @@ def visualize_partial_local_sequence_for_one_vx(poly_vx, origin, sequence, fname
     if DEBUG:
         plt.show()
 
-def visualize_bounce_visibility_diagram(bvd, hline = None, fname = 'bvd.png'):
-    ''' Save the link diagram for a given polygon to image
-
-    Parameters
-    ----------
-    bvd: :obj:`Bounce_Visibility_Diagram`
-        The link diagram computed for the given polygon
-    hline:float
-        The angle of fix theta bouncing
-    fname:string
-        The output file name for the link diagram
-    '''
-    i_poly_vx = bvd.partial_local_sequence.inserted_polygon.vertices
-    psize = i_poly_vx.shape[0]
-    acc_edge_len = bvd.partial_local_sequence.inserted_polygon.unit_interval_mapping
-    jet = plt.cm.jet
-    colors = jet(np.linspace(0, 1, psize))
-    fig, ax = plt.subplots()
-    x = []
-    for i in range(psize):
-        x.extend(list(np.linspace(acc_edge_len[i], acc_edge_len[i+1], bvd.resolution-1)))
-        x.extend([acc_edge_len[i+1]])
-    for i in range(psize):
-        plt.plot(x, bvd.visible_angle_info[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
-        plt.axvline(x=acc_edge_len[i], linestyle='--')
-    plt.axvline(x = acc_edge_len[-1], linestyle='--')
-    if hline != None:
-        plt.axhline(y = hline)
-    leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.15), ncol=5)
-    ax.set_xticks(acc_edge_len)
-    x_labels = list(range(psize))
-    x_labels.append(0)
-    ax.set_xticklabels(x_labels)
-    ax.set_yticks([0., np.pi/6., np.pi/3., np.pi/2., 2*np.pi/3., 5*np.pi/6., np.pi])
-    ax.set_yticklabels(["$0$", r"$\frac{1}{6}\pi$", r"$\frac{1}{3}\pi$", r"$\frac{1}{2}\pi$", r"$\frac{2}{3}\pi$", r"$\frac{5}{6}\pi$", r"$\pi$"])
-    plt.xlabel(r"vertices on $\partial P'$", fontsize=15)
-    plt.ylabel(r"bounce angle $\theta$", fontsize=15)
-    plt.savefig(osp.join(image_save_folder,fname), bbox_inches='tight', dpi = 300)
-    if DEBUG:
-        plt.show()
-
 def visualize_graph(G, fname = 'graph'):
     ''' Draw graph in circular shape
     '''
