@@ -19,17 +19,32 @@ if __name__ == '__main__':
     sequence = pls2.sequence_info[10]
 
 
-    start = (0.1, 0.15)
-    goal = (0.51, 0.66)
+    start = (0.51, 0.66)
+    goal = (0.85, 0.9)
     nav_task = FewestBouncesStrategy(start, goal, bounce_graph)
     path = nav_task.navigate()
 
     strat = ConstantStrategy(start, goal, bounce_graph)
-    final_search_state = strat.navigate()
+    print("Reachable states with constant strat from",strat.start)
+    r = strat.reachable_with_constant_strat()
+    print(r)
+    all_nodes = set(range(strat.sbvg.number_of_nodes()))
+    print("Unreachable from",strat.start,"with constant strategy:")
+    print(all_nodes.difference(r))
     print("Navigating from",start,"to",goal)
+    status, frontier = strat.navigate()
     print("Searching SBVG from",strat.start,"to",strat.end)
 
-    print("Results of search:", final_search_state)
+    if status:
+        print("Found constant strategy!")
+        for (s,f) in zip(strat.start, frontier):
+            print("bounce at",f,"from",s)
+    else:
+       print("Could not find constant strategy")
+       print("Final frontier:")
+       for f in frontier:
+           print(f)
+
 
     visualize_all_partial_order_sequence(pls.polygon.vertices, pls.inserted_polygon.vertices, pls.sequence_info)
     visualize_polygon(poly_vx, poly_name)

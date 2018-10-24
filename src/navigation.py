@@ -59,10 +59,9 @@ class FewestBouncesStrategy(object):
         self.inserted_polygon = self.pls.inserted_polygon
 
 
-# strategy is a function which performs BFS
 class ConstantStrategy():
     ''' Navigation assuming our robot can only perform one type of bounce, with
-    uncertainty. Searches safe bounce visibility graph.
+    uncertainty. Searches safe bounce visibility graph for shortest path.
     Attributes
     ----------
     start_interval : (float, float)
@@ -83,18 +82,42 @@ class ConstantStrategy():
         if depth == -1:
             depth = self.sbvg.number_of_nodes()
         angrange = [(0.0, pi)]
-        pathstates = [(s, angrange) for s in self.start]
+        pathstates = [[(s, angrange)] for s in self.start]
 
         for i in range(depth):
+            frontier = []
+            for startnode in pathstates:
+                for (v, angrange) in startnode:
+                    # list of nodes reached and corresponding angranges for kth step
+                    # in BFS from one of the start nodes
+                    frontier.append(self.take_step(self.sbvg, v, angrange))
+            if self.atGoal(frontier):
+                goal_paths = [[(v,range) for (v,range) in f if v in self.end]
+                                for f in frontier]
+                return True, goal_paths
+            pathstates = frontier
+
+        return False, frontier
+
+    def reachable_with_constant_strat(self):
+        reachable_states = set(self.start)
+        R_size = len(reachable_states)
+        R_diff = R_size - 0
+        angrange = [(0.0, pi)]
+        pathstates = [(s, angrange) for s in self.start]
+        while R_diff != 0:
             frontier = []
             for (v, angrange) in pathstates:
                 # list of nodes reached and corresponding angranges for kth step
                 # in BFS from one of the start nodes
-                frontier.extend(self.take_step(self.sbvg, v, angrange))
-            if self.atGoal(frontier):
-                    return True, frontier
-
-        return False, frontier
+                next = self.take_step(self.sbvg, v, angrange)
+                for (v, _) in next:
+                    reachable_states.add(v)
+                frontier.extend(next)
+            R_diff = len(reachable_states) - R_size
+            R_size = len(reachable_states)
+            pathstates = frontier
+        return reachable_states
 
     # PathState is:
         # the current vertex, and
@@ -122,12 +145,16 @@ class ConstantStrategy():
         iis = [intersect_intervals(angrange, safe_interval) for angrange in old_aranges]
         return [i for i in iis if interval_len(i) > EPSILON]
 
-
     # [[PathState]] -> Bool
     def atGoal(self, frontier):
-        curr_nodes = [v for (v, angs) in frontier]
         goal = set(self.end)
-        curr = set(curr_nodes)
-        return goal.issubset(curr)
+        curr_nodes = [set([v for (v, angs) in s]) for s in frontier]
+        checkGoal = [not goal.isdisjoint(f) for f in curr_nodes]
+        # check that nonzero intersection exists between all start states
+        #if all(checkGoal):
+        #    goal_ranges = [[angs for (v, angs) in s if v in goal]) for s in frontier]
+        #    for s in goal_states:
+
+        return all(checkGoal)
 
 
