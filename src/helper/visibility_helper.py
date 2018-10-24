@@ -53,7 +53,7 @@ def get_all_edge_visible_vertices(poly):
     for index, curr_poly_vx in enumerate(poly.vertex_list_per_poly):
         curr_viz_vxs = [visibleVertices(curr_poly_vx, poly.vertex_list_per_poly, i) for i in range(len(curr_poly_vx))]
         # if DEBUG:
-        print('All visible verts:\n{}\n'.format(curr_viz_vxs))
+            # print('All visible verts:\n{}\n'.format(curr_viz_vxs))
 
         # each element in the map is indexed by its clockwise vertex (smaller index)
         curr_viz_sets = []
@@ -89,7 +89,6 @@ def get_common_list_of_list_visible_vertices(ll_1, ll_2, edge, complete_vertex_l
         common_visible_vertex = list(set(ll_1[i]) & set(ll_2[i]))
         filted_visible_vertex = []
         for vertex in common_visible_vertex:
-            print(complete_vertex_list[vertex])
             if check_vertex_in_edge_half_plane(edge, complete_vertex_list[vertex]):
                 filted_visible_vertex.append(vertex)
         common_list.append(filted_visible_vertex)

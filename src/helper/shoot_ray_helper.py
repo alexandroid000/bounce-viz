@@ -126,7 +126,7 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_p
     pts = []
     # TODO: fix visible vertices to accept polygons with holes
     visible_verts = visibleVertices(curr_poly_vxs, vertex_list_per_poly, j)
-    print('visible_verts for ', j, ' is ', visible_verts)
+    # print('visible_verts for ', j, ' is ', visible_verts)
 
     # only ray shoot from non-adjacent vertices
     # previous and next neighbors always visible

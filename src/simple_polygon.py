@@ -108,4 +108,5 @@ class Simple_Polygon(object):
         self.size = len(self.complete_vertex_list)
         self.rverts = self.reflex_verts()
         self.unit_interval_mapping = self.compute_unit_interval_mapping()
+        print(self.unit_interval_mapping)
         self.visualization()
