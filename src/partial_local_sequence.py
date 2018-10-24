@@ -27,10 +27,10 @@ class Partial_Local_Sequence(object):
                     curr_seq_info.append([])
                     continue
                 # print('compute sequence for vertex: ', curr_polygon_vx[i][0])
-                r_children = ShootRaysFromReflex(curr_polygon_vx, input_polygon.all_poly_vx, i)
+                r_children = ShootRaysFromReflex(curr_polygon_vx, input_polygon.vertex_list_per_poly, i)
                 # print('r_children', r_children)
                 # print('compute from vert to reflex\n')
-                transition_pts = ShootRaysToReflexFromVerts(curr_polygon_vx, curr_polygon_index, input_polygon.all_poly_vx, i)
+                transition_pts = ShootRaysToReflexFromVerts(curr_polygon_vx, curr_polygon_index, input_polygon.vertex_list_per_poly, i)
                 # print('transition_pts: ', transition_pts)
                 # transition_pts = []
                 transition_pts.extend(r_children)

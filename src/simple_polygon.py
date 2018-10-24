@@ -100,12 +100,12 @@ class Simple_Polygon(object):
         self.outer_boundary_vertices = [(i, np.array(outer_boundary_vertices[i])) for i in range(len(outer_boundary_vertices))]
         size_list = self.get_hole_size_list(len(outer_boundary_vertices), holes)
         self.holes = [[(i+size_list[j], np.array(holes[j][i])) for i in range(len(holes[j]))] for j in range(len(holes))]
-        self.all_vertices = [vx[1] for vx in self.outer_boundary_vertices]
-        self.all_poly_vx = [self.outer_boundary_vertices]
+        self.complete_vertex_list = [vx[1] for vx in self.outer_boundary_vertices]
+        self.vertex_list_per_poly = [self.outer_boundary_vertices]
         for hole in self.holes:
-            self.all_vertices.extend([vx[1] for vx in hole])
-            self.all_poly_vx.append(hole)
-        self.size = len(self.all_vertices)
+            self.complete_vertex_list.extend([vx[1] for vx in hole])
+            self.vertex_list_per_poly.append(hole)
+        self.size = len(self.complete_vertex_list)
         self.rverts = self.reflex_verts()
         self.unit_interval_mapping = self.compute_unit_interval_mapping()
         self.visualization()

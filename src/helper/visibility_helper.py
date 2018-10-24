@@ -3,9 +3,10 @@
 import visilibity as vis
 from copy import copy
 from settings import *
+import numpy as np
 # for polygons not in general position: returns all visible vertices along a ray
 
-def visibleVertices(curr_poly_vx, all_poly_vx, j):
+def visibleVertices(curr_poly_vx, vertex_list_per_poly, j):
     #print('At vertex',j)
     vs = curr_poly_vx
 
@@ -18,7 +19,7 @@ def visibleVertices(curr_poly_vx, all_poly_vx, j):
         walls.enforce_standard_form()
         return walls
 
-    env_walls = [get_vis_form_from_vx_list(vs) for vs in all_poly_vx]
+    env_walls = [get_vis_form_from_vx_list(vs) for vs in vertex_list_per_poly]
 
     # point from which to calculate visibility
     p1 = vs[j][1]
@@ -33,7 +34,7 @@ def visibleVertices(curr_poly_vx, all_poly_vx, j):
     isovist = vis.Visibility_Polygon(vp1, env, EPSILON)
     vvs = [(isovist[i].x(), isovist[i].y()) for i in range(isovist.n())]
     visibleVertexSet = []
-    for poly_vx in all_poly_vx:
+    for poly_vx in vertex_list_per_poly:
         curr_vis_vx = []
         for i in range(len(poly_vx)):
             p = vis.Point(*poly_vx[i][1])
@@ -49,8 +50,8 @@ def get_all_edge_visible_vertices(poly):
     ''' make all sets of vertices visible from everywhere along edge
     '''
     total_viz_sets = []
-    for index, curr_poly_vx in enumerate(poly.all_poly_vx):
-        curr_viz_vxs = [visibleVertices(curr_poly_vx, poly.all_poly_vx, i) for i in range(len(curr_poly_vx))]
+    for index, curr_poly_vx in enumerate(poly.vertex_list_per_poly):
+        curr_viz_vxs = [visibleVertices(curr_poly_vx, poly.vertex_list_per_poly, i) for i in range(len(curr_poly_vx))]
         # if DEBUG:
         print('All visible verts:\n{}\n'.format(curr_viz_vxs))
 
@@ -59,7 +60,7 @@ def get_all_edge_visible_vertices(poly):
 
         # get vertices that are visible to the current vertex and the next vertex
         for i in range(len(curr_poly_vx)):
-            viz_vxs = get_common_list_of_list(curr_viz_vxs[i], curr_viz_vxs[(i+1)%len(curr_poly_vx)])
+            viz_vxs = get_common_list_of_list_visible_vertices(curr_viz_vxs[i], curr_viz_vxs[(i+1)%len(curr_poly_vx)], (curr_poly_vx[i][1], curr_poly_vx[(i+1)%len(curr_poly_vx)][1]), poly.complete_vertex_list)
             # if the following line included, allows transition to next edge by wall
             # following, even if reflex angle
             # TODO: figure out if we want to allow this behavior
@@ -73,11 +74,24 @@ def get_all_edge_visible_vertices(poly):
         
     return total_viz_sets 
 
-def get_common_list_of_list(ll_1, ll_2):
+def check_vertex_in_edge_half_plane(edge, vertex):
+    ''' the vertex should be to the left of the edge
+    '''
+    v1 = edge[0]-vertex
+    v2 = edge[1]-vertex 
+    return np.cross(v1, v2) >= 0
+
+def get_common_list_of_list_visible_vertices(ll_1, ll_2, edge, complete_vertex_list):
     # ll_1 and ll_2 should have the same size
     l_size = len(ll_1)
     common_list = []
     for i in range(l_size):
-        common_list.append(list(set(ll_1[i]) & set(ll_2[i])))
+        common_visible_vertex = list(set(ll_1[i]) & set(ll_2[i]))
+        filted_visible_vertex = []
+        for vertex in common_visible_vertex:
+            print(complete_vertex_list[vertex])
+            if check_vertex_in_edge_half_plane(edge, complete_vertex_list[vertex]):
+                filted_visible_vertex.append(vertex)
+        common_list.append(filted_visible_vertex)
     return common_list
 

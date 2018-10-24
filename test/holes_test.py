@@ -5,9 +5,10 @@ from helper.visualization_helper import *
 from bounce_visibility_diagram import Bounce_Visibility_Diagram
 from bounce_graph import Bounce_Graph
 from navigation import Navigation
+from simple_polygon import Simple_Polygon
 
 if __name__ == '__main__':
-    poly = small_holes 
+    poly = Simple_Polygon('two_triangles', two_triangles[0], two_triangles[1])
     pls = Partial_Local_Sequence(poly)
     bvd = Bounce_Visibility_Diagram(pls)
     bvd.visualize()

@@ -51,13 +51,13 @@ def RayInEdge(sp,bp,ep1,ep2):
 
 # shoot ray from p1 toward p2 in poly, return closest intersect point
 # will not return point on 'last_bounce_edge'
-def ClosestPtAlongRay(p1, p2, all_poly_vxs, last_bounce_edge=-1):
+def ClosestPtAlongRay(p1, p2, vertex_list_per_poly, last_bounce_edge=-1):
     # print('Calling ClosestPt...\n')
     closest_bounce = 100000000000
     bounce_point = np.array([0.0, 0.0])
     found_coll = False
     bounce_edge = last_bounce_edge
-    for poly_vxs in all_poly_vxs:
+    for poly_vxs in vertex_list_per_poly:
         psize = len(poly_vxs)
         # check each edge for collision
         for j in range(psize):
@@ -83,7 +83,7 @@ def ClosestPtAlongRay(p1, p2, all_poly_vxs, last_bounce_edge=-1):
     else:
         return False
 
-def ShootRaysFromReflex(curr_poly_vxs, all_poly_vxs, j):
+def ShootRaysFromReflex(curr_poly_vxs, vertex_list_per_poly, j):
     ''' shoot two rays from each reflex vertex, along incident edges
         group by edge so we can insert them in correct order
     '''
@@ -95,25 +95,25 @@ def ShootRaysFromReflex(curr_poly_vxs, all_poly_vxs, j):
     int_pts = []
 
     # ClosestPtAlongRay returns False if we shoot ray into existing vertex
-    result = ClosestPtAlongRay(p1_ccw, p2, all_poly_vxs, j)
+    result = ClosestPtAlongRay(p1_ccw, p2, vertex_list_per_poly, j)
     if result:
         pt, k = result
-        if not VertexExists(pt, all_poly_vxs):
+        if not VertexExists(pt, vertex_list_per_poly):
             int_pts.append((pt,k, (j+1) % curr_poly_size))
         else:
             print('1:vertex exists!')
 
-    result = ClosestPtAlongRay(p1_cw, p2, all_poly_vxs, ((j-1) % curr_poly_size))
+    result = ClosestPtAlongRay(p1_cw, p2, vertex_list_per_poly, ((j-1) % curr_poly_size))
     if result:
         pt, k = result
-        if not VertexExists(pt, all_poly_vxs):
+        if not VertexExists(pt, vertex_list_per_poly):
             int_pts.append((pt, k, (j-1) % curr_poly_size))
         else:
             print('2:vertex exists!')
 
     return int_pts
 
-def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, all_poly_vxs, j):
+def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_poly, j):
     ''' shoot ray from visible vertices through reflex verts
         Poly -> Int -> [(Point, Int)]
     '''
@@ -125,13 +125,13 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, all_poly_vxs, j):
 
     pts = []
     # TODO: fix visible vertices to accept polygons with holes
-    visible_verts = visibleVertices(curr_poly_vxs, all_poly_vxs, j)
+    visible_verts = visibleVertices(curr_poly_vxs, vertex_list_per_poly, j)
     print('visible_verts for ', j, ' is ', visible_verts)
 
     # only ray shoot from non-adjacent vertices
     # previous and next neighbors always visible
     for index, curr_vis_vx_set in enumerate(visible_verts):
-        vis_poly_vx = all_poly_vxs[index]
+        vis_poly_vx = vertex_list_per_poly[index]
         vis_poly_size = len(vis_poly_vx)
         for v in curr_vis_vx_set:
             # print('vis vx: ', v)
@@ -140,10 +140,10 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, all_poly_vxs, j):
                 mid_vector = vis_poly_vx[v][1] - r_v
                 if (vector_bwt_two_vector(mid_vector, bv1, bv2)):
                     continue
-                res = ClosestPtAlongRay(vis_poly_vx[v][1], r_v, all_poly_vxs)
+                res = ClosestPtAlongRay(vis_poly_vx[v][1], r_v, vertex_list_per_poly)
                 if res:
                     pt, k = res
-                    if not VertexExists(pt, all_poly_vxs):
+                    if not VertexExists(pt, vertex_list_per_poly):
                         pts.append((pt, k, v))
     return pts
 

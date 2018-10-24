@@ -39,7 +39,7 @@ class Bounce_Visibility_Diagram(object):
         np.array
             The visible angle info for the input polygon
         '''
-        def compute_visible_angle_info_single_polygon(curr_poly, viz_set_for_curr_poly, all_vertices, total_size):
+        def compute_visible_angle_info_single_polygon(curr_poly, viz_set_for_curr_poly, complete_vertex_list, total_size):
             psize =  len(curr_poly)
             visible_angle_info = np.nan*np.ones((total_size, resolution*psize))
             for i, edge_visible_vxs in enumerate(viz_set_for_curr_poly):
@@ -47,7 +47,7 @@ class Bounce_Visibility_Diagram(object):
                 next_p = curr_poly[(i+1)%psize][1]
                 for poly_index, viz_poly_vx in enumerate(edge_visible_vxs):
                     for vx_index in viz_poly_vx:
-                        interest_p = all_vertices[vx_index]
+                        interest_p = complete_vertex_list[vx_index]
                         visible_angle_info[vx_index][resolution*i] = get_angle_from_three_pts(next_p, interest_p, curr_p)
                         visible_angle_info[vx_index][resolution*i+resolution-1] = np.nan
                         # the if case is for when we are considering the 'next vertex'
@@ -64,10 +64,10 @@ class Bounce_Visibility_Diagram(object):
                             visible_angle_info[vx_index][resolution*i+stride] = get_angle_from_three_pts(interest_p, extended_point, origin)
             return visible_angle_info
 
-        visible_angle_info = [compute_visible_angle_info_single_polygon(pls.inserted_polygon.outer_boundary_vertices, visible_vx_set_for_edges[0], pls.inserted_polygon.all_vertices, pls.inserted_polygon.size)]
+        visible_angle_info = [compute_visible_angle_info_single_polygon(pls.inserted_polygon.outer_boundary_vertices, visible_vx_set_for_edges[0], pls.inserted_polygon.complete_vertex_list, pls.inserted_polygon.size)]
 
         for index, hole in enumerate(pls.inserted_polygon.holes):
-            visible_angle_info.append(compute_visible_angle_info_single_polygon(hole, visible_vx_set_for_edges[index+1], pls.inserted_polygon.all_vertices, pls.inserted_polygon.size))
+            visible_angle_info.append(compute_visible_angle_info_single_polygon(hole, visible_vx_set_for_edges[index+1], pls.inserted_polygon.complete_vertex_list, pls.inserted_polygon.size))
         return visible_angle_info
     
     def visualize(self, hline = None):
