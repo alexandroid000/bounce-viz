@@ -43,8 +43,7 @@ class Bounce_Visibility_Diagram(object):
             psize =  len(curr_poly)
             visible_angle_info = np.nan*np.ones((total_size, resolution*psize))
             for i, edge_visible_vxs in enumerate(viz_set_for_curr_poly):
-                curr_p = curr_poly[i][1]
-                next_p = curr_poly[(i+1)%psize][1]
+                curr_p, next_p = curr_poly[i][1], curr_poly[(i+1)%psize][1]
                 for poly_index, viz_poly_vx in enumerate(edge_visible_vxs):
                     for vx_index in viz_poly_vx:
                         interest_p = complete_vertex_list[vx_index]
@@ -79,89 +78,78 @@ class Bounce_Visibility_Diagram(object):
             The link diagram computed for the given polygon
         hline:float
             The angle of fix theta bouncing
-        fname:string
-            The output file name for the link diagram
         '''
-        def visualize_single_close_boundary_bvd(curr_poly, acc_edge_len, index, curr_visible_angle_info, total_size):
-            # i_poly_vx = self.partial_local_sequence.inserted_polygon.holes[0]
+        def set_y_labels(ax):
+            ax.set_yticks([0., np.pi/6., np.pi/3., np.pi/2., 2*np.pi/3., 5*np.pi/6., np.pi])
+            ax.set_yticklabels(["$0$", r"$\frac{1}{6}\pi$", r"$\frac{1}{3}\pi$", r"$\frac{1}{2}\pi$", r"$\frac{2}{3}\pi$", r"$\frac{5}{6}\pi$", r"$\pi$"])
+            plt.xlabel(r"vertices on $\partial P'$", fontsize=15)
+            plt.ylabel(r"bounce angle $\theta$", fontsize=15)
+
+        def get_visualize_info_for_single_poly(curr_poly, acc_edge_len, curr_visible_angle_info, total_size):
             psize = len(curr_poly)
-            # acc_edge_len = self.partial_local_sequence.inserted_polygon.unit_interval_mapping[1][0]
-            jet = plt.cm.jet
-            colors = jet(np.linspace(0, 1, total_size))
-            fig, ax = plt.subplots()
             x = []
             for i in range(psize):
                 x.extend(list(np.linspace(acc_edge_len[i], acc_edge_len[i+1], self.resolution-1)))
                 x.extend([acc_edge_len[i+1]])
-                plt.axvline(x=acc_edge_len[i], linestyle='--')
-            plt.axvline(x = acc_edge_len[-1], linestyle='--')
+                plt.axvline(x=acc_edge_len[i], linestyle='--', linewidth=0.8)
+            plt.axvline(x = acc_edge_len[-1], linestyle='--', linewidth=0.8)
 
             for i in range(total_size):
                 plt.plot(x, curr_visible_angle_info[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
             if hline != None:
                 plt.axhline(y = hline)
             leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.15), ncol=5)
-            ax.set_xticks(acc_edge_len)
             x_labels = [curr_poly[i][0] for i in range(psize)]
             x_labels.append(curr_poly[0][0])
+            return x_labels
+
+        def visualize_single_close_boundary_bvd(curr_poly, acc_edge_len, index, curr_visible_angle_info, total_size):
+            ''' Visualize the bvd for vertices on a single close boundary
+            '''
+            fig, ax = plt.subplots()
+            x_labels = get_visualize_info_for_single_poly(curr_poly, acc_edge_len, curr_visible_angle_info, total_size)
+            ax.set_xticks(acc_edge_len)
             ax.set_xticklabels(x_labels)
-            ax.set_yticks([0., np.pi/6., np.pi/3., np.pi/2., 2*np.pi/3., 5*np.pi/6., np.pi])
-            ax.set_yticklabels(["$0$", r"$\frac{1}{6}\pi$", r"$\frac{1}{3}\pi$", r"$\frac{1}{2}\pi$", r"$\frac{2}{3}\pi$", r"$\frac{5}{6}\pi$", r"$\pi$"])
-            plt.xlabel(r"vertices on $\partial P'$", fontsize=15)
-            plt.ylabel(r"bounce angle $\theta$", fontsize=15)
+            set_y_labels(ax)
             plt.savefig(osp.join(settings.image_save_folder, 'bvd_'+self.partial_local_sequence.inserted_polygon.name+'_'+str(index)+'.png'), dpi = 300, bbox_inches='tight')
             if DEBUG:
                 plt.show()
-        # visualize_single_close_boundary_bvd(self.partial_local_sequence.inserted_polygon.outer_boundary_vertices, self.partial_local_sequence.inserted_polygon.unit_interval_mapping[0], 0, self.visible_angle_info[0], self.partial_local_sequence.inserted_polygon.size)
-        # for index, hole in enumerate(self.partial_local_sequence.inserted_polygon.holes):
-        #     visualize_single_close_boundary_bvd(hole, self.partial_local_sequence.inserted_polygon.unit_interval_mapping[1][index], index+1, self.visible_angle_info[index+1], self.partial_local_sequence.inserted_polygon.size)
 
         def visualize_all_bvd():
-            total_size = self.partial_local_sequence.inserted_polygon.size
-            jet = plt.cm.jet
-            colors = jet(np.linspace(0, 1, total_size))
+            ''' Visualize all vertices in one bvd
+            '''
             fig, ax = plt.subplots()
-            def get_visualize_info_for_single_poly(curr_poly, acc_edge_len, curr_visible_angle_info, total_size):
-                psize = len(curr_poly)
-                x = []
-                for i in range(psize):
-                    x.extend(list(np.linspace(acc_edge_len[i], acc_edge_len[i+1], self.resolution-1)))
-                    x.extend([acc_edge_len[i+1]])
-                    plt.axvline(x=acc_edge_len[i], linestyle='--')
-                plt.axvline(x = acc_edge_len[-1], linestyle='--')
-
-                for i in range(total_size):
-                    plt.plot(x, curr_visible_angle_info[i], label= '{}'.format(i), alpha=0.7, color = colors[i])
-                if hline != None:
-                    plt.axhline(y = hline)
-                leg = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.15), ncol=5)
-                x_labels = [curr_poly[i][0] for i in range(psize)]
-                x_labels.append(curr_poly[0][0])
-                return x_labels
-
             total_acc_edge_len = []
             gap_bwt_polys = settings.unit_interval_len/15.
-            total_x_labels = get_visualize_info_for_single_poly(self.partial_local_sequence.inserted_polygon.outer_boundary_vertices, self.partial_local_sequence.inserted_polygon.unit_interval_mapping[0], self.visible_angle_info[0], self.partial_local_sequence.inserted_polygon.size)
-            total_acc_edge_len.extend(self.partial_local_sequence.inserted_polygon.unit_interval_mapping[0])
-            start_x = self.partial_local_sequence.inserted_polygon.unit_interval_mapping[0][-1] + gap_bwt_polys
+            total_x_labels = get_visualize_info_for_single_poly(outer_boundary_vertices, unit_interval_mapping[0], self.visible_angle_info[0], total_size)
+            total_acc_edge_len.extend(unit_interval_mapping[0])
+            start_x = unit_interval_mapping[0][-1] + gap_bwt_polys
             
-            for index, hole in enumerate(self.partial_local_sequence.inserted_polygon.holes):
-                acc_edge_len = [x+start_x for x in self.partial_local_sequence.inserted_polygon.unit_interval_mapping[1][index]]
+            for index, hole in enumerate(holes):
+                acc_edge_len = [x+start_x for x in unit_interval_mapping[1][index]]
                 total_x_labels.extend(get_visualize_info_for_single_poly(hole, acc_edge_len, self.visible_angle_info[index+1], self.partial_local_sequence.inserted_polygon.size))
                 total_acc_edge_len.extend(acc_edge_len)
                 start_x = acc_edge_len[-1] + gap_bwt_polys
 
             ax.set_xticks(total_acc_edge_len)
             ax.set_xticklabels(total_x_labels, fontsize = 9)
-            ax.set_yticks([0., np.pi/6., np.pi/3., np.pi/2., 2*np.pi/3., 5*np.pi/6., np.pi])
-            ax.set_yticklabels(["$0$", r"$\frac{1}{6}\pi$", r"$\frac{1}{3}\pi$", r"$\frac{1}{2}\pi$", r"$\frac{2}{3}\pi$", r"$\frac{5}{6}\pi$", r"$\pi$"])
-            plt.xlabel(r"vertices on $\partial P'$", fontsize=15)
-            plt.ylabel(r"bounce angle $\theta$", fontsize=15)
+            set_y_labels(ax)
             plt.savefig(osp.join(settings.image_save_folder, 'bvd_all_'+self.partial_local_sequence.inserted_polygon.name+'.png'), dpi = 300, bbox_inches='tight')
             if DEBUG:
                 plt.show()
 
+        total_size = self.partial_local_sequence.inserted_polygon.size
+        jet = plt.cm.jet
+        colors = jet(np.linspace(0, 1, total_size))
+        unit_interval_mapping = self.partial_local_sequence.inserted_polygon.unit_interval_mapping
+        outer_boundary_vertices = self.partial_local_sequence.inserted_polygon.outer_boundary_vertices
+        holes = self.partial_local_sequence.inserted_polygon.holes
+
+        visualize_single_close_boundary_bvd(outer_boundary_vertices, unit_interval_mapping[0], 0, self.visible_angle_info[0], total_size)
+        for index, hole in enumerate(holes):
+            visualize_single_close_boundary_bvd(hole, unit_interval_mapping[1][index], index+1, self.visible_angle_info[index+1], total_size)
         visualize_all_bvd()
+
     def __init__(self, pls):
         self.resolution = 15
         self.partial_local_sequence = pls

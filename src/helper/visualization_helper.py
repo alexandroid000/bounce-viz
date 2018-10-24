@@ -28,29 +28,6 @@ def visualize_all_partial_order_sequence(poly_vx, inserted_poly_vx, sequence_inf
     if DEBUG:
         plt.show()
 
-def visualize_polygon(poly, fname):
-    ''' Draws polygon with numbered vertices
-    '''
-    psize = poly.shape[0]
-    jet = plt.cm.jet
-    colors = jet(np.linspace(0, 1, psize))
-
-    # plot only polygon, no axis or frame
-    fig = plt.figure(frameon=False)
-    ax = fig.add_axes([0, 0, 1, 1])
-    ax.axis('off')
-    wall = np.vstack((poly, poly[0]))
-    plt.plot(wall[:, 0], wall[:, 1], 'black')
-    for i in range(psize):
-        point = poly[i]
-        plt.scatter(point[0], point[1], color=colors[i], s=100)
-        plt.annotate(str(i), (point[0]+5, point[1]+20), size = 20)
-    plt.axis('equal')
-
-    plt.savefig(osp.join(image_save_folder,fname+'.png'), dpi = 300, bbox_inches='tight')
-    if DEBUG:
-        plt.show()
-
 def visualize_partial_local_sequence_for_one_vx(poly_vx, origin, sequence, fname = 'partial_local_sequence'):
     ''' Draw the partial local sequence for a given vertex
     '''

@@ -12,8 +12,23 @@ class Simple_Polygon(object):
 
     Attributes
     ----------
-    vertices : numpy.array
-        A list of coordinates of vertices in the polygon in counter clockwise order.
+    name : str
+        name of the environment; used for saving results
+    outer_boundary_vertices : numpy.array
+        A list of coordinates of vertices in outer most boundary of the polygon in counter clockwise order.
+    holes : list of numpy.array 
+        A list of list of coordinates, each list contains vertices in a hole in the polygon in clockwise order
+    complete_vertex_list : list of (int, np.array)
+        Assigned each vertex an index and store the the index and coordinates in a list. The tuples are stored according to the index increasing order
+    vertex_list_per_poly : list of list of np.array
+        Store the vertex list for each close boundary in the polygon into a list
+    size : int
+        the total number of vertices in the polygon
+    reflex_vertices : list of numpy.array
+        list of reflex vertices in the polygon using the index assigned in complete_vertex_list
+    unit_interval_mapping : (list of floats, list of list of floats)
+        see compute_unit_interval_mapping
+
         
     '''
     def compute_unit_interval_mapping(self):
@@ -47,7 +62,7 @@ class Simple_Polygon(object):
 
         return reflex_verts
 
-    def reflex_verts(self):
+    def get_reflex_vertices(self):
         reflex_verts = self.reflex_verts_single_boundary(self.outer_boundary_vertices)
         for hole in self.holes:
             reflex_verts.extend(self.reflex_verts_single_boundary(hole))
@@ -61,7 +76,7 @@ class Simple_Polygon(object):
             size_list.append(curr_sum)
         return size_list
     
-    def visualization(self):
+    def visualize(self):
         ''' Draws polygon with numbered vertices
         '''
         jet = plt.cm.jet
@@ -106,7 +121,5 @@ class Simple_Polygon(object):
             self.complete_vertex_list.extend([vx[1] for vx in hole])
             self.vertex_list_per_poly.append(hole)
         self.size = len(self.complete_vertex_list)
-        self.rverts = self.reflex_verts()
+        self.reflex_vertices = self.get_reflex_vertices()
         self.unit_interval_mapping = self.compute_unit_interval_mapping()
-        print(self.unit_interval_mapping)
-        self.visualization()

@@ -5,7 +5,8 @@ Polygonal environment vertices information. Model: List outer boundary vertices 
 import numpy as np
 # Some initial polygons
 # Use these below (inside main() to set the initial shape poly
-two_triangles = [np.array([(0., 4.), (8.,0.), (8., 8.)]), [np.array([(3., 5.), (6., 6.), (6., 3.)])]]
+two_holes = [np.array([(0., 0.), (12., 0.), (12., 8.), (0., 8.)]), [np.array([(1., 4.), (3., 6.), (4., 2.)]), np.array([(6., 6.), (8., 7.), (9., 4.), (8., 3.)])]]
+two_triangles = [np.array([(0., 4.), (8.,0.), (8., 8.)]), [np.array([(3., 4.), (6., 5.), (6., 2.)])]]
 small_holes = [np.array([(0., 4.), (8.,0.), (7., 5.), (8., 8.)]), [np.array([(3., 5.), (6., 6.), (6., 3.)])]]
 median_holes = [np.array([(0.0, 0.0), (7.0, 0.0), (7.0, 2.0), (6.0, 2.0), (6.0, 4.0), (7.0, 4.0), (7.0, 7.0), (0.0, 7.0)]), [np.array([(1.0, 1.0), (2.0, 5.0), (4.0, 1.0)])]]
 simple_holes = [np.array([(0.0, 0.0), (7.0, 0.0), (7.0, 7.0), (0.0, 7.0)]), [np.array([(1.0, 1.0), (2.0, 5.0), (4.0, 1.0)])]]

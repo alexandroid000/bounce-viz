@@ -3,15 +3,15 @@ from helper.visibility_helper import visibleVertices
 from settings import *
 import numpy as np
 
-
-
-# find line intersection parameter of edge (v1,v2)
-# state :: (x,y,theta) initial point and angle of ray
-# (x,y,theta) -> Point -> Point -> Maybe (Double, Point)
-# theta is defined with 0 along the y axis
-# https://stackoverflow.com/questions/14307158/how-do-you-check-for-intersection-between-a-line-segment-and-a-line-ray-emanatin/32146853
-# https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
 def ShootRay(state, v1, v2):
+    '''
+    # find line intersection parameter of edge (v1,v2)
+    # state :: (x,y,theta) initial point and angle of ray
+    # (x,y,theta) -> Point -> Point -> Maybe (Double, Point)
+    # theta is defined with 0 along the y axis
+    # https://stackoverflow.com/questions/14307158/how-do-you-check-for-intersection-between-a-line-segment-and-a-line-ray-emanatin/32146853
+    # https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
+    '''
     pt = np.array([state[0], state[1]])
     theta = state[2]
 
@@ -32,27 +32,40 @@ def ShootRay(state, v1, v2):
         pint = np.array([pt[0] + np.cos(theta)*t, pt[1] + np.sin(theta)*t])
     return t, u, pint
 
-# shoot a ray starting at p1, along vector p1->p2
-# find intersection with edge v1,v2
-# will return first intersection *after* p2
 def ShootRayFromVect(p1, p2, v1, v2):
+    ''' 
+    - shoot a ray starting at p1, along vector p1->p2
+    - find intersection with edge v1,v2
+    - will return first intersection *after* p2
+    '''
     [x,y] = p2-p1 # recenter points so p1 is at origin
     theta = FixAngle(np.arctan2(y,x))
     state = (p2[0], p2[1], theta)
     return ShootRay(state, v1, v2)
 
-# checks if vector sp->bp points within edge p1p2
-# start point, boundary point, edge p1, edge p2
 def RayInEdge(sp,bp,ep1,ep2):
+    '''
+    checks if vector sp->bp points within edge p1p2
+    Parameters
+    ----------
+    sp : numpy.array
+        start point
+    bp : numpy.array
+        boundary point
+    ep1 : numpy.array
+        edge p1
+    ep2 : numpy.array
+        edge p2
+    '''
     return ((IsLeftTurn(sp,bp,ep2) and
              IsRightTurn(sp,bp,ep1)) or
             (IsRightTurn(sp,bp,ep2) and
              IsLeftTurn(sp,bp,ep1)))
 
-# shoot ray from p1 toward p2 in poly, return closest intersect point
-# will not return point on 'last_bounce_edge'
 def ClosestPtAlongRay(p1, p2, vertex_list_per_poly, last_bounce_edge=-1):
-    # print('Calling ClosestPt...\n')
+    '''
+    shoot ray from p1 toward p2 in poly, return closest intersect point will not return point on 'last_bounce_edge'
+    '''
     closest_bounce = 100000000000
     bounce_point = np.array([0.0, 0.0])
     found_coll = False
@@ -78,7 +91,6 @@ def ClosestPtAlongRay(p1, p2, vertex_list_per_poly, last_bounce_edge=-1):
             except:
                 pass
     if found_coll:
-        # print('found intersection: ', bounce_point, bounce_edge)
         return bounce_point, bounce_edge
     else:
         return False
@@ -100,16 +112,12 @@ def ShootRaysFromReflex(curr_poly_vxs, vertex_list_per_poly, j):
         pt, k = result
         if not VertexExists(pt, vertex_list_per_poly):
             int_pts.append((pt,k, (j+1) % curr_poly_size))
-        else:
-            print('1:vertex exists!')
 
     result = ClosestPtAlongRay(p1_cw, p2, vertex_list_per_poly, ((j-1) % curr_poly_size))
     if result:
         pt, k = result
         if not VertexExists(pt, vertex_list_per_poly):
             int_pts.append((pt, k, (j-1) % curr_poly_size))
-        else:
-            print('2:vertex exists!')
 
     return int_pts
 
@@ -124,9 +132,7 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_p
     bv2 = r_v - next_r_v
 
     pts = []
-    # TODO: fix visible vertices to accept polygons with holes
     visible_verts = visibleVertices(curr_poly_vxs, vertex_list_per_poly, j)
-    # print('visible_verts for ', j, ' is ', visible_verts)
 
     # only ray shoot from non-adjacent vertices
     # previous and next neighbors always visible
@@ -134,9 +140,7 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_p
         vis_poly_vx = vertex_list_per_poly[index]
         vis_poly_size = len(vis_poly_vx)
         for v in curr_vis_vx_set:
-            # print('vis vx: ', v)
             if (curr_poly_index == index and v != (j-1)%vis_poly_size) and (v != (j+1)%vis_poly_size) or (curr_poly_index != index):
-                # print('shooting ray from',v,'to',j)
                 mid_vector = vis_poly_vx[v][1] - r_v
                 if (vector_bwt_two_vector(mid_vector, bv1, bv2)):
                     continue
@@ -153,9 +157,9 @@ def vector_bwt_two_vector(input_vector, bv1, bv2):
     else:
         return (np.cross(bv1, input_vector) < 0 and np.cross(bv2, input_vector) > 0)
 
-# this does not work with holes
 def IsInPoly(p, poly_vx):
-    ''' test if point p is in poly using crossing number
+    ''' test if point p is in poly using crossing number. Note: this does not work with holes
+
     '''
     intersects = 0
     theta = np.random.rand()*2*np.pi

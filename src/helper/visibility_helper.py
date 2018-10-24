@@ -52,8 +52,8 @@ def get_all_edge_visible_vertices(poly):
     total_viz_sets = []
     for index, curr_poly_vx in enumerate(poly.vertex_list_per_poly):
         curr_viz_vxs = [visibleVertices(curr_poly_vx, poly.vertex_list_per_poly, i) for i in range(len(curr_poly_vx))]
-        # if DEBUG:
-            # print('All visible verts:\n{}\n'.format(curr_viz_vxs))
+        if DEBUG:
+            print('All visible verts:\n{}\n'.format(curr_viz_vxs))
 
         # each element in the map is indexed by its clockwise vertex (smaller index)
         curr_viz_sets = []
@@ -68,8 +68,8 @@ def get_all_edge_visible_vertices(poly):
             # vizSets[i] = viz_vxs
             curr_viz_sets.append(viz_vxs)
 
-        # if DEBUG:
-        print('viz sets\n--------\n{}\n'.format(curr_viz_sets))
+        if DEBUG:
+            print('viz sets\n--------\n{}\n'.format(curr_viz_sets))
         total_viz_sets.append(curr_viz_sets)
         
     return total_viz_sets 

@@ -8,8 +8,10 @@ from navigation import Navigation
 from simple_polygon import Simple_Polygon
 
 if __name__ == '__main__':
-    poly = Simple_Polygon('two_triangles', two_triangles[0], two_triangles[1])
+    poly = Simple_Polygon('two_holes', two_holes[0], two_holes[1])
+    poly.visualize()
     pls = Partial_Local_Sequence(poly)
+    pls.inserted_polygon.visualize()
     bvd = Bounce_Visibility_Diagram(pls)
     bvd.visualize()
     # bounce_graph = Bounce_Graph(bvd)
