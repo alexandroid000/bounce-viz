@@ -60,6 +60,27 @@ def intersect_intervals(i1, i2):
     (c,d) = i2
     return (max(a,c), min(b,d))
 
+def all_overlaps(interval_sets):
+    n = len(interval_sets)
+    overlaps = []
+    if n == 1 or n == 0:
+        return interval_sets
+    else:
+        set1, set2 = interval_sets[0], interval_sets[1]
+        for i in set1:
+            for j in set2:
+                overlap = intersect_intervals(i,j)
+                if interval_len(overlap) > EPSILON:
+                    overlaps.append(overlap)
+    remaining_ints = [overlaps] + interval_sets[2:]
+    return all_overlaps(remaining_ints)
+
+# [(Float, Float)] -> [(Float, Float)]
+#def union_intervals(ints):
+#    b = []
+#    for (begin, end) in sorted(ints):
+
+
 def interval_len(interval):
     return abs(interval[1]-interval[0])
 

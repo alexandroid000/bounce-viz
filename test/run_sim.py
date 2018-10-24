@@ -22,7 +22,9 @@ if __name__ == '__main__':
     start = (0.51, 0.66)
     goal = (0.85, 0.9)
     nav_task = FewestBouncesStrategy(start, goal, bounce_graph)
+    print("Navigating from",start,"to",goal)
     path = nav_task.navigate()
+    print("Shortest path:", path)
 
     strat = ConstantStrategy(start, goal, bounce_graph)
     print("Reachable states with constant strat from",strat.start)

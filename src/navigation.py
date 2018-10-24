@@ -152,8 +152,9 @@ class ConstantStrategy():
         checkGoal = [not goal.isdisjoint(f) for f in curr_nodes]
         # check that nonzero intersection exists between all start states
         #if all(checkGoal):
-        #    goal_ranges = [[angs for (v, angs) in s if v in goal]) for s in frontier]
-        #    for s in goal_states:
+        #    goal_ranges = [[angs for (v, angs) in s if v in goal] for s in frontier]
+        #    print(goal_ranges)
+        #    overlaps = all_overlaps(goal_ranges)
 
         return all(checkGoal)
 
