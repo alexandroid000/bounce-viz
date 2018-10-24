@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="test" href="bounce_viz.test.html" />
+    <link rel="next" title="helper" href="bounce_viz.src.helper.html" />
     <link rel="prev" title="bounce_viz" href="bounce_viz.html" /> 
 
   
@@ -80,17 +80,21 @@
             
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">src</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bounce_viz.src.helper.html">helper</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.bounce">bounce</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.env_gen">env_gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.general_position">general_position</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.geom_utils">geom_utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.graph_operations">graph_operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.graph_utils">graph_utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.link_diagram">link_diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.bounce_graph">bounce_graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.bounce_visibility_diagram">bounce_visibility_diagram</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.maps">maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.navigation">navigation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.orthogonal_connect_dots">orthogonal_connect_dots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.orthogonal_env">orthogonal_env</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.partial_local_sequence">partial_local_sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.settings">settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.simple_polygon">simple_polygon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src.timeout">timeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-bounce_viz.src">Module contents</a></li>
 </ul>
 </li>
@@ -161,352 +165,422 @@
             
   <div class="section" id="src">
 <h1>src<a class="headerlink" href="#src" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bounce_viz.src.helper.html">helper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#module-bounce_viz.src.helper.bounce_graph_helper">bounce_graph_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#module-bounce_viz.src.helper.bounce_helper">bounce_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#module-bounce_viz.src.helper.general_position_helper">general_position_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#module-bounce_viz.src.helper.geometry_helper">geometry_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#module-bounce_viz.src.helper.polygon_helper">polygon_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#module-bounce_viz.src.helper.shoot_ray_helper">shoot_ray_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#module-bounce_viz.src.helper.visibility_helper">visibility_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#module-bounce_viz.src.helper.visualization_helper">visualization_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bounce_viz.src.helper.html#module-bounce_viz.src.helper">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-bounce_viz.src.bounce">
-<span id="bounce"></span><h2>bounce<a class="headerlink" href="#module-bounce_viz.src.bounce" title="Permalink to this headline">¶</a></h2>
-<p>This program simulates the bouncing of balls
-under various bouncing strategies</p>
-<p>Written by Steve LaValle November 2011</p>
-<dl class="function">
-<dt id="bounce_viz.src.bounce.ShootInterval">
-<code class="descname">ShootInterval</code><span class="sig-paren">(</span><em>poly</em>, <em>i</em>, <em>j</em>, <em>pt1</em>, <em>pt2</em>, <em>min_ang</em>, <em>max_ang</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce.html#ShootInterval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce.ShootInterval" title="Permalink to this definition">¶</a></dt>
-<dd><p>Shoot Interval</p>
+<div class="section" id="module-bounce_viz.src.bounce_graph">
+<span id="bounce-graph"></span><h2>bounce_graph<a class="headerlink" href="#module-bounce_viz.src.bounce_graph" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bounce_viz.src.bounce_graph.Bounce_Graph">
+<em class="property">class </em><code class="descname">Bounce_Graph</code><span class="sig-paren">(</span><em>bvd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce_graph.html#Bounce_Graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce_graph.Bounce_Graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Bounce visibility diagram is the directed edge visibility graph a partitioned polygon
+.. attribute:: bounce_visibility_diagram</p>
+<dl class="attribute">
+<dt id="bounce_viz.src.bounce_graph.Bounce_Graph.visibility_graph">
+<code class="descname">visibility_graph</code><a class="headerlink" href="#bounce_viz.src.bounce_graph.Bounce_Graph.visibility_graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.bounce_graph.Bounce_Graph.safe_action_graph">
+<code class="descname">safe_action_graph</code><a class="headerlink" href="#bounce_viz.src.bounce_graph.Bounce_Graph.safe_action_graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bounce_viz.src.bounce_graph.Bounce_Graph.create_bounce_visibility_graph">
+<code class="descname">create_bounce_visibility_graph</code><span class="sig-paren">(</span><em>poly</em>, <em>requireContract=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce_graph.html#Bounce_Graph.create_bounce_visibility_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce_graph.Bounce_Graph.create_bounce_visibility_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates directed edge-to-edge visibility graph; edge information is angle ranges which create contraction mapping</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="bounce_viz.src.bounce.PerformRotation">
-<code class="descname">PerformRotation</code><span class="sig-paren">(</span><em>incoming</em>, <em>n</em>, <em>strategy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce.html#PerformRotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce.PerformRotation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="bounce_viz.src.bounce_graph.Bounce_Graph.create_safe_action_graph">
+<code class="descname">create_safe_action_graph</code><span class="sig-paren">(</span><em>bvg</em>, <em>poly</em>, <em>visible_vx_set_for_edges</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce_graph.html#Bounce_Graph.create_safe_action_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce_graph.Bounce_Graph.create_safe_action_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove edges with an empty angle range from the bounce visibility graph to create the safe action graph</p>
+</dd></dl>
 
-<dl class="function">
-<dt id="bounce_viz.src.bounce.PerformBounce">
-<code class="descname">PerformBounce</code><span class="sig-paren">(</span><em>s</em>, <em>bp</em>, <em>n</em>, <em>strategy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce.html#PerformBounce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce.PerformBounce" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="bounce_viz.src.bounce_graph.Bounce_Graph.get_shortest_path">
+<code class="descname">get_shortest_path</code><span class="sig-paren">(</span><em>start_set</em>, <em>goal_set</em>, <em>graph_type='safe'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce_graph.html#Bounce_Graph.get_shortest_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce_graph.Bounce_Graph.get_shortest_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get shortest paths set from a start set to the goal set in a given graph</p>
+</dd></dl>
 
-<dl class="function">
-<dt id="bounce_viz.src.bounce.main">
-<code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce.main" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.bounce.random">
-<code class="descname">random</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; x in the interval [0, 1).<a class="headerlink" href="#bounce_viz.src.bounce.random" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+</dd></dl>
 
 </div>
-<div class="section" id="module-bounce_viz.src.env_gen">
-<span id="env-gen"></span><h2>env_gen<a class="headerlink" href="#module-bounce_viz.src.env_gen" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="bounce_viz.src.env_gen.reg_poly">
-<code class="descname">reg_poly</code><span class="sig-paren">(</span><em>N</em>, <em>r</em>, <em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/env_gen.html#reg_poly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.env_gen.reg_poly" title="Permalink to this definition">¶</a></dt>
-<dd><p>generate regular polygon with n sides, radius r, centered at x,y</p>
+<div class="section" id="module-bounce_viz.src.bounce_visibility_diagram">
+<span id="bounce-visibility-diagram"></span><h2>bounce_visibility_diagram<a class="headerlink" href="#module-bounce_viz.src.bounce_visibility_diagram" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram">
+<em class="property">class </em><code class="descname">Bounce_Visibility_Diagram</code><span class="sig-paren">(</span><em>pls</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce_visibility_diagram.html#Bounce_Visibility_Diagram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Bounce visibility diagram is a representation of the vertex-edge visibility structure of a partitioned polygon</p>
+<dl class="attribute">
+<dt id="bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.resolution">
+<code class="descname">resolution</code><a class="headerlink" href="#bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.resolution" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – the discretization constant for the angle function</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.partial_local_sequence">
+<code class="descname">partial_local_sequence</code><a class="headerlink" href="#bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.partial_local_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Partial_Local_Sequence</span></code> – The partial local sequence for the polygon</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.visible_vx_set_for_edges">
+<code class="descname">visible_vx_set_for_edges</code><a class="headerlink" href="#bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.visible_vx_set_for_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of list of list of list</em> – format: [poly1: [e1:[viz vx poly1:[], viz vx poly2:[]], e2:[viz vx poly1:[], viz vx poly2:[]]], poly2: [e1:[viz vx poly1:[], viz vx poly2:[]], e2:[viz vx poly1:[], viz vx poly2:[]]]]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.visible_angle_info">
+<code class="descname">visible_angle_info</code><a class="headerlink" href="#bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.visible_angle_info" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of numpy.array</em> – The angle functions for each edge in each closed polygonal boundary</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.compute_visible_angle_info">
+<code class="descname">compute_visible_angle_info</code><span class="sig-paren">(</span><em>pls</em>, <em>visible_vx_set_for_edges</em>, <em>resolution</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce_visibility_diagram.html#Bounce_Visibility_Diagram.compute_visible_angle_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.compute_visible_angle_info" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Compute the visible angle info for the input polygon</dt>
+<dd><dl class="first last docutils">
+<dt>For each visible vertex, we need to calculate:</dt>
+<dd><ol class="first last arabic simple">
+<li>the view angle at the current vertex w.r.t the current edge and</li>
+<li>the view angle at the sample points on the edge and the next vertex w.r.t the current edge</li>
+<li>insert a np.nan for discontinuity otherwise matplotlib will try to connect them together</li>
+</ol>
+</dd>
+</dl>
+</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the polygon</li>
-<li><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The radius of the polygon</li>
-<li><strong>(</strong><strong>x</strong><strong>,</strong><strong>y</strong><strong>)</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – The coordinates of the center of the polygon</li>
+<li><strong>pls</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Partial_Local_Sequence</span></code>) – </li>
+<li><strong>resolution</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the number of sample points on each edge</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The regular polygon represented by vertex coordinates</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The visible angle info for the input polygon</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.array</p>
 </td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
-<dl class="function">
-<dt id="bounce_viz.src.env_gen.room">
-<code class="descname">room</code><span class="sig-paren">(</span><em>r</em>, <em>x0</em>, <em>y0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/env_gen.html#room"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.env_gen.room" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>hline=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/bounce_visibility_diagram.html#Bounce_Visibility_Diagram.visualize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the link diagram for a given polygon to image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>bvd</strong> (<a class="reference internal" href="#bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram" title="bounce_viz.src.bounce_visibility_diagram.Bounce_Visibility_Diagram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Bounce_Visibility_Diagram</span></code></a>) – The link diagram computed for the given polygon</li>
+<li><strong>hline</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The angle of fix theta bouncing</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
-<dl class="function">
-<dt id="bounce_viz.src.env_gen.rooms">
-<code class="descname">rooms</code><span class="sig-paren">(</span><em>N</em>, <em>r</em>, <em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/env_gen.html#rooms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.env_gen.rooms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.env_gen.random">
-<code class="descname">random</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; x in the interval [0, 1).<a class="headerlink" href="#bounce_viz.src.env_gen.random" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</div>
-<div class="section" id="module-bounce_viz.src.general_position">
-<span id="general-position"></span><h2>general_position<a class="headerlink" href="#module-bounce_viz.src.general_position" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="bounce_viz.src.general_position.IsThreePointsOnLine">
-<code class="descname">IsThreePointsOnLine</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em>, <em>p3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/general_position.html#IsThreePointsOnLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.general_position.IsThreePointsOnLine" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.general_position.IsThreePointsOnLineSeg">
-<code class="descname">IsThreePointsOnLineSeg</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em>, <em>p3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/general_position.html#IsThreePointsOnLineSeg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.general_position.IsThreePointsOnLineSeg" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.general_position.SegsInGeneralPos">
-<code class="descname">SegsInGeneralPos</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em>, <em>q1</em>, <em>q2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/general_position.html#SegsInGeneralPos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.general_position.SegsInGeneralPos" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.general_position.PolyInGeneralPos">
-<code class="descname">PolyInGeneralPos</code><span class="sig-paren">(</span><em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/general_position.html#PolyInGeneralPos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.general_position.PolyInGeneralPos" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</div>
-<div class="section" id="module-bounce_viz.src.geom_utils">
-<span id="geom-utils"></span><h2>geom_utils<a class="headerlink" href="#module-bounce_viz.src.geom_utils" title="Permalink to this headline">¶</a></h2>
-<p>Utility functions for geometry in simple polygons</p>
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.FixAngle">
-<code class="descname">FixAngle</code><span class="sig-paren">(</span><em>theta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#FixAngle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.FixAngle" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.PointDistance">
-<code class="descname">PointDistance</code><span class="sig-paren">(</span><em>p</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#PointDistance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.PointDistance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.Points2Vect">
-<code class="descname">Points2Vect</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#Points2Vect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.Points2Vect" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.GetVectorLen">
-<code class="descname">GetVectorLen</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#GetVectorLen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.GetVectorLen" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.GetVector2Angle">
-<code class="descname">GetVector2Angle</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#GetVector2Angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.GetVector2Angle" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.IsLeftTurn">
-<code class="descname">IsLeftTurn</code><span class="sig-paren">(</span><em>p</em>, <em>q</em>, <em>r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#IsLeftTurn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.IsLeftTurn" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.IsRightTurn">
-<code class="descname">IsRightTurn</code><span class="sig-paren">(</span><em>p</em>, <em>q</em>, <em>r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#IsRightTurn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.IsRightTurn" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.IsIntersectSegments">
-<code class="descname">IsIntersectSegments</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em>, <em>q1</em>, <em>q2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#IsIntersectSegments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.IsIntersectSegments" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.BouncePointInEdge">
-<code class="descname">BouncePointInEdge</code><span class="sig-paren">(</span><em>sp</em>, <em>bp</em>, <em>ep1</em>, <em>ep2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#BouncePointInEdge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.BouncePointInEdge" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.ShootRay">
-<code class="descname">ShootRay</code><span class="sig-paren">(</span><em>state</em>, <em>v1</em>, <em>v2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#ShootRay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.ShootRay" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.ShootRayFromVect">
-<code class="descname">ShootRayFromVect</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em>, <em>v1</em>, <em>v2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#ShootRayFromVect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.ShootRayFromVect" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.geom_utils.ClosestPtAlongRay">
-<code class="descname">ClosestPtAlongRay</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em>, <em>poly</em>, <em>last_bounce_edge=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/geom_utils.html#ClosestPtAlongRay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.geom_utils.ClosestPtAlongRay" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</div>
-<div class="section" id="module-bounce_viz.src.graph_operations">
-<span id="graph-operations"></span><h2>graph_operations<a class="headerlink" href="#module-bounce_viz.src.graph_operations" title="Permalink to this headline">¶</a></h2>
-<p>Applications of the bounce visibility graph to robotic tasks</p>
-<dl class="function">
-<dt id="bounce_viz.src.graph_operations.interp">
-<code class="descname">interp</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em>, <em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_operations.html#interp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_operations.interp" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_operations.polyLens">
-<code class="descname">polyLens</code><span class="sig-paren">(</span><em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_operations.html#polyLens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_operations.polyLens" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_operations.s">
-<code class="descname">s</code><span class="sig-paren">(</span><em>s_param</em>, <em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_operations.html#s"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_operations.s" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_operations.s_inv">
-<code class="descname">s_inv</code><span class="sig-paren">(</span><em>pt</em>, <em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_operations.html#s_inv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_operations.s_inv" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_operations.nodesCovered">
-<code class="descname">nodesCovered</code><span class="sig-paren">(</span><em>poly</em>, <em>interval</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_operations.html#nodesCovered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_operations.nodesCovered" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_operations.navigate">
-<code class="descname">navigate</code><span class="sig-paren">(</span><em>poly</em>, <em>S</em>, <em>G</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_operations.html#navigate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_operations.navigate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_operations.path2transitions">
-<code class="descname">path2transitions</code><span class="sig-paren">(</span><em>path</em>, <em>BVG</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_operations.html#path2transitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_operations.path2transitions" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_operations.PropagatePath">
-<code class="descname">PropagatePath</code><span class="sig-paren">(</span><em>poly</em>, <em>path</em>, <em>S</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_operations.html#PropagatePath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_operations.PropagatePath" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_operations.random">
-<code class="descname">random</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; x in the interval [0, 1).<a class="headerlink" href="#bounce_viz.src.graph_operations.random" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</div>
-<div class="section" id="module-bounce_viz.src.graph_utils">
-<span id="graph-utils"></span><h2>graph_utils<a class="headerlink" href="#module-bounce_viz.src.graph_utils" title="Permalink to this headline">¶</a></h2>
-<p>Functions for constructing and querying the bounce visibility graph</p>
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.AnglesBetweenSegs">
-<code class="descname">AnglesBetweenSegs</code><span class="sig-paren">(</span><em>e1</em>, <em>e2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#AnglesBetweenSegs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.AnglesBetweenSegs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.SafeAngles">
-<code class="descname">SafeAngles</code><span class="sig-paren">(</span><em>e1</em>, <em>e2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#SafeAngles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.SafeAngles" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.angleBound">
-<code class="descname">angleBound</code><span class="sig-paren">(</span><em>poly</em>, <em>i</em>, <em>j</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#angleBound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.angleBound" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.coeff">
-<code class="descname">coeff</code><span class="sig-paren">(</span><em>poly</em>, <em>i</em>, <em>j</em>, <em>theta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#coeff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.coeff" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.intersect_intervals">
-<code class="descname">intersect_intervals</code><span class="sig-paren">(</span><em>i1</em>, <em>i2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#intersect_intervals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.intersect_intervals" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.interval_len">
-<code class="descname">interval_len</code><span class="sig-paren">(</span><em>interval</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#interval_len"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.interval_len" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.validAnglesForContract">
-<code class="descname">validAnglesForContract</code><span class="sig-paren">(</span><em>poly</em>, <em>i</em>, <em>j</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#validAnglesForContract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.validAnglesForContract" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.mkGraph">
-<code class="descname">mkGraph</code><span class="sig-paren">(</span><em>poly</em>, <em>requireContract=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#mkGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.mkGraph" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.allCycles">
-<code class="descname">allCycles</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#allCycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.allCycles" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.findPaths">
-<code class="descname">findPaths</code><span class="sig-paren">(</span><em>G</em>, <em>start</em>, <em>goal</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#findPaths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.findPaths" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.reduceGraphWrtAngle">
-<code class="descname">reduceGraphWrtAngle</code><span class="sig-paren">(</span><em>G</em>, <em>theta_min</em>, <em>theta_max</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#reduceGraphWrtAngle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.reduceGraphWrtAngle" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.graph_utils.mkSafeGraph">
-<code class="descname">mkSafeGraph</code><span class="sig-paren">(</span><em>G</em>, <em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/graph_utils.html#mkSafeGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.graph_utils.mkSafeGraph" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</div>
-<div class="section" id="module-bounce_viz.src.link_diagram">
-<span id="link-diagram"></span><h2>link_diagram<a class="headerlink" href="#module-bounce_viz.src.link_diagram" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="bounce_viz.src.link_diagram.GetAngleFromThreePoint">
-<code class="descname">GetAngleFromThreePoint</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em>, <em>origin</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/link_diagram.html#GetAngleFromThreePoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.link_diagram.GetAngleFromThreePoint" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.link_diagram.SortByDistance">
-<code class="descname">SortByDistance</code><span class="sig-paren">(</span><em>p1</em>, <em>unsorted_vs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/link_diagram.html#SortByDistance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.link_diagram.SortByDistance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.link_diagram.InsertAllTransitionPts">
-<code class="descname">InsertAllTransitionPts</code><span class="sig-paren">(</span><em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/link_diagram.html#InsertAllTransitionPts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.link_diagram.InsertAllTransitionPts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.link_diagram.mkVizSets">
-<code class="descname">mkVizSets</code><span class="sig-paren">(</span><em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/link_diagram.html#mkVizSets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.link_diagram.mkVizSets" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.link_diagram.GetLinkDiagram">
-<code class="descname">GetLinkDiagram</code><span class="sig-paren">(</span><em>poly</em>, <em>resolution=15</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/link_diagram.html#GetLinkDiagram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.link_diagram.GetLinkDiagram" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+</dd></dl>
 
 </div>
 <div class="section" id="module-bounce_viz.src.maps">
 <span id="maps"></span><h2>maps<a class="headerlink" href="#module-bounce_viz.src.maps" title="Permalink to this headline">¶</a></h2>
+<p>Polygonal environment vertices information. Model: List outer boundary vertices in counterclockwise direction; list vertices in each holes in clockwise direction.</p>
+</div>
+<div class="section" id="module-bounce_viz.src.navigation">
+<span id="navigation"></span><h2>navigation<a class="headerlink" href="#module-bounce_viz.src.navigation" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="bounce_viz.src.maps.random">
-<code class="descname">random</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; x in the interval [0, 1).<a class="headerlink" href="#bounce_viz.src.maps.random" title="Permalink to this definition">¶</a></dt>
+<dt id="bounce_viz.src.navigation.get_vertices_in_interval">
+<code class="descname">get_vertices_in_interval</code><span class="sig-paren">(</span><em>poly_unit_map</em>, <em>interval</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/navigation.html#get_vertices_in_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.navigation.get_vertices_in_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find vertices on the polygon that are in the range specified</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.navigation.get_transition_over_path">
+<code class="descname">get_transition_over_path</code><span class="sig-paren">(</span><em>path</em>, <em>safe_action_graph</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/navigation.html#get_transition_over_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.navigation.get_transition_over_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the transition with angle range information from a given path</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bounce_viz.src.navigation.Navigation">
+<em class="property">class </em><code class="descname">Navigation</code><span class="sig-paren">(</span><em>start_position</em>, <em>end_position</em>, <em>bvg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/navigation.html#Navigation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.navigation.Navigation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Description of a navigation task for a given polygon
+.. attribute:: start_position</p>
+<blockquote>
+<div><em>(float, float)</em> – The range of starting position in the unit interval mapping of the polygon</div></blockquote>
+<dl class="attribute">
+<dt id="bounce_viz.src.navigation.Navigation.end_position">
+<code class="descname">end_position</code><a class="headerlink" href="#bounce_viz.src.navigation.Navigation.end_position" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(float, float)</em> – The range of ending position in the unit interval mapping of the polygon</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.navigation.Navigation.bvg">
+<code class="descname">bvg</code><a class="headerlink" href="#bounce_viz.src.navigation.Navigation.bvg" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Bounce_Visibility_Graph</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.navigation.Navigation.bvd">
+<code class="descname">bvd</code><a class="headerlink" href="#bounce_viz.src.navigation.Navigation.bvd" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Bounce_Visibility_Diagram</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.navigation.Navigation.pls">
+<code class="descname">pls</code><a class="headerlink" href="#bounce_viz.src.navigation.Navigation.pls" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Partial_Local_Sequence</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.navigation.Navigation.polygon">
+<code class="descname">polygon</code><a class="headerlink" href="#bounce_viz.src.navigation.Navigation.polygon" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simple_Polygon</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.navigation.Navigation.inserted_polygon">
+<code class="descname">inserted_polygon</code><a class="headerlink" href="#bounce_viz.src.navigation.Navigation.inserted_polygon" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simple_Polygon</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bounce_viz.src.navigation.Navigation.navigate">
+<code class="descname">navigate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/navigation.html#Navigation.navigate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.navigation.Navigation.navigate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executing the navigation task with a given strategy</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-bounce_viz.src.orthogonal_connect_dots">
+<span id="orthogonal-connect-dots"></span><h2>orthogonal_connect_dots<a class="headerlink" href="#module-bounce_viz.src.orthogonal_connect_dots" title="Permalink to this headline">¶</a></h2>
+<p>An implementation of “UNIQUENESS OF ORTHOGONAL CONNECT-THE-DOTS” by Joseph O’Rourke</p>
+<dl class="function">
+<dt id="bounce_viz.src.orthogonal_connect_dots.get_dot_dict_from_dots">
+<code class="descname">get_dot_dict_from_dots</code><span class="sig-paren">(</span><em>dots</em>, <em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/orthogonal_connect_dots.html#get_dot_dict_from_dots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.orthogonal_connect_dots.get_dot_dict_from_dots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.orthogonal_connect_dots.remove_repeat_from_sorted_list">
+<code class="descname">remove_repeat_from_sorted_list</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/orthogonal_connect_dots.html#remove_repeat_from_sorted_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.orthogonal_connect_dots.remove_repeat_from_sorted_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.orthogonal_connect_dots.check_dots_parity">
+<code class="descname">check_dots_parity</code><span class="sig-paren">(</span><em>dot_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/orthogonal_connect_dots.html#check_dots_parity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.orthogonal_connect_dots.check_dots_parity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.orthogonal_connect_dots.check_two_edge_cross">
+<code class="descname">check_two_edge_cross</code><span class="sig-paren">(</span><em>h_edge</em>, <em>v_edge</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/orthogonal_connect_dots.html#check_two_edge_cross"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.orthogonal_connect_dots.check_two_edge_cross" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.orthogonal_connect_dots.generate_points">
+<code class="descname">generate_points</code><span class="sig-paren">(</span><em>grid_size</em>, <em>points_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/orthogonal_connect_dots.html#generate_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.orthogonal_connect_dots.generate_points" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.orthogonal_connect_dots.generate_edges">
+<code class="descname">generate_edges</code><span class="sig-paren">(</span><em>h_dot_dict</em>, <em>v_dot_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/orthogonal_connect_dots.html#generate_edges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.orthogonal_connect_dots.generate_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.orthogonal_connect_dots.generate_orthogonal_map">
+<code class="descname">generate_orthogonal_map</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/orthogonal_connect_dots.html#generate_orthogonal_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.orthogonal_connect_dots.generate_orthogonal_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.orthogonal_connect_dots.get_largest_polygon">
+<code class="descname">get_largest_polygon</code><span class="sig-paren">(</span><em>edges</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/orthogonal_connect_dots.html#get_largest_polygon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.orthogonal_connect_dots.get_largest_polygon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.orthogonal_connect_dots.get_line_number_in_file">
+<code class="descname">get_line_number_in_file</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/orthogonal_connect_dots.html#get_line_number_in_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.orthogonal_connect_dots.get_line_number_in_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
+<div class="section" id="module-bounce_viz.src.orthogonal_env">
+<span id="orthogonal-env"></span><h2>orthogonal_env<a class="headerlink" href="#module-bounce_viz.src.orthogonal_env" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-bounce_viz.src.partial_local_sequence">
 <span id="partial-local-sequence"></span><h2>partial_local_sequence<a class="headerlink" href="#module-bounce_viz.src.partial_local_sequence" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="bounce_viz.src.partial_local_sequence.IsInPoly">
-<code class="descname">IsInPoly</code><span class="sig-paren">(</span><em>p</em>, <em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/partial_local_sequence.html#IsInPoly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.IsInPoly" title="Permalink to this definition">¶</a></dt>
-<dd><p>test if point p is in poly using crossing number</p>
+<dl class="class">
+<dt id="bounce_viz.src.partial_local_sequence.Partial_Local_Sequence">
+<em class="property">class </em><code class="descname">Partial_Local_Sequence</code><span class="sig-paren">(</span><em>polygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/partial_local_sequence.html#Partial_Local_Sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.Partial_Local_Sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Partial local sequence is a sequence of points on the boundary of P associated with a vertex v0, and is constructed by shooting a ray through a reflex vertex v0 from every visible vertex and keeping the resulting sequence of intersections with the boundary of P. The partial local sequence for a convex vertex is empty.</p>
+<dl class="attribute">
+<dt id="bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.polygon">
+<code class="descname">polygon</code><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.polygon" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.array</em> – The polygon that the partial local sequence is built upon</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="bounce_viz.src.partial_local_sequence.VertexExists">
-<code class="descname">VertexExists</code><span class="sig-paren">(</span><em>v</em>, <em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/partial_local_sequence.html#VertexExists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.VertexExists" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="bounce_viz.src.partial_local_sequence.FindReflexVerts">
-<code class="descname">FindReflexVerts</code><span class="sig-paren">(</span><em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/partial_local_sequence.html#FindReflexVerts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.FindReflexVerts" title="Permalink to this definition">¶</a></dt>
-<dd><p>return indices of all reflex vertices in poly</p>
+<dl class="attribute">
+<dt id="bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.inserted_polygon">
+<code class="descname">inserted_polygon</code><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.inserted_polygon" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.array</em> – The polygon with all new vertices inserted</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="bounce_viz.src.partial_local_sequence.ShootRaysFromReflex">
-<code class="descname">ShootRaysFromReflex</code><span class="sig-paren">(</span><em>poly</em>, <em>j</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/partial_local_sequence.html#ShootRaysFromReflex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.ShootRaysFromReflex" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="attribute">
+<dt id="bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.sequence_info">
+<code class="descname">sequence_info</code><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.sequence_info" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – A 2D array stores the partial local sequence for each vertex in polygon in rows</p>
+</dd></dl>
 
-<dl class="function">
-<dt id="bounce_viz.src.partial_local_sequence.ShootRaysToReflexFromVerts">
-<code class="descname">ShootRaysToReflexFromVerts</code><span class="sig-paren">(</span><em>poly</em>, <em>j</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/partial_local_sequence.html#ShootRaysToReflexFromVerts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.ShootRaysToReflexFromVerts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.compute_sequence">
+<code class="descname">compute_sequence</code><span class="sig-paren">(</span><em>input_polygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/partial_local_sequence.html#Partial_Local_Sequence.compute_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.compute_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the partial local sequence for all vertices of the polygon</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.compute_inserted_polygon">
+<code class="descname">compute_inserted_polygon</code><span class="sig-paren">(</span><em>polygon</em>, <em>sequence_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/partial_local_sequence.html#Partial_Local_Sequence.compute_inserted_polygon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.partial_local_sequence.Partial_Local_Sequence.compute_inserted_polygon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the polygon with all new vertices from the partial local sequence inserted</p>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="module-bounce_viz.src.settings">
 <span id="settings"></span><h2>settings<a class="headerlink" href="#module-bounce_viz.src.settings" title="Permalink to this headline">¶</a></h2>
+<p>Settings (constant values, file paths, etc) for the project</p>
+</div>
+<div class="section" id="module-bounce_viz.src.simple_polygon">
+<span id="simple-polygon"></span><h2>simple_polygon<a class="headerlink" href="#module-bounce_viz.src.simple_polygon" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon">
+<em class="property">class </em><code class="descname">Simple_Polygon</code><span class="sig-paren">(</span><em>name</em>, <em>outer_boundary_vertices</em>, <em>holes=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/simple_polygon.html#Simple_Polygon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Partial local sequence is a sequence of points on the boundary of P associated with a vertex v0, and is constructed by shooting a ray through a reflex vertex v0 from every visible vertex and keeping the resulting sequence of intersections with the boundary of P. The partial local sequence for a convex vertex is empty.</p>
+<dl class="attribute">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.name">
+<code class="descname">name</code><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – name of the environment; used for saving results</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.outer_boundary_vertices">
+<code class="descname">outer_boundary_vertices</code><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.outer_boundary_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.array</em> – A list of coordinates of vertices in outer most boundary of the polygon in counter clockwise order.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.holes">
+<code class="descname">holes</code><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.holes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of numpy.array</em> – A list of list of coordinates, each list contains vertices in a hole in the polygon in clockwise order</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.complete_vertex_list">
+<code class="descname">complete_vertex_list</code><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.complete_vertex_list" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of (int, np.array)</em> – Assigned each vertex an index and store the the index and coordinates in a list. The tuples are stored according to the index increasing order</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.vertex_list_per_poly">
+<code class="descname">vertex_list_per_poly</code><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.vertex_list_per_poly" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of list of np.array</em> – Store the vertex list for each close boundary in the polygon into a list</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.size">
+<code class="descname">size</code><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.size" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – the total number of vertices in the polygon</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.reflex_vertices">
+<code class="descname">reflex_vertices</code><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.reflex_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of numpy.array</em> – list of reflex vertices in the polygon using the index assigned in complete_vertex_list</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.unit_interval_mapping">
+<code class="descname">unit_interval_mapping</code><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.unit_interval_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(list of floats, list of list of floats)</em> – see compute_unit_interval_mapping</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.compute_unit_interval_mapping">
+<code class="descname">compute_unit_interval_mapping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/simple_polygon.html#Simple_Polygon.compute_unit_interval_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.compute_unit_interval_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map the vertices of the polygon on to a given interval (length specified in settings) where both the start and the end of the interval identify with the first vertex in the polygon</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.reflex_verts_single_boundary">
+<code class="descname">reflex_verts_single_boundary</code><span class="sig-paren">(</span><em>vs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/simple_polygon.html#Simple_Polygon.reflex_verts_single_boundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.reflex_verts_single_boundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>return indices of all reflex vertices in poly</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.get_reflex_vertices">
+<code class="descname">get_reflex_vertices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/simple_polygon.html#Simple_Polygon.get_reflex_vertices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.get_reflex_vertices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.get_hole_size_list">
+<code class="descname">get_hole_size_list</code><span class="sig-paren">(</span><em>start</em>, <em>holes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/simple_polygon.html#Simple_Polygon.get_hole_size_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.get_hole_size_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bounce_viz.src.simple_polygon.Simple_Polygon.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/simple_polygon.html#Simple_Polygon.visualize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.simple_polygon.Simple_Polygon.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws polygon with numbered vertices</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-bounce_viz.src.timeout">
+<span id="timeout"></span><h2>timeout<a class="headerlink" href="#module-bounce_viz.src.timeout" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="bounce_viz.src.timeout.TimeoutError">
+<em class="property">exception </em><code class="descname">TimeoutError</code><a class="reference internal" href="_modules/bounce_viz/src/timeout.html#TimeoutError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.timeout.TimeoutError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bounce_viz.src.timeout.timeout">
+<code class="descname">timeout</code><span class="sig-paren">(</span><em>seconds=10</em>, <em>error_message='STREAM ioctl timeout'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bounce_viz/src/timeout.html#timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bounce_viz.src.timeout.timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-bounce_viz.src">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bounce_viz.src" title="Permalink to this headline">¶</a></h2>
@@ -521,7 +595,7 @@ under various bouncing strategies</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="bounce_viz.test.html" class="btn btn-neutral float-right" title="test" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="bounce_viz.src.helper.html" class="btn btn-neutral float-right" title="helper" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="bounce_viz.html" class="btn btn-neutral" title="bounce_viz" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

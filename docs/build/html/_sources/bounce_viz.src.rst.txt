@@ -1,61 +1,28 @@
 src
 =======================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    bounce_viz.src.helper
+
 Submodules
 ----------
 
-bounce
------------------------------
-
-.. automodule:: bounce_viz.src.bounce
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-env\_gen
--------------------------------
-
-.. automodule:: bounce_viz.src.env_gen
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-general\_position
-----------------------------------------
-
-.. automodule:: bounce_viz.src.general_position
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-geom\_utils
-----------------------------------
-
-.. automodule:: bounce_viz.src.geom_utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-graph\_operations
-----------------------------------------
-
-.. automodule:: bounce_viz.src.graph_operations
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-graph\_utils
------------------------------------
-
-.. automodule:: bounce_viz.src.graph_utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-link\_diagram
+bounce\_graph
 ------------------------------------
 
-.. automodule:: bounce_viz.src.link_diagram
+.. automodule:: bounce_viz.src.bounce_graph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+bounce\_visibility\_diagram
+--------------------------------------------------
+
+.. automodule:: bounce_viz.src.bounce_visibility_diagram
     :members:
     :undoc-members:
     :show-inheritance:
@@ -64,6 +31,30 @@ maps
 ---------------------------
 
 .. automodule:: bounce_viz.src.maps
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+navigation
+---------------------------------
+
+.. automodule:: bounce_viz.src.navigation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+orthogonal\_connect\_dots
+------------------------------------------------
+
+.. automodule:: bounce_viz.src.orthogonal_connect_dots
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+orthogonal\_env
+--------------------------------------
+
+.. automodule:: bounce_viz.src.orthogonal_env
     :members:
     :undoc-members:
     :show-inheritance:
@@ -80,6 +71,22 @@ settings
 -------------------------------
 
 .. automodule:: bounce_viz.src.settings
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+simple\_polygon
+--------------------------------------
+
+.. automodule:: bounce_viz.src.simple_polygon
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+timeout
+------------------------------
+
+.. automodule:: bounce_viz.src.timeout
     :members:
     :undoc-members:
     :show-inheritance:

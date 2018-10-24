@@ -4,6 +4,14 @@ test
 Submodules
 ----------
 
+holes\_test
+-----------------------------------
+
+.. automodule:: bounce_viz.test.holes_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 run\_sim
 --------------------------------
 
@@ -12,10 +20,10 @@ run\_sim
     :undoc-members:
     :show-inheritance:
 
-tests
------------------------------
+test\_bounce
+------------------------------------
 
-.. automodule:: bounce_viz.test.tests
+.. automodule:: bounce_viz.test.test_bounce
     :members:
     :undoc-members:
     :show-inheritance:
