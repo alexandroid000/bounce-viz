@@ -14,6 +14,17 @@ with pkgs.python35Packages;
         ps.pygame
         ps.sphinx
         ps.sphinx_rtd_theme
+        ps.cycler
+        ps.decorator
+        #ps.kiwisolver
+        ps.matplotlib
+        ps.networkx
+        ps.numpy
+        ps.pyparsing
+        #ps.PyQt5
+        #ps.PyQt5-sip
+        ps.python-dateutil
+        ps.six
         visilibity
         ])
 ).env
