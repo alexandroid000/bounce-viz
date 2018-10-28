@@ -89,9 +89,9 @@ such as one that orients the robot relative to its heading prior to collision,
 or relative to the normal of the boundary. We introduce a new data structure,
 the {\em bounce visibility graph}, which is generated from a polygonal
 environment definition. The bounce visibility graph can be queried to determine
-the feasibility of path-based tasks such as navigation and patrolling under
-actuator uncertainty. If the task is feasible, then this approach synthesizes a
-strategy (a sequence of nondeterministic rotations). We also show how to compute
+the feasibility of path-based tasks such as navigation and patrolling, assuming
+we have unavoidable nondeterminism in our actuation. If the task is feasible, 
+then this approach synthesizes a strategy (a sequence of nondeterministic rotations). We also show how to compute
 stable cyclic trajectories and use these to limit uncertainty in the robot's
 position.
 \end{abstract}
@@ -104,10 +104,9 @@ spotted vacuuming our floors, cleaning our pools, mowing our grass, and moving
 goods in our warehouses. These tasks require that the robot's path achieve certain properties; for example, a 
 vacuuming robot should cover the whole space while not visiting 
 any particular area more frequently than others. A robot that is monitoring
-humidity or temperature in a warehouse may be
-required to follow a repeatable path so that data can be easily compared 
-over time. In these examples and more, the strategies for controlling the robot's
-path may be decoupled from the specific tasks, and we envision building a
+humidity or temperature in a warehouse should repeat its path consistently so data 
+can be compared over time. In many such examples, the strategies for controlling 
+the robot's path may be decoupled from the specific application, so we envision building a
 library of useful high-level path controllers based on desired dynamical system
 properties.
 
@@ -115,24 +114,25 @@ Current algorithmic approaches to these tasks take two flavors: 1)
 maximizing the information available to the robot though high-fidelity sensors
 and map-generating algorithms such as SLAM, or 2) minimizing the information needed
 by the robot, such as the largely random navigation strategies of the early
-robot vacuum models. The first approach is very powerful and well-suited to 
+robot vacuums. The first approach is powerful and well-suited to 
 dynamic environments, but also
-resource-intensive (in terms of required energy, computation, and storage
-space). The second approach 
-is more efficient but makes it more difficult to develop general-purpose strategies 
-for navigation and loop-closure. We propose a dual
-approach. First, global geometric information about environment boundaries is provided 
+resource-intensive in terms of energy, computation, and storage
+space. The second approach 
+is more resource efficient, but does not immediately provide general-purpose strategies 
+for navigation and loop-closure. We propose a combined
+approach: first, global geometry of environment boundaries is provided 
 to the system, either \emph{a priori} or calculated online by
-an algorithm such as SLAM. This global geometry is then processed to produce
+an algorithm such as SLAM. The global geometry is then processed to produce
 a strategy providing strong formal guarantees and which can be executed with minimal 
-processing power and only low bandwidth local sensors, such as bump sensors,
+processing power and only low bandwidth local sensors, such as bump and proximity sensors,
 instead of high bandwidth sensors such as cameras.
 
 In this paper, we consider simple robots with ``bouncing" behaviors: robots that
 travel in straight lines in the plane, until encountering an environment
-boundary, at which point they rotate in place and set off again. 
-A growing line of work is considering the computational power of individual bouncing strategies
-and their applications to robotic tasks and applications in biological, microscale, 
+boundary, at which point they rotate in place and set off again. The exact
+action taken at a boundary will be determined by what we call {\em bounce rules}.
+A growing line of work is considering the computational power of individual
+bounce rules and their applications to robotic tasks in biological, microscale, 
 and dynamical contexts. The environment interactions may be mechanical,
 with the robot actually making contact with a surface, or may be simulated with
 virtual boundaries such as the perimeter wire systems used by lawn mowing robots
@@ -141,25 +141,32 @@ been validated experimentally, for example in \cite{alam2018space} and \cite{Lew
 Often these lines of work consider only a small
 part of the strategy space, such as \cite{ErLav13}, which considers only robots
 that ``bounce'' at a single fixed angle to the normal. In this work, we present 
-a tractable approach to reasoning over all possible bounce strategies.
+a tractable approach to reasoning over {\em all possible} bounce strategies,
+generalizing previous tools for analyzing a few given bounce rules.
 
-This paper presents two ideas for simplifying the characterization and
-generation of paths of such mobile robots.  First, that by using the geometric
+This paper presents three ideas for simplifying the characterization and
+generation of paths of such mobile robots. One crucial
+aspect of our approach is that we assume that the robot has some intrinsic
+nondeterminism, so we generate nondeterministic strategies such that if the
+robot executes any action in a family at each stage, the strategy will succeed.
+We can then analyze the size of the families of bounce rules at each stage to
+determine the minimum required accuracy of a successful robot design.
+Our second contribution is that by using the geometric
 structure of a polygonal environment, we can create a combinatorial
 representation of the environment that lets us reason over a finite number of
 families of paths, instead of the infinite collection of all possible paths.
-Second, we can take advantage of the fact that linear functions mapping points
-between line segments are often \emph{contracting}: two points under the
- function become closer together.  We use this property to
-control uncertainty and synthesize strategies along with explicit descriptions of the
-amount of allowable actuator uncertainty for successful execution of the strategy.
-
+Finally, we provide results on when transitions in this robotic system are 
+\emph{contracting}: two potential robot states under the transition move closer together. 
+This property can be used to control uncertainty through actuation, and we
+provide the first steps toward synthesizing strategies which leverage this
+property.
 
 \section{Related Work}
 
-The motion model that we use, which relies on environment interactions, is a
+Our motion model is a
 form of \emph{compliant motion}, in which task constraints are used to guide task
-completion, even when the exact system state is not known. Our approach is
+completion, even when the exact system state is not known. Our use of
+contraction mappings and nondeterministic reasoning is
 related to the idea of funnelling: using
 the attraction regions of a dynamical system to guide states into a goal region.
 These ideas have been developed in the context of manipulation and fine motion control by Whitney
@@ -168,16 +175,15 @@ These ideas have been developed in the context of manipulation and fine motion c
 \cite{LozMasTay84}, Lynch and Mason \cite{LynMas95}, and Burridge, Rizzi, and Koditschek
 \cite{BurRizKod99}, among many others.
 
-
-A key aspect of our robot model is the intentional use of collisions with
-environment boundaries, enabled by the advent of more robust, lightweight mobile
-robots. Collisions as information sources for such mobile robots have also been
-recently explored for multi-robot systems \cite{mayya2017collisions}. Our
+Our intentional use of collisions with
+environment boundaries is enabled by the advent of more robust, lightweight mobile
+robots. Collisions as information sources have also been
+recently explored for multi-robot systems \cite{mayya2018localization}. Our
 specific motion model has been used in works such as \cite{OkaLav06} to
 determine minimal information processing requirements for mobile robot tasks.
-The first-class study of the motion model's dynamical properties was proposed in
-\cite{ErLav13} and continued in \cite{NilBecLav17}. Our work extends and improves
-these analysis tools, and presents new insights from the use of visibility to
+The first-class study of the dynamical properties of bouncing was proposed in
+\cite{ErLav13} and continued in \cite{NilBecLav17}. Here we extend and improve
+these analysis tools, and incorporate visibility properties to
 discretize the strategy space.
 
 The most closely related work to ours is \cite{LewOKa13}, which considered
@@ -186,21 +192,19 @@ environment boundary, then rotates in place with bounded nonzero
 uncertainty, with the bound given as input to the task. 
 They introduce the idea of ``safe actions,'' which place the entire forward
 projected state of the robot within a single segment of the partitioned
-environment boundary. However, their boundary partition is computed with the robot's 
-motion uncertainty as a fixed input. Our approach
+environment boundary, which we also use in this work. However, their boundary 
+partition is computed with the robot's motion uncertainty as a fixed input. Our approach
 considers all possible amounts of uncertainty, and returns bounds on the required
 accuracy of movement as an output of the algorithm.
 
 In \cite{alam2017minimalist} and \cite{alam2018space}, the authors describe
-navigation, coverage, and localization algorithms for a similar robot that rotates a fixed amount 
+navigation, coverage, and localization algorithms for a robot that rotates a fixed amount 
 relative to the robot's prior heading. 
 Their approach uses a grid discretization of the robot configuration space and searches the discretized dynamical system for paths and limit cycles. The
 algorithm is complete and correct up to discretization, though periodic
 trajectories may exist which require bounce angles not allowed by the
 discretization. By using a discretization induced by the environment geometry,
 we are able to find all possible limit cycles.
-
-
 
 The questions we pose, and our methods of attacking the problem, are related to
 work on visibility in computational geometry \cite{ghosh2007visibility}. Visibility has been
@@ -214,16 +218,15 @@ reflections (as if the edges of the polygon are mirrors)
 \cite{Aronov1996}, or with diffuse
 reflections \cite{prasad1998visibility}, which are related to our nondeterministic bounces.
 
-The dynamical system defined by our robot model is related to \emph{dynamical billiards}
-\cite{billiards}. Along with specular reflection, modified dynamical systems have
-also attracted recent interest \cite{DelMagno2014,pinball,billiards}. 
-One very similar work was inspired by the dynamics of microorganisms; in \cite{microorganism2017}, 
-the authors show that 
+The dynamical system defined by our robot model is related to
+\emph{dynamical billiards} \cite{billiards}. Along with specular reflection,
+modified dynamical systems have also attracted recent interest
+\cite{DelMagno2014,pinball,billiards}. One very similar work was inspired by the
+dynamics of microorganisms; in \cite{microorganism2017}, the authors show that
 \textit{Chlamydomonas reinhardtii} ``bounce'' off boundaries at a specific
 angle determined by their body morphology. They characterize periodic and
-chaotic trajectories of such agents in regular polygons, planar curves, and other
-environments.
-
+chaotic trajectories of such agents in regular polygons, planar curves, and
+other environments.
 
 We are working toward a generalization and hierarchy of robot models, in a
 similar spirit to \cite{brunner2008simple}. Their basic robot model, the simple
@@ -1093,8 +1096,8 @@ of ergodicity have recently been used in exploration tasks
 \cite{miller2016ergodic}. Chaotic dynamical systems have also been used directly
 as controllers for mobile robots \cite{nakamura2001chaotic}.
 
-\textbf{Obstacles. } There is no obvious reason that Algorithm \ref{algo:insert} and the 
-bounce visibility graph cannot be extended to polygonal regions with obstacles.
+%\textbf{Obstacles. } There is no obvious reason that Algorithm \ref{algo:insert} and the 
+%bounce visibility graph cannot be extended to polygonal regions with obstacles.
 
 \subsubsection{Acknowledgement} This work was supported by NSF grants 1035345 and 1328018, and CONACyT
 post-doctoral fellowship 277028.
