@@ -10,14 +10,16 @@
 \usepackage{graphicx}   % need for figures
 \usepackage{color}      % use if color is used in text
 \usepackage{subcaption}
+\captionsetup{compatibility=false}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{url}
 \usepackage{bm}
-\usepackage{tikz}
 \usepackage[outdir=./figures/]{epstopdf}
 \def\UrlFont{\rmfamily}
-
+\usepackage{tikz}
+\usetikzlibrary{through,calc, quotes,angles}
+\usepackage{mathtools}
 
 % bounce transition graph
 % visibility event graph
@@ -660,6 +662,92 @@ some open interval of actions bordering the edge in each direction.
 
 \qed
 \end{proof}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.3\textwidth}
+\centering
+\begin{tikzpicture}
+  \coordinate (A) at (-4, -0.8);
+  \node at (A) [below] {$v_i$};
+  \coordinate (B) at (-1.2, -0.8);
+  \node at (B) [below] {$v_{i+1}$};
+  \coordinate (C) at (-0.3, 1.5);
+  \draw [fill] (A) circle [radius=0.1];
+  \draw [fill] (B) circle [radius=0.1];
+  \draw [fill] (C) circle [radius=0.1];
+  \draw [thick](A) -- (B) node [midway, below, font = \large] {$e_i$};
+  \draw [thick](B) -- (C);
+  \draw[thick, dotted] (A) -- (C);
+  \draw pic["$\widetilde{\theta}$",draw=red,<->,angle eccentricity=1.2,angle radius=1cm] {angle=B--A--C};
+\end{tikzpicture}\captionof{figure}{\label{fig:safe_action_1}}
+\end{subfigure}%
+\begin{subfigure}{0.3\textwidth}
+\centering
+\begin{tikzpicture}
+  \coordinate (A) at (-3, -4);
+  \node at (A) [below] {$v_i$};
+  \coordinate (B) at (-0.1, -4);
+  \coordinate (C) at (0.8, -1.8);
+  \coordinate (D) at (-1.3, -4);
+  \coordinate (E) at (-1.1, -4.9);
+  \coordinate (F) at (-0.5, -4.9);
+  \coordinate (G) at (-1.9, -4);
+  \node at (G) [below] {$v_{i+1}$};
+  \draw [fill] (A) circle [radius=0.1];
+  \draw [fill] (B) circle [radius=0.1];
+  \draw [fill] (C) circle [radius=0.1];
+  \draw [fill] (D) circle [radius=0.1];
+  \draw [fill] (E) circle [radius=0.1];
+  \draw [fill] (F) circle [radius=0.1];
+  \draw [fill] (G) circle [radius=0.1];
+  \draw [thick](A) -- (G) node [midway, below, font = \large] {$e_i$};
+  \draw [thick](G) -- (D);
+  \draw [thick](D) -- (E);
+  \draw [thick](C) -- (F);
+  \draw[thick, dotted] (A) -- (C);
+  \draw[thick, dotted] (D) -- (B);
+  \draw pic["$\widetilde{\theta}$",draw=red,<->,angle eccentricity=0.8,angle radius=1cm] {angle=G--A--C};
+\end{tikzpicture}
+\centering
+\captionof{figure}{\label{fig:safe_action_2}}
+\end{subfigure}
+\begin{subfigure}{0.3\textwidth}
+\centering
+\begin{tikzpicture}
+  \coordinate (A) at (-3, -4);
+  \node at (A) [below] {$v_i$};
+  \coordinate (B) at (-0.1, -4);
+  \coordinate (C) at (0.8, -1.8);
+  \coordinate (D) at (-1.3, -4);
+  \coordinate (E) at (-1.1, -4.9);
+  \coordinate (F) at (-0.5, -4.9);
+  \coordinate (G) at (-1.9, -4);
+  \coordinate (H) at (-4, -4);
+  \node at (G) [below] {$v_{i+1}$};
+  \draw [fill] (A) circle [radius=0.1];
+  \draw [fill] (B) circle [radius=0.1];
+  \draw [fill] (C) circle [radius=0.1];
+  \draw [fill] (D) circle [radius=0.1];
+  \draw [fill] (E) circle [radius=0.1];
+  \draw [fill] (F) circle [radius=0.1];
+  \draw [fill] (G) circle [radius=0.1];
+  \draw [fill] (H) circle [radius=0.1];
+  \draw [thick](A) -- (G) node [midway, below, font = \large] {$e_i$};
+  \draw [thick](G) -- (D);
+  \draw [thick](H) -- (A);
+  \draw [thick](D) -- (E);
+  \draw [thick](C) -- (F);
+  \draw[thick, dotted] (A) -- (C);
+  \draw[thick, dotted] (D) -- (B);
+  \draw pic["$\widetilde{\theta}$",draw=red,<->,angle eccentricity=0.8,angle radius=1cm] {angle=G--A--C};
+\end{tikzpicture}
+\centering
+\captionof{figure}{\label{fig:safe_action_3}}
+\end{subfigure}
+\caption{Cases in Proposition~\ref{prop:twosafe}}
+\label{fig:two_safe_cases}
+\end{figure}
 
 %\begin{definition}
 %We say that two robot trajectories are in the same \textbf{combinatorial family}
