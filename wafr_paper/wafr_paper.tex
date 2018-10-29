@@ -21,6 +21,7 @@
 \usetikzlibrary{through,calc, quotes,angles}
 \usepackage{mathtools}
 
+\setlength{\intextsep}{5pt}
 
 % bounce transition graph
 % visibility event graph
@@ -244,7 +245,7 @@ We are working toward a generalization and hierarchy of robot models, in a
 similar spirit to \cite{brunner2008simple}. Their {\em simple
 combinatorial robot} is able to detect all visible vertices and any edges
 between them, and move straight toward vertices. By augmenting this basic robot model
-with sensors they construct a hierarchy of these robot models. Our questions are related but
+with sensors they construct a hierarchy of these robot models. Our questions are related but 
 different: if the robot is given a compact, purely combinatorial environment representation, 
 what tasks can it accomplish with minimal sensing?
 
@@ -374,9 +375,10 @@ original polygon (though they may see different portions of those edges).
 Thus, the set of possible transitions from a segment becomes easier to
 characterize discretely. See Algorithm \ref{algo:insert} for a pseudocode
 description of this partitioning process. Algorithm
-\ref{algo:insert} applies to polygons with or without holes; holes simply
-require a bit more bookkeeping to correctly find visible vertices and shoot
-rays. Let $P'$ be the polygon $P$ after application of Algorithm
+\ref{algo:insert} applies to polygons with or without holes; holes 
+require more bookkeeping to correctly find visible vertices and shoot
+rays. See Figure \ref{fig:bvd_holes} for an example partition of a polygon with
+ holes. Let $P'$ be the polygon $P$ after application of Algorithm
 \ref{algo:insert}.
 
 \begin{algorithm}
@@ -433,7 +435,6 @@ within the interior of $P$.
 %The partition of $\partial P$ created by Algorithm \ref{algo:insert} are the
 %equivalence classes induced by $\thicksim$ {\color{red} todo but easy}.
 
-\setlength{\intextsep}{5pt}
 \begin{figure}[h]
 \centering
 \begin{subfigure}{0.5\textwidth}
@@ -671,23 +672,23 @@ The proof of Proposition \ref{prop:complexity} is left to the Appendix.
 \centering
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=0.5\linewidth]{figures/median_holes.png}
+\includegraphics[width=0.8\linewidth]{figures/median_holes.png}
 \centering
 %\captionof{figure}{\label{fig:median_holes}}
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=0.5\linewidth]{figures/median_holes_inserted.png}
+\includegraphics[width=0.8\linewidth]{figures/median_holes_inserted.png}
 \centering
 %\captionof{figure}{\label{fig:median_holes_inserted}}
 \end{subfigure}
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\linewidth]{figures/median_holes_bvd_all_inserted.png}
-\centering
-%\captionof{figure}{\label{fig:median_holes_bvd_all_inserted}}
-\end{subfigure}
-\caption{An example bounce visibility diagram for a polygon with holes.}
+%\begin{subfigure}{\textwidth}
+%\centering
+%\includegraphics[width=\linewidth]{figures/median_holes_bvd_all_inserted.png}
+%\centering
+%%\captionof{figure}{\label{fig:median_holes_bvd_all_inserted}}
+%\end{subfigure}
+\caption{An example partition for a polygon with holes.}
 \label{fig:bvd_holes}
 \end{figure}
 
@@ -1119,7 +1120,8 @@ We define a few helper functions:
 start to goal, starting with $\tilde{\theta} = (0, \pi)$ and intersecting
 $\tilde{\theta}$ with the safe action intervals along each path, terminating
 when all start states reach a goal state at the same stage with overlapping
-$\tilde{\theta}$ intervals.
+$\tilde{\theta}$ intervals, and returns the successful $\tilde{\theta}$ or that
+no such strategy is possible.
 \end{itemize}
 
 \begin{algorithm}
@@ -1127,13 +1129,14 @@ $\tilde{\theta}$ intervals.
 \label{algo:nav}
 \hspace*{\algorithmicindent} \textbf{Input:} A polygon $P$, intervals $S$ and
 $G$ in $\partial P$, and an integer bound $k$.\\
-\hspace*{\algorithmicindent} \textbf{Output:} A strategy (list of bounce rules),
-or a special value \textsc{None} if no strategy can be found.
+\hspace*{\algorithmicindent} \textbf{Output:} A nondeterministic bounce rule,
+or \textsc{None} if no strategy can be found.
 \begin{algorithmic}[1]
 \State $P' \gets$ \Call{PartitionPoly}{$P$}
 \State $BVG \gets$ \Call{mkBVG}{$P'$}
 \State $BVG_{safe} \gets$ \Call{mkSafeBVG}{$BVG$}
-\State \textbf{return} \Call{SearchConstantFixedStrats}{$BVG_{safe}$, $S$, $G$, $k$}
+\State $\tilde{\theta} \gets$ \Call{SearchConstantFixedStrats}{$BVG_{safe}$, $S$, $G$, $k$}
+\State \textbf{return} $\tilde{\theta}$
 \end{algorithmic}
 \end{algorithm}
 
@@ -1184,11 +1187,11 @@ $BVG_{safe}$. }
 
 \subsection{Patrolling}
 
-Note that all cycles in the bounce visibility graph for which the contraction coefficient of
-the cycle is less than 1 in magnitude will induce limit cycles. There are
+Note that there are
 exponentially many possible limit cycles, since a cycle may contain
-transitions which are not contraction mappings. We may search this space of cycles to
-solve various robotic tasks. We define the \emph{patrolling} task as:
+transitions which are not contraction mappings, as long as the overall
+contraction coefficient is less than one. We sketch here how to begin searching
+this space of cycles to solve various robotic tasks, such as \emph{patrolling}:
 
 \begin{definition}
 Given an environment $P$, a set of possible starting states $S$, and
