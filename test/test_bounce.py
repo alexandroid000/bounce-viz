@@ -161,6 +161,14 @@ class TestGeomUtils(unittest.TestCase):
                         , (7, [(1.4909663410826588, 1.5385494443596421)])]
         compare(step, expected_step)
 
+    def test_reachability(self):
+        poly = simple_bit
+        poly_vx = poly.vertices
+        pls = Partial_Local_Sequence(poly)
+        bvd = Bounce_Visibility_Diagram(pls)
+        bounce_graph = Bounce_Graph(bvd)
+
+
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)
 #        bvd = Bounce_Visibility_Diagram(pls)

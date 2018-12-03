@@ -43,20 +43,21 @@ class FewestBouncesStrategy(object):
         ''' Executing the navigation task with a given strategy
         '''
         paths = []
-        for g in get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping, self.end_interval):
-            for s in get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping,
-            self.start_interval):
+        for g in self.goal_nodes:
+            for s in self.start_nodes:
                 paths.append(self.bvg.get_shortest_path(s, g, 'safe'))
         return get_transition_over_path(paths[0], self.bvg.safe_action_graph)
 
     def __init__(self, start_interval, end_interval, bvg):
-        self.start_interval = start_interval 
+        self.start_interval = start_interval
         self.end_interval = end_interval  
         self.bvg = bvg
         self.bvd = bvg.bounce_visibility_diagram
         self.pls = self.bvd.partial_local_sequence
         self.polygon = self.pls.polygon
         self.inserted_polygon = self.pls.inserted_polygon
+        self.start_nodes = get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping, self.start_interval)
+        self.goal_nodes = get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping, self.end_interval)
 
 
 class ConstantStrategy():

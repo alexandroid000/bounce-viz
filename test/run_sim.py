@@ -1,30 +1,26 @@
 #! /usr/bin/env python3
 import sys
 sys.path.append('../src')
+from simple_polygon import Simple_Polygon
 from helper.visualization_helper import *
 from bounce_visibility_diagram import Bounce_Visibility_Diagram
 from bounce_graph import Bounce_Graph
 from navigation import FewestBouncesStrategy, ConstantStrategy
 
 if __name__ == '__main__':
-    poly = hallway
+    poly = Simple_Polygon(two_conv[0])
     poly_vx = poly.vertices
-    poly_name = 'hallway'
     pls = Partial_Local_Sequence(poly)
     bvd = Bounce_Visibility_Diagram(pls)
     bounce_graph = Bounce_Graph(bvd)
+    print(bounce_graph.safe_action_graph.edges)
 
-    pls2 = Partial_Local_Sequence(poly2)
-    origin = poly2.vertices[10]
-    sequence = pls2.sequence_info[10]
-
-
-    start = (0.51, 0.66)
-    goal = (0.85, 0.9)
+    start = (0.9, 0.99)
+    goal = (0.6, 0.63)
     nav_task = FewestBouncesStrategy(start, goal, bounce_graph)
-    print("Navigating from",start,"to",goal)
-    #path = nav_task.navigate()
-    #print("Shortest path:", path)
+    print("Navigating from",nav_task.start_nodes,"to",nav_task.goal_nodes)
+    path = nav_task.navigate()
+    print("Shortest path:", path)
 
     strat = ConstantStrategy(start, goal, bounce_graph)
     print("Reachable states with constant strat from",strat.start)
@@ -34,17 +30,17 @@ if __name__ == '__main__':
     print("Unreachable from",strat.start,"with constant strategy:")
     print(all_nodes.difference(r))
     print("Navigating from",start,"to",goal)
-#    status, frontier = strat.navigate()
-#    print("Searching SBVG from",strat.start,"to",strat.end)
-#    if status:
-#        print("Found constant strategy!")
-#        for (s,f) in zip(strat.start, frontier):
-#            print("bounce at",f,"from",s)
-#    else:
-#       print("Could not find constant strategy")
-#       print("Final frontier:")
-#       for f in frontier:
-#           print(f)
+    status, frontier = strat.navigate()
+    print("Searching SBVG from",strat.start,"to",strat.end)
+    #if status:
+    #    print("Found constant strategy!")
+    #    for (s,f) in zip(strat.start, frontier):
+    #        print("bounce at",f,"from",s)
+    #else:
+    #   print("Could not find constant strategy")
+    #   print("Final frontier:")
+    #   for f in frontier:
+    #       print(f)
 
 
     visualize_all_partial_order_sequence(pls.polygon.vertices, pls.inserted_polygon.vertices, pls.sequence_info)
