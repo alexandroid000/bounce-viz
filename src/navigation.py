@@ -39,6 +39,19 @@ class FewestBouncesStrategy(object):
     polygon: :obj:`Simple_Polygon`
     inserted_polygon: :obj:`Simple_Polygon`
     '''
+
+    def properties(self):
+        sbvg = self.bvg.safe_action_graph
+        nsccs = nx.number_strongly_connected_components(sbvg)
+        print("The safe action graph has", nsccs,"strongly connected components. They are:")
+        sccs = nx.strongly_connected_components(sbvg)
+        for s in sccs:
+            print(s)
+        print("the condensation of the safe action graph is")
+        cond = nx.condensation(sbvg)
+        print(cond.edges)
+
+
     def navigate(self):
         ''' Executing the navigation task with a given strategy
         '''

@@ -3,6 +3,7 @@ from maps import *
 from partial_local_sequence import ShootRaysFromReflex, ShootRaysToReflexFromVerts
 from settings import *
 from partial_local_sequence import Partial_Local_Sequence
+from simple_polygon import *
 
 
 import numpy as np
@@ -44,7 +45,7 @@ def visualize_polygon(poly, fname):
     for i in range(psize):
         point = poly[i]
         plt.scatter(point[0], point[1], color=colors[i], s=100)
-        plt.annotate(str(i), (point[0]+5, point[1]+20), size = 20)
+        plt.annotate(str(i), (point[0]+10, point[1]), size = 15)
     plt.axis('equal')
 
     plt.savefig(osp.join(image_save_folder,fname+'.png'), dpi = 300, bbox_inches='tight')
@@ -115,27 +116,36 @@ def visualize_bounce_visibility_diagram(bvd, hline = None, fname = 'bvd.png'):
     if DEBUG:
         plt.show()
 
-def visualize_graph(G, fname = 'graph'):
-    ''' Draw graph in circular shape
+def visualize_graph(G, poly, fname = 'graph'):
+    ''' Draw graph, with nodes at corresponding vertex locations
     '''
     plt.clf()
-    pos = nx.circular_layout(G)
     labels = nx.get_edge_attributes(G,'weight')
     new_pos = dict()
     count = 0
-    for i in pos:
-        new_pos[count] = pos[i]
-        count += 1
+    for i in range(poly.size):
+        new_pos[i] = poly.vertices[i]
     nx.draw_networkx(G, with_labels=True,
         pos = new_pos,
         node_color='white',
         width=1.2,
-        node_size = 600, 
-        font_size=14)
+        node_size = 200, 
+        font_size=8)
     plt.axis('off')
     ax = plt.gca()
     ax.collections[0].set_edgecolor('black') 
     plt.savefig(osp.join(image_save_folder,fname+'.png'), bbox_inches='tight', dpi = 300)
+
+def visualize_condensation(G, poly, fname = 'cond_graph'):
+    vs = []
+    members = nx.get_node_attributes(G, 'members')
+    for n in G.nodes:
+        x_coords = [poly.vertices[p][0] for p in members[n]]
+        y_coords = [poly.vertices[p][1] for p in members[n]]
+        vs.append([sum(x_coords)/len(members[n]), sum(y_coords)/len(members[n])])
+    cond_poly = Simple_Polygon(np.array(vs))
+    visualize_graph(G, cond_poly, fname)
+
 
 # def VizPath(poly, intervals):
 #     psize = len(poly)
