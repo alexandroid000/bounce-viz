@@ -91,7 +91,7 @@ we have unavoidable nondeterminism in our actuation. If the task is feasible,
 then this approach synthesizes a strategy (a sequence of nondeterministic rotations). We also show how to compute
 stable cyclic trajectories and use these to limit uncertainty in the robot's
 position.
-\footnote{Code and documentation available at
+\footnote{Software implementation at
 \url{https://github.com/alexandroid000/bounce_viz}}
 \end{abstract}
 
@@ -578,25 +578,24 @@ are visible from points in $\partial P'$ is the bounce visibility diagram.
 
 The bounce visibility diagram gives us some visual insight into the structure of
 the problem. First, it shows our motivation for the specific partitioning we
-have chosen: at each inserted vertex, another vertex appears or disappears from view. Of course, such
-transitions also occur at the original vertices of $P$. Thus, the partition induced by the
-vertices of $P$ and our inserted partial local sequences captures all
-combinatorial changes in the visible vertices.
-
-Additionally, this diagram gives us some insight into types of possible
-segment-to-segment transitions under ranges of departure angles. 
-For example, slicing the diagram vertically at a specific $s \in \partial P'$
+have chosen: at each inserted vertex, another vertex appears or disappears from view. 
+Of course, such transitions also occur at the original vertices of $P$. Thus,
+the partition induced by the vertices of $P$ and our inserted partial local
+sequences captures all combinatorial changes in the visible vertices. Slicing the diagram vertically at a specific $s \in \partial P'$
 produces a list of vertices visible from that point on the boundary (the
-combinatorial visibility vector) \cite{suri2008simple}. The vertical dotted
-lines, vertices of $P'$, are the exact points at which the combinatorial visibility
-vector (cvv) changes. Within a segment $(v_i, v_{i+1})$, if two successive elements of the cvv are 
+combinatorial visibility vector \cite{suri2008simple}), and vertices of $P'$
+are points where this vector changes. 
+
+his diagram gives us some insight into which
+segment-to-segment transitions are possible under uncertainty. 
+Within a segment $(v_i, v_{i+1})$, if two successive elements of the cvv are 
 adjacent vertices, then \emph{some} transition exists from
 $(v_i, v_{i+1})$ to a point on the edge between those vertices.
-
-If for a segment $(v_i, v_{i+1})$, if there is an interval of $\theta$ such that
+Also, if within an entire segment there is an interval of $\theta$ such that
 no vertex lines are crossed from left to right, this corresponds to our notion
 of \emph{safe actions}; the robot can transition from segment to segment under
-some amount of nondeterministic error in position and action.
+some amount of nondeterministic error in position and action from
+\emph{anywhere} on the originating segment.
 For example, in
 Figure \ref{fig:diagram}, we see that a band of intervals exists at the top and
 bottom of the diagram with no ``crossings" as you move from left to right
@@ -722,14 +721,10 @@ generation of boundary segments, methods of searching the resulting graph, and
 how we generate constraints on robot uncertainty instead of assuming uncertainty
 bounds are an input to the algorithm.
 
-\begin{lemma}
+\begin{lemma} \label{lem:action}
 If two edges in $\partial P'$ are entirely visible to each other, then there will be at least one safe
 action between them.
 \end{lemma}
-
-The geometric condition in Proposition \ref{prop:saferange} must hold in one
-direction or the other, except in the case where $\theta_l = \theta_r$, which we
-do not consider in this work as it is a rare geometric condition.
 
 \begin{corollary} \label{coro:neighbor}
 If two edges in $\partial P'$ share a vertex that is not reflex, and the two
@@ -737,9 +732,13 @@ If two edges in $\partial P'$ share a vertex that is not reflex, and the two
 from one to the other in both directions.
 \end{corollary}
 
-\begin{proof}
-See Figure \ref{fig:safe_action_1}.
-\end{proof}
+Lemma \ref{lem:action} holds because the geometric condition in Proposition \ref{prop:saferange} must hold in one
+direction or the other, except in the case where $\theta_l = \theta_r$, which we
+do not consider in this work as it is a rare geometric condition.
+
+For a proof of Corollary \ref{coro:neighbor}, see Figure \ref{fig:safe_action_1}.
+Algorithm \ref{algo:insert} guarantees that such neighboring segments are
+entirely visible.
 
 \begin{definition}
 Given two entirely visible segments $e_i$ and $e_j$,
@@ -784,9 +783,9 @@ visible to $e_i$ through Algorithm \ref{algo:insert} if there were any reflex ve
 blocking transitions to $e_k$.
 See Figure \ref{fig:safe_action_3} for an example of the geometry.
 
-If the adjacent edge $e_{i+1}$ is collinear with $e_i$, take the first
-non-collinear edge and apply the above reasoning to find $e_k$.
-All the same arguments extend symmetrically to left transitions, which will have
+If the adjacent edge $e_{i+1}$ is collinear with $e_i$, apply the above reasoning 
+to the first non-collinear edge to find $e_k$.
+The above arguments extend symmetrically to left transitions, which will have
 safe actions of the form $\tilde{\theta} = [\theta_r, \pi)$. Thus, each edge will 
 have two guaranteed safe actions leading away from it. \qed
 \end{proof}
@@ -892,8 +891,8 @@ dynamical system can be used to engineer paths corresponding to different robot
 task requirements.
 
 One generally useful property of mapping functions is \emph{contraction}: 
-when two points under the function always become closer together. We can use this property to control
-uncertainty in the robot's position by entering stable limit cycles.
+when two points under the function always become closer together. 
+We can use this property to control uncertainty in the robot's position.
 
 \begin{definition}
 Let $\bm{\phi_{i,j}}$ be the interior angle between two edges $e_i, e_j \in \partial P$. 
@@ -1129,8 +1128,7 @@ or \textsc{None} if no strategy can be found.
 \end{algorithmic}
 \end{algorithm}
 
-Code implementing Algorithm \ref{algo:nav} and many example polygons can be
-found at \url{https://github.com/alexandroid000/bounce_viz}.
+
 
 %\textbf{Making Concise Strategies:}
 %In general, deciding whether a given path may be
@@ -1143,14 +1141,11 @@ found at \url{https://github.com/alexandroid000/bounce_viz}.
 \subsection{Patrolling}
 
 Note that there are
-exponentially many possible limit cycles, since a cycle may contain
+exponentially many possible limit cycles; a cycle may contain
 transitions which are not contraction mappings, as long as the overall
-contraction coefficient is less than one. Also, Proposition \ref{prop:cycle}
-shows that at least one type of limit cycle is reachable from all points on
-$\partial P$ for all polygons, under an open interval of constant fixed
-controllers. As more becomes understood about the structure and robustness of
-such limit cycles, we can sketch some possibly useful robotic tasks under the
-umbrella of {\em patrolling}:
+contraction coefficient is less than one. As more becomes understood about the structure and robustness of
+such limit cycles, we can begin to formalize robotic \emph{patrolling} tasks as a search over 
+possible cycles.
 
 \begin{definition}
 Given an environment $P$, a set of possible starting states $S$, and
@@ -1163,9 +1158,7 @@ This task is related to the Aquarium Keeper's Problem in computational
 geometry \cite{czyzowicz1991aquarium}. It may be solved by coloring nodes in the
 bounce visibility graph by which edge of $P$ they belong to, and then searching
 for safe cycles which visit edges in the correct order. If a cycle is
-contracting, it will result in a converging stable trajectory.
-
-Interesting open questions remain on how to incorporate other useful properties of a
+contracting, it will result in a converging stable trajectory. Interesting open questions remain on how to incorporate other useful properties of a
 patrolling cycle, such as coverage of a space with certain sensors, or guarantees
 about detecting evaders while patrolling.
 
@@ -1218,8 +1211,8 @@ it would be interesting to take a similar approach with our environment
 discretization.
 
 \textbf{Ergodic Trajectories.} 
-We are interested in strategies that produce ergodic motion, where the robot
-does not spend ``too much'' time in any given part of the state space. Measures
+We are interested in strategies that produce ergodic motion, where the robot's
+trajectory ``evenly'' covers the state space. Measures
 of ergodicity have recently been used in exploration tasks
 \cite{miller2016ergodic}. Chaotic dynamical systems have also been used directly
 as controllers for mobile robots \cite{nakamura2001chaotic}.

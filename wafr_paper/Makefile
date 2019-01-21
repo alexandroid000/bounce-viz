@@ -1,8 +1,8 @@
 all: \
-    wafr_paper.pdf \
     wafr_paper_camera_ready.pdf \
-    perturbation.pdf \
-    iterated_decomp.pdf
+    supplementary/wafr_paper.pdf \
+    supplementary/perturbation.pdf \
+    supplementary/iterated_decomp.pdf
 
 %.pdf: %.tex
 	pdflatex -interaction nonstopmode  $*
