@@ -3,6 +3,7 @@
 import visilibity as vis
 from copy import copy
 from settings import *
+from helper.shoot_ray_helper import *
 # for polygons not in general position: returns all visible vertices along a ray
 
 def visibleVertices(poly, j):
@@ -62,3 +63,27 @@ def get_all_edge_visible_vertices(poly):
     if DEBUG:
         print('viz sets\n--------\n{}\n'.format(vizSets))
     return vizSets 
+
+def ShootRaysToReflexFromVerts(poly, j):
+    ''' shoot ray from visible vertices through reflex verts
+        Poly -> Int -> [(Point, Int)]
+    '''
+    psize = poly.size
+    vs = poly.vertices
+    r_v = vs[j]
+    pts = []
+    visible_verts = visibleVertices(poly,j)
+
+    # only ray shoot from non-adjacent vertices
+    # previous and next neighbors always visible
+    for v in visible_verts:
+        if (v != (j-1)%psize) and (v != (j+1)%psize):
+            #print('shooting ray from',v,'to',j)
+            res = ClosestPtAlongRay(vs[v], r_v, poly)
+            if res:
+                pt, k = res
+                if (IsInPoly((pt+r_v)/2, poly) and not VertexExists(pt, poly)):
+                    #print('successful insert')
+                    pts.append((pt, k, v))
+    return pts
+

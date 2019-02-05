@@ -1,9 +1,6 @@
 from helper.polygon_helper import *
-from helper.visibility_helper import visibleVertices
 from settings import *
 import numpy as np
-
-
 
 # find line intersection parameter of edge (v1,v2)
 # state :: (x,y,theta) initial point and angle of ray
@@ -106,29 +103,6 @@ def ShootRaysFromReflex(poly, j):
             int_pts.append((pt,k, (j-1) % psize))
 
     return int_pts
-
-def ShootRaysToReflexFromVerts(poly, j):
-    ''' shoot ray from visible vertices through reflex verts
-        Poly -> Int -> [(Point, Int)]
-    '''
-    psize = poly.size
-    vs = poly.vertices
-    r_v = vs[j]
-    pts = []
-    visible_verts = visibleVertices(poly,j)
-
-    # only ray shoot from non-adjacent vertices
-    # previous and next neighbors always visible
-    for v in visible_verts:
-        if (v != (j-1)%psize) and (v != (j+1)%psize):
-            #print('shooting ray from',v,'to',j)
-            res = ClosestPtAlongRay(vs[v], r_v, poly)
-            if res:
-                pt, k = res
-                if (IsInPoly((pt+r_v)/2, poly) and not VertexExists(pt, poly)):
-                    #print('successful insert')
-                    pts.append((pt, k, v))
-    return pts
 
 def IsInPoly(p, poly):
     ''' test if point p is in poly using crossing number
