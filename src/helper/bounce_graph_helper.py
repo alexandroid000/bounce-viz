@@ -48,7 +48,7 @@ def SafeAngles(e1, e2):
 def angleBound(poly, i, j):
     ''' the coefficent of 'contraction' for the mapping from edge i to edge j `|f(x) - f(y)| = |x - y| * sin(theta) / sin (theta-phi) -1 < |f(x) - f(y)| < 1` leads to `theta > phi/2 theta < -phi/2` for contraction mapping
     '''
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
     v1 = vs[i] - vs[(i+1) % poly.size]
     v2 = vs[j] - vs[(j+1) % poly.size]
     phi = AngleBetween(v1, v2)
@@ -69,7 +69,7 @@ def validAnglesForContract(poly, i, j):
     '''
     epsilon = 0.0001
     n = poly.size
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
     phi = angleBound(poly, i, j)
     e1 = (vs[i], vs[(i+1) % n])
     e2 = (vs[j], vs[(j+1) % n])

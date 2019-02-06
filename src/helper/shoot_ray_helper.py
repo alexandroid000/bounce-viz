@@ -50,7 +50,7 @@ def RayInEdge(sp,bp,ep1,ep2):
 # will not return point on 'last_bounce_edge'
 def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
     psize = poly.size
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
     closest_bounce = 100000000000
     bounce_point = np.array([0.0, 0.0])
     found_coll = False
@@ -84,7 +84,7 @@ def ShootRaysFromReflex(poly, j):
         group by edge so we can insert them in correct order
     '''
     psize = poly.size
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
     p2 = vs[j]
     p1_ccw = vs[(j+1) % psize]
     p1_cw = vs[(j-1) % psize]
@@ -111,7 +111,7 @@ def IsInPoly(p, poly):
     theta = np.random.rand()*2*np.pi
     state=(p[0],p[1],theta)
     psize = poly.size
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
     for j in range(psize):
         v1, v2 = vs[j], vs[(j+1) % psize]
         try:

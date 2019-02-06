@@ -8,7 +8,7 @@ from helper.shoot_ray_helper import *
 
 def visibleVertices(poly, j):
     #print('At vertex',j)
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
 
     # Outer boundary polygon must be COUNTER-CLOCK-WISE(ccw)
     # Create the outer boundary polygon
@@ -69,7 +69,7 @@ def ShootRaysToReflexFromVerts(poly, j):
         Poly -> Int -> [(Point, Int)]
     '''
     psize = poly.size
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
     r_v = vs[j]
     pts = []
     visible_verts = visibleVertices(poly,j)
