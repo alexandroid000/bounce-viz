@@ -105,15 +105,27 @@ def ShootRaysFromReflex(poly, j):
     return int_pts
 
 def IsInPoly(p, poly):
-    ''' test if point p is in poly using crossing number
+    ''' test if point p is in poly using crossing number.
+
     '''
-    intersects = 0
     theta = np.random.rand()*2*np.pi
     state=(p[0],p[1],theta)
-    psize = poly.size
-    vs = poly.complete_vertex_list
-    for j in range(psize):
-        v1, v2 = vs[j], vs[(j+1) % psize]
+    vs = [v for (i,v) in poly.outer_boundary_vertices]
+    holes = [h[::-1] for h in poly.holes]
+    hs = [[v for (i,v) in h] for h in holes]
+
+    isInOuterPoly = OddIntersects(state, vs)
+
+    isInHole = any([OddIntersects(state, h) for h in hs])
+
+    return isInOuterPoly and (not isInHole)
+
+def OddIntersects(state, vs):
+    ''' test if the ray "state" intersects with polygon vs an odd number of times
+
+    '''
+    intersects = 0
+    for (v1, v2) in list(zip(vs, vs[1:]))+[(vs[-1], vs[0])]:
         try:
             t, u, pt = ShootRay(state, v1, v2)
             if t>0 and (0 < u) and (u < 1):
