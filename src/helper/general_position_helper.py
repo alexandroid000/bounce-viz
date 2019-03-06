@@ -41,7 +41,7 @@ def SegsInGeneralPos(p1, p2, q1, q2):
 def PolyInGeneralPos(poly):
     ''' Check whether the input polygon is in general position
     '''
-    for (a,b,c) in combinations(poly.vertices,3):
+    for (a,b,c) in combinations(poly.complete_vertex_list,3):
         if IsThreePointsOnLine(a,b,c):
             return False
     return True

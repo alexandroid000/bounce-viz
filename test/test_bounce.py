@@ -55,14 +55,25 @@ class TestGeomUtils(unittest.TestCase):
          self.assertTrue(v1 and v2)
 
     def test_contains(self):
-         self.assertTrue(IsInPoly((0.0,0.0), square))
+         self.assertTrue(IsInPoly((0.0,0.0), Simple_Polygon("sq",square[0])))
+
+    def test_contains_w_hole(self):
+         self.assertTrue(IsInPoly((5.0,3.0),
+                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+
+         self.assertFalse(IsInPoly((2.0,1.5),
+                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+
+         self.assertFalse(IsInPoly((8.0,8.5),
+                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
 
     def test_notIn(self):
-         self.assertFalse(IsInPoly((500.0,0.0), poly1))
+         self.assertFalse(IsInPoly((500.0,0.0), Simple_Polygon("p1",poly1[0])))
 
     def test_general_pos(self):
-        self.assertFalse(PolyInGeneralPos(tworooms2))
-        self.assertTrue(poly1)
+        tr = Simple_Polygon("tr",tworooms2[0])
+        self.assertFalse(PolyInGeneralPos(tr))
+        self.assertTrue(Simple_Polygon("p1",poly1[0]))
 
     # def ShootRay(state, v1, v2):
     def test_shootRay(self):
@@ -80,23 +91,25 @@ class TestGeomUtils(unittest.TestCase):
          self.assertAlmostEqual(y, 8.0)
 
     def test_intersect_interior(self):
-         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, poly1)
+         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, Simple_Polygon("p1",poly1[0]))
          self.assertAlmostEqual(x, 139.1304347826087)
          self.assertAlmostEqual(y, 0.0)
 
     def test_intersect_thru_vertex(self):
-         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), poly1)
+         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), Simple_Polygon("p1",poly1[0]))
          self.assertAlmostEqual(x, 198.21428571428572)
          self.assertAlmostEqual(y, 66.07142857142857)
 
     def test_reflex(self):
-         self.assertEqual([3,7,10], poly1.rverts)
+         p1 = Simple_Polygon("p1",poly1[0])
+         self.assertEqual([3,7,10], p1.reflex_vertices)
 
     def test_transition_pts(self):
-         t3 = ShootRaysToReflexFromVerts(poly1, 3)
-         t7 = ShootRaysToReflexFromVerts(poly1, 7)
-         t9 = ShootRaysToReflexFromVerts(poly1, 9)
-         t10 = ShootRaysToReflexFromVerts(poly1, 10)
+         p1 = Simple_Polygon("p1",poly1[0])
+         t3 = ShootRaysToReflexFromVerts(p1, 3)
+         t7 = ShootRaysToReflexFromVerts(p1, 7)
+         t9 = ShootRaysToReflexFromVerts(p1, 9)
+         t10 = ShootRaysToReflexFromVerts(p1, 10)
          ts3 = [(np.array([-67.74193548, 182.25806452]), 4, 1), (np.array([109.82142857, 186.60714286]), 1, 5),
          (np.array([-60., 190.]), 4, 10)]
          ts7 = [(np.array([-206.18384401, -199.13649025]), 8, 4), (np.array([-127.36842105, -194.21052632]), 8,
@@ -112,20 +125,21 @@ class TestGeomUtils(unittest.TestCase):
          compare(ts10, t10)
 
     def test_viz_verts(self):
-        p = Partial_Local_Sequence(simple_bit).inserted_polygon
+        p = Partial_Local_Sequence(Simple_Polygon("sb",simple_bit[0])).inserted_polygon
         self.assertEqual([2, 4, 5, 6, 7], visibleVertices(p,3))
         self.assertEqual([0, 1, 3, 4, 5, 6, 7, 8, 10, 11], visibleVertices(p,2))
 
     def test_viz_gp(self):
-        p = Partial_Local_Sequence(tworooms).inserted_polygon
+        p = Partial_Local_Sequence(Simple_Polygon("tr",tworooms[0])).inserted_polygon
         self.assertEqual([1, 2, 11, 12, 13, 14, 15], visibleVertices(p, 0))
 
     def test_angle_parallel(self):
-        a = angleBound(square, 1, 3)
+        sq = Simple_Polygon("sq",square[0])
+        a = angleBound(sq, 1, 3)
         self.assertAlmostEqual(a, 1.57079632679)
 
     def test_angle_collinear(self):
-        p = Simple_Polygon(np.array([(0,0),(0,10),(0,20)]))
+        p = Simple_Polygon("line", np.array([(0,0),(0,10),(0,20)]))
         a = angleBound(p, 0, 1)
         self.assertAlmostEqual(a, 0.0)
 

@@ -1,9 +1,6 @@
 from helper.polygon_helper import *
-from helper.visibility_helper import visibleVertices
 from settings import *
 import numpy as np
-
-
 
 # find line intersection parameter of edge (v1,v2)
 # state :: (x,y,theta) initial point and angle of ray
@@ -53,7 +50,7 @@ def RayInEdge(sp,bp,ep1,ep2):
 # will not return point on 'last_bounce_edge'
 def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
     psize = poly.size
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
     closest_bounce = 100000000000
     bounce_point = np.array([0.0, 0.0])
     found_coll = False
@@ -87,7 +84,7 @@ def ShootRaysFromReflex(poly, j):
         group by edge so we can insert them in correct order
     '''
     psize = poly.size
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
     p2 = vs[j]
     p1_ccw = vs[(j+1) % psize]
     p1_cw = vs[(j-1) % psize]
@@ -107,39 +104,28 @@ def ShootRaysFromReflex(poly, j):
 
     return int_pts
 
-def ShootRaysToReflexFromVerts(poly, j):
-    ''' shoot ray from visible vertices through reflex verts
-        Poly -> Int -> [(Point, Int)]
-    '''
-    psize = poly.size
-    vs = poly.vertices
-    r_v = vs[j]
-    pts = []
-    visible_verts = visibleVertices(poly,j)
-
-    # only ray shoot from non-adjacent vertices
-    # previous and next neighbors always visible
-    for v in visible_verts:
-        if (v != (j-1)%psize) and (v != (j+1)%psize):
-            #print('shooting ray from',v,'to',j)
-            res = ClosestPtAlongRay(vs[v], r_v, poly)
-            if res:
-                pt, k = res
-                if (IsInPoly((pt+r_v)/2, poly) and not VertexExists(pt, poly)):
-                    #print('successful insert')
-                    pts.append((pt, k, v))
-    return pts
-
 def IsInPoly(p, poly):
-    ''' test if point p is in poly using crossing number
+    ''' test if point p is in poly using crossing number.
+
     '''
-    intersects = 0
     theta = np.random.rand()*2*np.pi
     state=(p[0],p[1],theta)
-    psize = poly.size
-    vs = poly.vertices
-    for j in range(psize):
-        v1, v2 = vs[j], vs[(j+1) % psize]
+    vs = [v for (i,v) in poly.outer_boundary_vertices]
+    holes = [h[::-1] for h in poly.holes]
+    hs = [[v for (i,v) in h] for h in holes]
+
+    isInOuterPoly = OddIntersects(state, vs)
+
+    isInHole = any([OddIntersects(state, h) for h in hs])
+
+    return isInOuterPoly and (not isInHole)
+
+def OddIntersects(state, vs):
+    ''' test if the ray "state" intersects with polygon vs an odd number of times
+
+    '''
+    intersects = 0
+    for (v1, v2) in list(zip(vs, vs[1:]))+[(vs[-1], vs[0])]:
         try:
             t, u, pt = ShootRay(state, v1, v2)
             if t>0 and (0 < u) and (u < 1):

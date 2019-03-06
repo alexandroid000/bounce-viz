@@ -5,7 +5,7 @@ from settings import *
 def VertexExists(v, poly):
     ''' Check whether a given vertex exists in the polygon
     '''
-    vs = poly.vertices
+    vs = poly.complete_vertex_list
     for pt in vs:
         if la.norm(v-pt) < EPSILON:
             return True

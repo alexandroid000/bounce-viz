@@ -1,6 +1,7 @@
 from settings import *
 from simple_polygon import Simple_Polygon
 from helper.shoot_ray_helper import *
+from helper.visibility_helper import ShootRaysToReflexFromVerts
 
 class Partial_Local_Sequence(object):
     ''' Partial local sequence is a sequence of points on the boundary of P associated with a vertex v0, and is constructed by shooting a ray through a reflex vertex v0 from every visible vertex and keeping the resulting sequence of intersections with the boundary of P. The partial local sequence for a convex vertex is empty.
@@ -17,7 +18,7 @@ class Partial_Local_Sequence(object):
     def compute_sequence(self, input_polygon):
         ''' Compute the partial local sequence for all vertices of the polygon
         '''
-        rvs = input_polygon.rverts
+        rvs = input_polygon.reflex_vertices
         sequence_info = []
         for i in range(input_polygon.size):
             if not i in rvs:
@@ -41,7 +42,7 @@ class Partial_Local_Sequence(object):
         # sort transition points along edge
         new_poly_grouped = {}
         for i in range(polygon.size):
-            new_poly_grouped[i] = sort_by_distance(polygon.vertices[i], np.array(t_pts_grouped[i]))
+            new_poly_grouped[i] = sort_by_distance(polygon.complete_vertex_list[i], np.array(t_pts_grouped[i]))
             if DEBUG:
                 print('Inserted verts', new_poly_grouped[i], 'on edge',i)
 
@@ -49,7 +50,7 @@ class Partial_Local_Sequence(object):
         new_vertices = []
         for i in range(polygon.size):
             new_vertices.extend(new_poly_grouped[i])
-        inserted_polygon = Simple_Polygon(np.array(new_vertices))
+        inserted_polygon = Simple_Polygon(polygon.name+"prime",np.array(new_vertices))
         return inserted_polygon
 
     # initialized with Simple_Polygon instance

@@ -1,9 +1,9 @@
-from helper.geometry_helper import *
 from maps import *
-from partial_local_sequence import ShootRaysFromReflex, ShootRaysToReflexFromVerts
 from settings import *
+from helper.geometry_helper import *
+from helper.shoot_ray_helper import ShootRaysFromReflex
+from helper.visibility_helper import ShootRaysToReflexFromVerts
 from partial_local_sequence import Partial_Local_Sequence
-
 
 import numpy as np
 from numpy.linalg import norm
