@@ -5,7 +5,6 @@ import numpy as np
 # find line intersection parameter of edge (v1,v2)
 # state :: (x,y,theta) initial point and angle of ray
 # (x,y,theta) -> Point -> Point -> Maybe (Double, Point)
-# theta is defined with 0 along the y axis
 # https://stackoverflow.com/questions/14307158/how-do-you-check-for-intersection-between-a-line-segment-and-a-line-ray-emanatin/32146853
 # https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
 def ShootRay(state, v1, v2):
@@ -104,6 +103,20 @@ def ShootRaysFromReflex(poly, j):
 
     return int_pts
 
+def OddIntersects(state, vs):
+        ''' test if the ray "state" intersects with polygon vs an odd number of times
+
+    '''
+    intersects = 0
+    for (v1, v2) in list(zip(vs, vs[1:]))+[(vs[-1], vs[0])]:
+        try:
+            t, u, pt = ShootRay(state, v1, v2)
+            if t>0 and (0 < u) and (u < 1):
+                intersects += 1
+        except:
+            pass
+    return not (intersects%2 == 0)
+
 def IsInPoly(p, poly):
     ''' test if point p is in poly using crossing number.
 
@@ -119,18 +132,4 @@ def IsInPoly(p, poly):
     isInHole = any([OddIntersects(state, h) for h in hs])
 
     return isInOuterPoly and (not isInHole)
-
-def OddIntersects(state, vs):
-    ''' test if the ray "state" intersects with polygon vs an odd number of times
-
-    '''
-    intersects = 0
-    for (v1, v2) in list(zip(vs, vs[1:]))+[(vs[-1], vs[0])]:
-        try:
-            t, u, pt = ShootRay(state, v1, v2)
-            if t>0 and (0 < u) and (u < 1):
-                intersects += 1
-        except:
-            pass
-    return not (intersects%2 == 0)
 
