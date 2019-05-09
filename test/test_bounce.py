@@ -9,6 +9,7 @@ from helper.visibility_helper import *
 from helper.bounce_graph_helper import *
 from navigation import *
 from maps import *
+from classify import *
 from math import pi
 import numpy as np
 
@@ -158,6 +159,12 @@ class TestGeomUtils(unittest.TestCase):
         self.assertAlmostEqual(min_c, min_a)
         self.assertAlmostEqual(max_c, max_a)
 
+    def test(self):
+        e1 = np.array([(0.0, 0.0), (2.0, 0.0)])
+        e2 = np.array([(3.0, 1.0), (1.0, 1.0)])
+        theta = np.pi/2
+        subset = findDomain(e1, e2, theta)
+        compare(subset, np.array([[1., 0.], [2., 0.]]))
 
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)
