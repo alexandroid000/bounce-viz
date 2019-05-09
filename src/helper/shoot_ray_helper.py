@@ -104,7 +104,7 @@ def ShootRaysFromReflex(poly, j):
     return int_pts
 
 def OddIntersects(state, vs):
-        ''' test if the ray "state" intersects with polygon vs an odd number of times
+    ''' test if the ray "state" intersects with polygon vs an odd number of times
 
     '''
     intersects = 0
