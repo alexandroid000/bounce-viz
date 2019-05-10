@@ -183,6 +183,20 @@ class TestGeomUtils(unittest.TestCase):
         subset = findDomain(e1, e2, theta)
         self.assertTrue(subset.size == 0)
 
+    def test_contraction(self):
+        e1 = np.array([[20.,7.],[10.,0.]])
+        e2 = np.array([[10.,0.],[0.,7.]])
+        e3 = np.array([[16.,18.],[20.,7.]])
+        theta1 = 5.*np.pi/6.
+        theta2 = np.pi/6.
+        theta3 = np.pi/3.
+        val1, c1 = isContraction(e1, e2, theta1)
+        val2, c2 = isContraction(e1, e3, theta2)
+        val3, c3 = isContraction(e1, e3, theta3)
+        self.assertTrue(val1)
+        self.assertTrue(val2)
+        self.assertFalse(val3)
+
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)
 #        bvd = Bounce_Visibility_Diagram(pls)

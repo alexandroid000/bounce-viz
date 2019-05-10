@@ -2,7 +2,7 @@
 # contraction mappings under a given angle theta
 
 from helper.shoot_ray_helper import ShootRayFromVect
-from helper.geometry_helper import IsRightTurn, IsLeftTurn
+from helper.geometry_helper import IsRightTurn, IsLeftTurn, AngleBetween
 import numpy as np
 import numpy.linalg as la
 
@@ -48,4 +48,18 @@ def findDomain(e1, e2, theta):
 
     return np.array([pt1, pt2])
 
-#def isContraction(s1, s2, theta):
+# compute whether transition is contracting and what the coefficient is
+def isContraction(e1, e2, theta):
+    [e1v1, e1v2] = e1
+    [e2v1, e2v2] = e2
+    phi = AngleBetween(e1v2-e1v1, e2v2-e2v1) # in range [0,pi]
+    _, _, int_pt = ShootRayFromVect(*e1, *e2)
+    if IsLeftTurn(e1v1, e2v1, int_pt):
+        c_th = np.sin(theta)/np.sin(theta-phi)
+    else:
+        c_th = np.sin(theta)/np.sin(theta+phi)
+
+    if abs(c_th) < 1.0:
+        return True, c_th
+    else:
+        return False, c_th
