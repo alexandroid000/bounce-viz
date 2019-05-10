@@ -159,12 +159,29 @@ class TestGeomUtils(unittest.TestCase):
         self.assertAlmostEqual(min_c, min_a)
         self.assertAlmostEqual(max_c, max_a)
 
-    def test(self):
+    def test_simple_domain(self):
         e1 = np.array([(0.0, 0.0), (2.0, 0.0)])
         e2 = np.array([(3.0, 1.0), (1.0, 1.0)])
         theta = np.pi/2
         subset = findDomain(e1, e2, theta)
         compare(subset, np.array([[1., 0.], [2., 0.]]))
+
+    def test_weirder_domain(self):
+        e1 = np.array([(1.0, 1.0), (0.0, 0.0)])
+        e2 = np.array([(3.0, -1.0), (3.0, 3.0)])
+        theta1 = 3.*np.pi/4.
+        theta2 = np.pi/2.
+        subset1 = findDomain(e1, e2, theta1)
+        subset2 = findDomain(e2, e1, theta2)
+        compare(subset1, np.array([[0., 0.], [1., 1.]]))
+        compare(subset2, np.array([[3., 0.], [3., 1.]]))
+
+    def test_miss(self):
+        e1 = np.array([(0.0, 0.0), (1.0, 0.0)])
+        e2 = np.array([(2.0, 1.0), (3.0, 1.0)])
+        theta = np.pi/2.
+        subset = findDomain(e1, e2, theta)
+        self.assertTrue(subset.size == 0)
 
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)

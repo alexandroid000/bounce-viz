@@ -18,6 +18,7 @@ def rotate_vector(v, theta):
 # find subset of e1 that can map to e2 under theta
 # returns (pt1, pt2), subset of e1 which is domain of transition
 # assumes e1, e2, entirely visible to each other
+# returns empty array if domain is empty
 def findDomain(e1, e2, theta):
     e1v1, e1v2 = e1
     e2v1, e2v2 = e2
@@ -25,6 +26,10 @@ def findDomain(e1, e2, theta):
     bounce_vector = rotate_vector(e1v2-e1v1, theta)
     f_e1v1 = e1v1 + bounce_vector
     f_e1v2 = e1v2 + bounce_vector
+
+    # if the domain is empty
+    if IsRightTurn(e1v2, f_e1v2, e2v2) or IsLeftTurn(e1v1, f_e1v1, e2v1):
+        return np.array([pt1, pt2])
 
     # check left hand side of interval
     if IsRightTurn(e1v1, f_e1v1, e2v2):
@@ -42,11 +47,5 @@ def findDomain(e1, e2, theta):
         pt2 = e1v2
 
     return np.array([pt1, pt2])
-
-def test():
-    e1 = np.array([(0.0, 0.0), (2.0, 0.0)])
-    e2 = np.array([(3.0, 1.0), (1.0, 1.0)])
-    theta = np.pi/2
-    return findDomain(e1, e2, theta)
 
 #def isContraction(s1, s2, theta):
