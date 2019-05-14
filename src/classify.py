@@ -109,18 +109,21 @@ def classifyBoundary(poly, theta):
     return class_data
 
 def color(c):
-    if abs(c) < 1:
+    if abs(c) <= 1.:
         return 'b'
     else:
         return 'r'
 
 def test():
+    theta = 1.5
     init_poly = Simple_Polygon("nonconv", np.array([(250,250),(0,100),(-250,250),(-250,-250),(250,-250)], dtype=np.float))
     pls = Partial_Local_Sequence(init_poly).inserted_polygon
-    data = classifyBoundary(pls, 1.5)
+    data = classifyBoundary(pls, theta)
 
     poly = pls.vertex_list_per_poly[0]
     n = len(poly)
+    for i in range(n):
+        print(data[i])
     xs = [pt[0] for i,pt in poly]
     ys = [pt[1] for i,pt in poly]
     for i in range(n):
