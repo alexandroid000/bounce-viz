@@ -3,6 +3,7 @@ import sys
 sys.path.append("./src")
 import unittest
 from bounce_graph import *
+from simple_polygon import *
 from bounce_visibility_diagram import *
 from partial_local_sequence import *
 from helper.visibility_helper import *
@@ -196,6 +197,16 @@ class TestGeomUtils(unittest.TestCase):
         self.assertTrue(val1)
         self.assertTrue(val2)
         self.assertFalse(val3)
+
+    def test_regpoly_classify(self):
+        pent = Simple_Polygon("pent",np.array([(550,450), (645,519), (609,631), (491,631), (455,519)], dtype=np.float))
+
+        output = { 0: [[True, np.array([[550., 450.], [645., 519.]]), 0.20004096545497796]],
+                   1: [[True, np.array([[645., 519.], [609., 631.]]), 0.19989950974821585]],
+                   2: [[True, np.array([[609., 631.], [491., 631.]]), 0.19989950974821585]],
+                   3: [[True, np.array([[491., 631.], [455., 519.]]), 0.20004096545497796]],
+                   4: [[True, np.array([[455., 519.], [550., 450.]]), 0.1999777758081791]]}
+        compare(list(classifyBoundary(pent, 0.2)), list(output))
 
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)
