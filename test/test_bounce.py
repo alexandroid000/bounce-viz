@@ -129,13 +129,18 @@ class TestGeomUtils(unittest.TestCase):
          compare(ts10, t10)
 
     def test_viz_verts(self):
-        p = Partial_Local_Sequence(Simple_Polygon("sb",simple_bit[0])).inserted_polygon
-        self.assertEqual([2, 4, 5, 6, 7], visibleVertices(p,3))
-        self.assertEqual([0, 1, 3, 4, 5, 6, 7, 8, 10, 11], visibleVertices(p,2))
+        poly_vs = Partial_Local_Sequence(Simple_Polygon("sb",simple_bit[0])).inserted_polygon.complete_vertex_list
+        poly = Simple_Polygon("sb2", np.array(poly_vs))
+        vvs1 = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, 3)
+        vvs2 = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, 2)
+        self.assertEqual([[2, 4, 5, 6, 7]], vvs1)
+        self.assertEqual([[0, 1, 3, 4, 5, 6, 7, 8, 10, 11]], vvs2)
 
     def test_viz_gp(self):
-        p = Partial_Local_Sequence(Simple_Polygon("tr",tworooms[0])).inserted_polygon
-        self.assertEqual([1, 2, 11, 12, 13, 14, 15], visibleVertices(p, 0))
+        poly_vs = Partial_Local_Sequence(Simple_Polygon("tr",tworooms[0])).inserted_polygon.complete_vertex_list
+        poly = Simple_Polygon("gptr", np.array(poly_vs))
+        vvs = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, 0)
+        self.assertEqual([[1, 2, 11, 12, 13, 14, 15]], vvs)
 
 #def visibleVertices(curr_poly_vx, vertex_list_per_poly, j):
     def test_viz_holes(self):

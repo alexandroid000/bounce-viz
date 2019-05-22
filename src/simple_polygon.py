@@ -112,7 +112,6 @@ class Simple_Polygon(object):
 
     def __init__(self, name, outer_boundary_vertices, holes = []):
         self.name = name
-        print(self.name, holes)
         N = outer_boundary_vertices.shape[0]
         self.complete_vertex_list = [v for v in outer_boundary_vertices]
         self.outer_boundary_vertices = [(i, np.array(outer_boundary_vertices[i])) for i in range(N)]

@@ -7,7 +7,6 @@ import numpy as np
 # for polygons not in general position: returns all visible vertices along a ray
 
 def visibleVertices(curr_poly_vx, vertex_list_per_poly, j):
-    #print('At vertex',j)
     vs = [v for i,v in curr_poly_vx]
 
     # Outer boundary polygon must be COUNTER-CLOCK-WISE(ccw)
@@ -23,7 +22,7 @@ def visibleVertices(curr_poly_vx, vertex_list_per_poly, j):
 
     # point from which to calculate visibility
     p1 = vs[j]
-    vp1 = vis.Point(*p1)
+    vp1 = vis.Point(p1[0],p1[1])
 
     # Create environment, wall will be the outer boundary because
     # is the first polygon in the list. The other polygons will be holes
