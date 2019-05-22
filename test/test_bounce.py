@@ -90,12 +90,14 @@ class TestGeomUtils(unittest.TestCase):
          self.assertAlmostEqual(y, 8.0)
 
     def test_intersect_interior(self):
-         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, Simple_Polygon("p1",poly1[0]))
+         poly = Simple_Polygon("p1",poly1[0])
+         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, poly.vertex_list_per_poly)
          self.assertAlmostEqual(x, 139.1304347826087)
          self.assertAlmostEqual(y, 0.0)
 
     def test_intersect_thru_vertex(self):
-         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), Simple_Polygon("p1",poly1[0]))
+         poly = Simple_Polygon("p1",poly1[0])
+         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), poly.vertex_list_per_poly)
          self.assertAlmostEqual(x, 198.21428571428572)
          self.assertAlmostEqual(y, 66.07142857142857)
 
@@ -103,12 +105,15 @@ class TestGeomUtils(unittest.TestCase):
          p1 = Simple_Polygon("p1",poly1[0])
          self.assertEqual([3,7,10], p1.reflex_vertices)
 
+#ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_poly, j):
     def test_transition_pts(self):
          p1 = Simple_Polygon("p1",poly1[0])
-         t3 = ShootRaysToReflexFromVerts(p1, 3)
-         t7 = ShootRaysToReflexFromVerts(p1, 7)
-         t9 = ShootRaysToReflexFromVerts(p1, 9)
-         t10 = ShootRaysToReflexFromVerts(p1, 10)
+         outer_vxs = p1.vertex_list_per_poly[0]
+
+         t3 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly, 3)
+         t7 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly, 7)
+         t9 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly, 9)
+         t10 = ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly, 10)
          ts3 = [(np.array([-67.74193548, 182.25806452]), 4, 1), (np.array([109.82142857, 186.60714286]), 1, 5),
          (np.array([-60., 190.]), 4, 10)]
          ts7 = [(np.array([-206.18384401, -199.13649025]), 8, 4), (np.array([-127.36842105, -194.21052632]), 8,

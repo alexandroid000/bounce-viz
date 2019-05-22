@@ -62,7 +62,7 @@ def RayInEdge(sp,bp,ep1,ep2):
             (IsRightTurn(sp,bp,ep2) and
              IsLeftTurn(sp,bp,ep1)))
 
-def ClosestPtAlongRay(p1, p2, poly, last_bounce_edge=-1):
+def ClosestPtAlongRay(p1, p2, vertex_list_per_poly, last_bounce_edge=-1):
     '''
     shoot ray from p1 toward p2 in poly, return closest intersect point will not return point on 'last_bounce_edge'
     '''
@@ -70,12 +70,10 @@ def ClosestPtAlongRay(p1, p2, poly, last_bounce_edge=-1):
     bounce_point = np.array([0.0, 0.0])
     found_coll = False
     bounce_edge = last_bounce_edge
-    for poly_vxs in poly.vertex_list_per_poly:
+    for poly_vxs in vertex_list_per_poly:
         psize = len(poly_vxs)
         # check each edge for collision
         for j in range(psize):
-            # TODO: why is this line here???
-            # if (j != last_bounce_edge):
             v1, v2 = poly_vxs[j][1], poly_vxs[(j+1) % psize][1]
             try:
                 t,u,pt = ShootRayFromVect(p1, p2, v1, v2)
@@ -107,13 +105,13 @@ def ShootRaysFromReflex(curr_poly_vxs, vertex_list_per_poly, j):
     int_pts = []
 
     # ClosestPtAlongRay returns False if we shoot ray into existing vertex
-    result = ClosestPtAlongRay(p1_ccw, p2, vertex_list_per_poly, j)
+    result = ClosestPtAlongRay(p1_ccw, p2, vertex_list_per_poly)
     if result:
         pt, k = result
         if not VertexExists(pt, curr_poly_vxs):
             int_pts.append((pt,k, (j+1) % curr_poly_size))
 
-    result = ClosestPtAlongRay(p1_cw, p2, vertex_list_per_poly, ((j-1) % curr_poly_size))
+    result = ClosestPtAlongRay(p1_cw, p2, vertex_list_per_poly)
     if result:
         pt, k = result
         if not VertexExists(pt, curr_poly_vxs):
@@ -122,7 +120,8 @@ def ShootRaysFromReflex(curr_poly_vxs, vertex_list_per_poly, j):
     return int_pts
 
 def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_poly, j):
-    ''' shoot ray from visible vertices through reflex verts
+    ''' shoot ray from visible vertices through a specific reflex vert
+        j is the index of the reflex vertex
         Poly -> Int -> [(Point, Int)]
     '''
     r_v = curr_poly_vxs[j][1]
