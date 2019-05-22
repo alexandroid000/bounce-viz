@@ -60,14 +60,11 @@ class TestGeomUtils(unittest.TestCase):
          self.assertTrue(IsInPoly((0.0,0.0), Simple_Polygon("sq",square[0])))
 
     def test_contains_w_hole(self):
-         self.assertTrue(IsInPoly((5.0,3.0),
-                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+         self.assertTrue(IsInPoly((5.0,3.0), Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
 
-         self.assertFalse(IsInPoly((2.0,1.5),
-                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+         self.assertFalse(IsInPoly((2.0,1.5), Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
 
-         self.assertFalse(IsInPoly((8.0,8.5),
-                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+         self.assertFalse(IsInPoly((8.0,8.5), Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
 
     def test_notIn(self):
          self.assertFalse(IsInPoly((500.0,0.0), Simple_Polygon("p1",poly1[0])))

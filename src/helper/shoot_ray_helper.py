@@ -62,7 +62,7 @@ def RayInEdge(sp,bp,ep1,ep2):
             (IsRightTurn(sp,bp,ep2) and
              IsLeftTurn(sp,bp,ep1)))
 
-def ClosestPtAlongRay(p1, p2, vertex_list_per_poly, last_bounce_edge=-1):
+def ClosestPtAlongRay(p1, p2, poly, last_bounce_edge=-1):
     '''
     shoot ray from p1 toward p2 in poly, return closest intersect point will not return point on 'last_bounce_edge'
     '''
@@ -70,7 +70,7 @@ def ClosestPtAlongRay(p1, p2, vertex_list_per_poly, last_bounce_edge=-1):
     bounce_point = np.array([0.0, 0.0])
     found_coll = False
     bounce_edge = last_bounce_edge
-    for poly_vxs in vertex_list_per_poly:
+    for poly_vxs in poly.vertex_list_per_poly:
         psize = len(poly_vxs)
         # check each edge for collision
         for j in range(psize):
@@ -189,8 +189,8 @@ def IsInPoly(p, poly):
         inHoles = []
         for hole in holes:
             vs = [v for i,v in hole]
-            hole_vs = vs.reverse()
-            inHoles.append(IsInPolyNoHoles(p, hole_vs))
+            vs.reverse()
+            inHoles.append(IsInPolyNoHoles(p, vs))
         return (not any(inHoles))
 
 
