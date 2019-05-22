@@ -5,6 +5,8 @@ from helper.shoot_ray_helper import ShootRayFromVect
 from helper.geometry_helper import IsRightTurn, IsLeftTurn, AngleBetween
 from simple_polygon import *
 from partial_local_sequence import *
+from bounce_visibility_diagram import *
+from bounce_graph import *
 from settings import *
 
 import numpy as np
@@ -117,7 +119,9 @@ def color(c):
 def test():
     theta = 1.5
     init_poly = Simple_Polygon("nonconv", np.array([(250,250),(0,100),(-250,250),(-250,-250),(250,-250)], dtype=np.float))
-    pls = Partial_Local_Sequence(init_poly).inserted_polygon
+    pls = Partial_Local_Sequence(init_poly)
+    bvd = Bounce_Visibility_Diagram(pls)
+    bvg = Bounce_Graph(bvd)
     data = classifyBoundary(pls, theta)
 
     poly = pls.vertex_list_per_poly[0]
@@ -140,5 +144,5 @@ def test():
 
 
 
-test()
+#test()
 

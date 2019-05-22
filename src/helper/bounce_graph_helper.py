@@ -90,7 +90,9 @@ def check_valid_transit(v, r_vs, start, psize, poly_vx):
     ''' don't allow transition to edge 'around corner'
     don't allow zero-measure transition from one endpoint
     TODO: clean up logic
+    This works for outer boundary of polygon only right now, not holes.
     '''
+
     return not (
                ((v in r_vs) and (v == (start+1) % psize))
                or

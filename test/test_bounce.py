@@ -61,13 +61,13 @@ class TestGeomUtils(unittest.TestCase):
 
     def test_contains_w_hole(self):
          self.assertTrue(IsInPoly((5.0,3.0),
-                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1:])))
 
          self.assertFalse(IsInPoly((2.0,1.5),
-                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1:])))
 
          self.assertFalse(IsInPoly((8.0,8.5),
-                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1:])))
 
     def test_notIn(self):
          self.assertFalse(IsInPoly((500.0,0.0), Simple_Polygon("p1",poly1[0])))
@@ -134,6 +134,10 @@ class TestGeomUtils(unittest.TestCase):
     def test_viz_gp(self):
         p = Partial_Local_Sequence(Simple_Polygon("tr",tworooms[0])).inserted_polygon
         self.assertEqual([1, 2, 11, 12, 13, 14, 15], visibleVertices(p, 0))
+
+#def visibleVertices(curr_poly_vx, vertex_list_per_poly, j):
+    def test_viz_holes(self):
+        p = Simple_Polygon("simple_holes", simple_holes[0], simple_holes[1:])
 
     def test_angle_parallel(self):
         sq = Simple_Polygon("sq",square[0])
