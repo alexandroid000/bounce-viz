@@ -144,7 +144,10 @@ class TestGeomUtils(unittest.TestCase):
 
 #def visibleVertices(curr_poly_vx, vertex_list_per_poly, j):
     def test_viz_holes(self):
-        p = Simple_Polygon("simple_holes", simple_holes[0], simple_holes[1])
+        poly = Simple_Polygon("simple_holes", simple_holes[0], simple_holes[1])
+        vvs = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, 2)
+        expected = [[1,3],[1,2]]
+        self.assertEqual(expected, vvs)
 
     def test_angle_parallel(self):
         sq = Simple_Polygon("sq",square[0])

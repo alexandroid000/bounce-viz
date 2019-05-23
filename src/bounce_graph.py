@@ -15,14 +15,16 @@ class Bounce_Graph(object):
         ''' creates directed edge-to-edge visibility graph; edge information is angle ranges which create contraction mapping
         '''
         bvg = nx.DiGraph()
-        r_vs = poly.reflex_vertices
-        outer_boundary_vs = poly.complete_vertex_list[0]
+
         for component in poly.vertex_list_per_poly:
-            for i, start in component:
-                viz_verts = visibleVertices(component, poly.vertex_list_per_poly, i)
-                edges = [(start,v,validAnglesForContract(poly, start, v)) for v in
-                viz_verts if
-                check_valid_transit(v, r_vs, start, poly.size, outer_boundary_vs)]
+            for start_i, start in component:
+                viz_verts = visibleVertices(component, poly.vertex_list_per_poly, start_i)
+                vvs = [poly.vertex_list_per_poly[c][j][0]
+                       for c, vv in enumerate(viz_verts)
+                       for j in vv]
+                edges = [(start_i,v,validAnglesForContract(poly, start, v))
+                         for v in vvs if
+                         check_valid_transit(v, start_i, poly)]
                 if requireContract:
                     c_edges = [(i,j, angs) for (i,j,angs) in edges if angs != []]
                     bvg.add_weighted_edges_from(c_edges)

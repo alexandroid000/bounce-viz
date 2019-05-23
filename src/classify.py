@@ -7,6 +7,7 @@ from simple_polygon import *
 from partial_local_sequence import *
 from bounce_visibility_diagram import *
 from bounce_graph import *
+from maps import *
 from settings import *
 
 import numpy as np
@@ -118,18 +119,19 @@ def color(c):
 
 def test():
     theta = 1.5
-    init_poly = Simple_Polygon("nonconv", np.array([(250,250),(0,100),(-250,250),(-250,-250),(250,-250)], dtype=np.float))
+    init_poly = Simple_Polygon("sh", simple_holes[0], simple_holes[1])
     pls = Partial_Local_Sequence(init_poly)
     bvd = Bounce_Visibility_Diagram(pls)
     bvg = Bounce_Graph(bvd)
-    data = classifyBoundary(pls, theta)
+    poly = pls.inserted_polygon
+    data = classifyBoundary(poly, theta)
 
-    poly = pls.vertex_list_per_poly[0]
-    n = len(poly)
+    vs = poly.vertex_list_per_poly[0]
+    n = len(vs)
     for i in range(n):
         print(data[i])
-    xs = [pt[0] for i,pt in poly]
-    ys = [pt[1] for i,pt in poly]
+    xs = [pt[0] for i,pt in vs]
+    ys = [pt[1] for i,pt in vs]
     for i in range(n):
         xpair = [xs[i], xs[(i+1) % n]]
         ypair = [ys[i], ys[(i+1) % n]]
@@ -144,5 +146,5 @@ def test():
 
 
 
-#test()
+test()
 

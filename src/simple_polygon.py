@@ -72,7 +72,7 @@ class Simple_Polygon(object):
         size_list = [start]
         curr_sum = start
         for hole in holes:
-            curr_sum += hole.shape[0]
+            curr_sum += len(hole)
             size_list.append(curr_sum)
         return size_list
     
@@ -116,7 +116,7 @@ class Simple_Polygon(object):
         self.complete_vertex_list = [v for v in outer_boundary_vertices]
         self.outer_boundary_vertices = [(i, np.array(outer_boundary_vertices[i])) for i in range(N)]
         size_list = self.get_hole_size_list(N, holes)
-        self.holes = [[(i+size_list[j], np.array(holes[j][i])) for i in range(holes[j].shape[0])] for j in range(len(holes))]
+        self.holes = [[(i+size_list[j], np.array(holes[j][i])) for i in range(len(holes[j]))] for j in range(len(holes))]
         self.vertex_list_per_poly = [self.outer_boundary_vertices]
         for hole in self.holes:
             self.complete_vertex_list.extend([vx[1] for vx in hole])
