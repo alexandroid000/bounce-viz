@@ -20,8 +20,7 @@ def ShootRay(state, v1, v2):
     # points on segment are (x2,y2) + u*s
     s = v2-v1
     rXs = Cross2d(r,s)
-    u = Cross2d(v1-pt, r)/rXs
-    t = Cross2d(v1-pt, s)/rXs
+
     # if ray and target edge are parallel, will get divide by zero
     if abs(rXs) < EPSILON:
         if DEBUG:
@@ -29,8 +28,10 @@ def ShootRay(state, v1, v2):
             print('shot from ',state,'to',v1,v2)
         raise ValueError
     else:
+        u = Cross2d(v1-pt, r)/rXs
+        t = Cross2d(v1-pt, s)/rXs
         pint = np.array([pt[0] + np.cos(theta)*t, pt[1] + np.sin(theta)*t])
-    return t, u, pint
+        return t, u, pint
 
 def ShootRayFromVect(p1, p2, v1, v2):
     ''' 

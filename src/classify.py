@@ -119,7 +119,7 @@ def color(c):
 
 def test():
     theta = 1.5
-    init_poly = Simple_Polygon("sh", simple_holes[0], simple_holes[1])
+    init_poly = Simple_Polygon("sh", simple_nonconv[0])
     pls = Partial_Local_Sequence(init_poly)
     bvd = Bounce_Visibility_Diagram(pls)
     bvg = Bounce_Graph(bvd)
@@ -128,8 +128,8 @@ def test():
 
     vs = poly.vertex_list_per_poly[0]
     n = len(vs)
-    for i in range(n):
-        print(data[i])
+    #for i in range(n):
+    #    print(data[i])
     xs = [pt[0] for i,pt in vs]
     ys = [pt[1] for i,pt in vs]
     for i in range(n):

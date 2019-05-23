@@ -97,10 +97,23 @@ def check_valid_transit(v, start, poly):
     This works for outer boundary of polygon only right now, not holes.
     '''
 
+    r_vs = poly.reflex_vertices
+    psize = poly.size
+    poly_vx = poly.complete_vertex_list
 
-    print("checking transit from", start, "to", v)
+    def whichComponent(v):
+        currComponent = 0
+        for i, component in enumerate(poly.vertex_list_per_poly):
+            if v >= component[0][0]:
+                currComponent = i
+        return currComponent
 
-    return not (
+
+    # check if two segments are collinear
+    collinear = IsThreePointsOnLine(poly_vx[start],
+    poly_vx[(start+1)%psize], poly_vx[v]) and IsThreePointsOnLine(poly_vx[start], poly_vx[(start+1)%psize], poly_vx[(v+1)%psize])
+
+    aroundCorner = (
                ((v in r_vs) and (v == (start+1) % psize))
                or
                ((start in r_vs) and (start == (v+1) % psize))
@@ -113,6 +126,8 @@ def check_valid_transit(v, start, poly):
                poly_vx[v], poly_vx[(start+1)%psize])
                             and v != (start+1) % psize)
                 )
+
+    return (not aroundCorner) and (not collinear)
 
 # includes transient cycles
 # complexity O((n+e)(c+1)) if there are c cycles

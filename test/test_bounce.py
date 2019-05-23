@@ -222,6 +222,18 @@ class TestGeomUtils(unittest.TestCase):
                    4: [[True, np.array([[455., 519.], [550., 450.]]), 0.1999777758081791]]}
         compare(list(classifyBoundary(pent, 0.2)), list(output))
 
+
+    def test_edge_viz_graph_nonconv(self):
+        init_poly = Simple_Polygon("sh", simple_nonconv[0])
+        pls = Partial_Local_Sequence(init_poly)
+        bvd = Bounce_Visibility_Diagram(pls)
+        bvg = Bounce_Graph(bvd)
+
+
+        expected = [(0, 3), (0, 4), (0, 5), (0, 6), (1, 2), (1, 3), (1, 4), (1,
+        5), (2, 1), (2, 4), (2, 5), (2, 6), (3, 0), (3, 1), (3, 4), (3, 5), (3,
+        6), (4, 0), (4, 1), (4, 2), (4, 3), (4, 5), (4, 6), (5, 0), (5, 1), (5,
+        2), (5, 3), (5, 4), (6, 0), (6, 2), (6, 3), (6, 4)]
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)
 #        bvd = Bounce_Visibility_Diagram(pls)
