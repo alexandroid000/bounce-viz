@@ -86,6 +86,16 @@ def validAnglesForContract(poly, i, j):
 
     return intervals
 
+def whichComponent(v, poly):
+    '''
+    returns the id of the component containing v
+    '''
+    currComponent = 0
+    for i, component in enumerate(poly.vertex_list_per_poly):
+        if v >= component[0][0]:
+            currComponent = i
+    return currComponent
+
 def check_valid_transit(v, start, poly):
     '''
     checks if the transition between the edge start, (start+1) and v, (v+1)
@@ -101,12 +111,6 @@ def check_valid_transit(v, start, poly):
     psize = poly.size
     poly_vx = poly.complete_vertex_list
 
-    def whichComponent(v):
-        currComponent = 0
-        for i, component in enumerate(poly.vertex_list_per_poly):
-            if v >= component[0][0]:
-                currComponent = i
-        return currComponent
 
 
     # check if two segments are collinear

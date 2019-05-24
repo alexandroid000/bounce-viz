@@ -3,6 +3,7 @@
 
 from helper.shoot_ray_helper import ShootRayFromVect
 from helper.geometry_helper import IsRightTurn, IsLeftTurn, AngleBetween
+from helper.bounce_graph_helper import whichComponent
 from simple_polygon import *
 from partial_local_sequence import *
 from bounce_visibility_diagram import *
@@ -38,7 +39,7 @@ def findDomain(e1, e2, theta):
 
     # if the domain is empty
     if IsRightTurn(e1v2, f_e1v2, e2v2) or IsLeftTurn(e1v1, f_e1v1, e2v1):
-        return np.array([pt1, pt2])
+        return np.array([[], []])
 
     # check left hand side of interval
     if IsRightTurn(e1v1, f_e1v1, e2v2):
@@ -88,28 +89,55 @@ def isContraction(e1, e2, theta):
     else:
         return False, c_th
 
-# brute force, O(n^2) way. Can be reduced by checking viz info first
-# first pass: do not consider holes
 def classifyBoundary(poly, theta):
-    components = poly.vertex_list_per_poly
+
+    # construct edge-edge visibility graph
+    pls = Partial_Local_Sequence(poly)
+    poly_prime = pls.inserted_polygon
+    bvg = Bounce_Graph(Bounce_Visibility_Diagram(pls))
+    viz_edges = bvg.visibility_graph.edges
+
+    vs = poly_prime.complete_vertex_list
+    components = poly_prime.vertex_list_per_poly
     outer_boundary = [v for i,v in components[0]]
-    n = len(outer_boundary)
+    n = len(vs)
     class_data = {i:[] for i in range(n)}
-    for i in range(n):
-        e1 = [outer_boundary[i], outer_boundary[(i+1) % n]]
-        for j in range(n):
-            if j != i:
-                e2 = [outer_boundary[j], outer_boundary[(j+1) % n]]
-                subset = findDomain(e1, e2, theta)
-                admitsTransition = subset.size != 0
-                isContract, c = isContraction(e1, e2, theta)
-                if admitsTransition and isContract:
-                    class_data[i].append([True, subset, c])
-                elif admitsTransition:
-                    class_data[i].append([False, subset, -1000])
-                else:
-                    pass
-    return class_data
+    for (v1, v2) in viz_edges:
+        c1 = whichComponent(v1, poly_prime)
+        c2 = whichComponent(v2, poly_prime)
+        e1 = [vs[v1], vs[next_v(v1, poly_prime)]]
+        e2 = [vs[v2], vs[next_v(v2, poly_prime)]]
+
+        subset = findDomain(e1, e2, theta)
+        admitsTransition = subset.size != 0
+        isContract, c = isContraction(e1, e2, theta)
+        if admitsTransition and isContract:
+            class_data[v1].append([True, subset, c])
+        elif admitsTransition:
+            class_data[v1].append([False, subset, -1000])
+        else:
+            pass
+    return poly_prime, class_data
+
+# wrapper to correct for sequential numbering across components
+def next_v(i, poly):
+    n = poly.size
+    c1 = whichComponent(i, poly)
+
+    if c1 == 0:
+        next_i = i+1
+    else:
+        next_i = i-1
+
+    c2 = whichComponent(next_i % n, poly)
+
+    if c1 != c2:
+        if c1 == 0:
+            return poly.vertex_list_per_poly[c1][0][0]
+        else:
+            return poly.vertex_list_per_poly[c1][1][0]
+    else:
+        return next_i
 
 def color(c):
     if abs(c) <= 1.:
@@ -117,30 +145,43 @@ def color(c):
     else:
         return 'r'
 
-def test():
-    theta = 1.5
-    init_poly = Simple_Polygon("sh", simple_nonconv[0])
-    pls = Partial_Local_Sequence(init_poly)
-    bvd = Bounce_Visibility_Diagram(pls)
-    bvg = Bounce_Graph(bvd)
-    poly = pls.inserted_polygon
-    data = classifyBoundary(poly, theta)
+def plot_poly(vs, data, poly):
 
-    vs = poly.vertex_list_per_poly[0]
+    all_vs = poly.complete_vertex_list
     n = len(vs)
+    xs = [all_vs[i][0] for i in vs]
+    ys = [all_vs[i][1] for i in vs]
+    edges = list(zip(vs, vs[1:])) + [(vs[-1], vs[0])]
+    for v1, v2 in edges:
+        pt1 = all_vs[v1]
+        pt2 = all_vs[v2]
+        xpair = [pt1[0], pt2[0]]
+        ypair = [pt1[1], pt2[1]]
+        plt.plot(xpair, ypair, 'ko-')
+        if v1 in data:
+            dat = data[v1]
+            plot_dat = [(subset, color(c)) for val, subset, c in dat]
+            for [pt1, pt2], c in plot_dat:
+                plt.plot([pt1[0], pt2[0]], [pt1[1], pt2[1]], c+'-')
+
+
+def test():
+    theta = 1.57
+    poly = Simple_Polygon("sh", simple_holes[0], simple_holes[1])
+    pprime, data = classifyBoundary(poly, theta)
+
+    outer_vs = [i for i,v in pprime.vertex_list_per_poly[0]]
+    outer_data = {i:data[i] for i in data.keys() if i in outer_vs}
+    plot_poly(outer_vs, outer_data, pprime)
+
+    components = pprime.vertex_list_per_poly[1:]
+    for c in components:
+        vs = [i for i,v in c]
+        vs.reverse()
+        c_data = {i:data[i] for i in data.keys() if i in vs}
+        plot_poly(vs, c_data, pprime)
     #for i in range(n):
     #    print(data[i])
-    xs = [pt[0] for i,pt in vs]
-    ys = [pt[1] for i,pt in vs]
-    for i in range(n):
-        xpair = [xs[i], xs[(i+1) % n]]
-        ypair = [ys[i], ys[(i+1) % n]]
-        plt.plot(xpair, ypair, 'ko-')
-    for i in range(n):
-        dat = data[i]
-        plot_dat = [(subset, color(c)) for val, subset, c in dat]
-        for [pt1, pt2], c in plot_dat:
-            plt.plot([pt1[0], pt2[0]], [pt1[1], pt2[1]], c+'-')
     plt.savefig("test.png")
     plt.clf
 
