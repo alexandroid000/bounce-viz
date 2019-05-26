@@ -128,6 +128,25 @@ class TestGeomUtils(unittest.TestCase):
          compare([], t9)
          compare(ts10, t10)
 
+    def test_pls_convex(self):
+        pent = Simple_Polygon("pent",np.array([(550,450), (645,519), (609,631), (491,631), (455,519)], dtype=np.float))
+        pls = Partial_Local_Sequence(pent)
+        poly_prime = pls.inserted_polygon
+
+        compare(pent.complete_vertex_list, poly_prime.complete_vertex_list)
+
+    def test_viz_convex(self):
+
+        pent = Simple_Polygon("pent",np.array([(550,450), (645,519), (609,631), (491,631), (455,519)], dtype=np.float))
+        pls = Partial_Local_Sequence(pent)
+        bvg = Bounce_Graph(Bounce_Visibility_Diagram(pls))
+        viz_edges = bvg.visibility_graph.edges
+        expected = [(0, 1), (0, 2), (0, 3), (0, 4),
+                    (1, 0), (1, 2), (1, 3), (1, 4),
+                    (2, 0), (2, 1), (2, 3), (2, 4),
+                    (3, 0), (3, 1), (3, 2), (3, 4),
+                    (4, 0), (4, 1), (4, 2), (4, 3)]
+
     def test_viz_verts(self):
         poly_vs = Partial_Local_Sequence(Simple_Polygon("sb",simple_bit[0])).inserted_polygon.complete_vertex_list
         poly = Simple_Polygon("sb2", np.array(poly_vs))
@@ -204,6 +223,8 @@ class TestGeomUtils(unittest.TestCase):
         self.assertEqual(next_v(3, poly), 0)
         self.assertEqual(next_v(4, poly), 5)
         self.assertEqual(next_v(6, poly), 4)
+        poly2 = Simple_Polygon("pent", pent[0])
+        self.assertEqual(next_v(4, poly2), 0)
 
 
     def test_contraction(self):
@@ -228,7 +249,8 @@ class TestGeomUtils(unittest.TestCase):
                    2: [[True, np.array([[609., 631.], [491., 631.]]), 0.19989950974821585]],
                    3: [[True, np.array([[491., 631.], [455., 519.]]), 0.20004096545497796]],
                    4: [[True, np.array([[455., 519.], [550., 450.]]), 0.1999777758081791]]}
-        compare(list(classifyBoundary(pent, 0.2)), list(output))
+        pprime, segments = classifyBoundary(pent, 0.2)
+        compare(list(segments), list(output))
 
 
     def test_edge_viz_graph_nonconv(self):

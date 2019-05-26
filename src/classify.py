@@ -103,8 +103,6 @@ def classifyBoundary(poly, theta):
     n = len(vs)
     class_data = {i:[] for i in range(n)}
     for (v1, v2) in viz_edges:
-        c1 = whichComponent(v1, poly_prime)
-        c2 = whichComponent(v2, poly_prime)
         e1 = [vs[v1], vs[next_v(v1, poly_prime)]]
         e2 = [vs[v2], vs[next_v(v2, poly_prime)]]
 
@@ -129,7 +127,7 @@ def next_v(i, poly):
     if c1 != c2:
         return poly.vertex_list_per_poly[c1][0][0]
     else:
-        return i+1
+        return (i+1)%n
 
 def color(c):
     if abs(c) <= 1.:
@@ -179,5 +177,5 @@ def test():
 
 
 
-test()
+#test()
 
