@@ -198,6 +198,14 @@ class TestGeomUtils(unittest.TestCase):
         subset = findDomain(e1, e2, theta)
         self.assertTrue(subset.size == 0)
 
+    def test_indexing(self):
+        poly = Simple_Polygon("sh", simple_holes[0], simple_holes[1])
+        self.assertEqual(next_v(0, poly), 1)
+        self.assertEqual(next_v(3, poly), 0)
+        self.assertEqual(next_v(4, poly), 5)
+        self.assertEqual(next_v(6, poly), 4)
+
+
     def test_contraction(self):
         e1 = np.array([[20.,7.],[10.,0.]])
         e2 = np.array([[10.,0.],[0.,7.]])
@@ -228,12 +236,14 @@ class TestGeomUtils(unittest.TestCase):
         pls = Partial_Local_Sequence(init_poly)
         bvd = Bounce_Visibility_Diagram(pls)
         bvg = Bounce_Graph(bvd)
-
-
+        result = bvg.visibility_graph.edges
         expected = [(0, 3), (0, 4), (0, 5), (0, 6), (1, 2), (1, 3), (1, 4), (1,
         5), (2, 1), (2, 4), (2, 5), (2, 6), (3, 0), (3, 1), (3, 4), (3, 5), (3,
         6), (4, 0), (4, 1), (4, 2), (4, 3), (4, 5), (4, 6), (5, 0), (5, 1), (5,
         2), (5, 3), (5, 4), (6, 0), (6, 2), (6, 3), (6, 4)]
+
+        self.assertEqual(result, expected)
+
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)
 #        bvd = Bounce_Visibility_Diagram(pls)

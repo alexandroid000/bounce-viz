@@ -122,22 +122,14 @@ def classifyBoundary(poly, theta):
 # wrapper to correct for sequential numbering across components
 def next_v(i, poly):
     n = poly.size
+
     c1 = whichComponent(i, poly)
-
-    if c1 == 0:
-        next_i = i+1
-    else:
-        next_i = i-1
-
-    c2 = whichComponent(next_i % n, poly)
+    c2 = whichComponent((i+1) % n, poly)
 
     if c1 != c2:
-        if c1 == 0:
-            return poly.vertex_list_per_poly[c1][0][0]
-        else:
-            return poly.vertex_list_per_poly[c1][1][0]
+        return poly.vertex_list_per_poly[c1][0][0]
     else:
-        return next_i
+        return i+1
 
 def color(c):
     if abs(c) <= 1.:
