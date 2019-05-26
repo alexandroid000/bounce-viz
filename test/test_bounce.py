@@ -258,7 +258,7 @@ class TestGeomUtils(unittest.TestCase):
         pls = Partial_Local_Sequence(init_poly)
         bvd = Bounce_Visibility_Diagram(pls)
         bvg = Bounce_Graph(bvd)
-        result = bvg.visibility_graph.edges
+        result = list(bvg.visibility_graph.edges)
         expected = [(0, 3), (0, 4), (0, 5), (0, 6), (1, 2), (1, 3), (1, 4), (1,
         5), (2, 1), (2, 4), (2, 5), (2, 6), (3, 0), (3, 1), (3, 4), (3, 5), (3,
         6), (4, 0), (4, 1), (4, 2), (4, 3), (4, 5), (4, 6), (5, 0), (5, 1), (5,
