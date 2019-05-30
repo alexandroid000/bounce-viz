@@ -26,7 +26,7 @@ class Partial_Local_Sequence(object):
                     curr_seq_info.append([])
                     continue
                 r_children = ShootRaysFromReflex(curr_polygon_vx, input_polygon.vertex_list_per_poly, i)
-                transition_pts = ShootRaysToReflexFromVerts(curr_polygon_vx, curr_polygon_index, input_polygon.vertex_list_per_poly, i)
+                transition_pts = ShootRaysToReflexFromVerts(curr_polygon_vx, curr_polygon_index, input_polygon.vertex_list_per_poly, input_polygon, i)
                 # transition_pts = []
                 transition_pts.extend(r_children)
                 curr_seq_info.append(transition_pts)

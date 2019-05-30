@@ -71,10 +71,10 @@ def isContraction(e1, e2, theta):
 
     # determine handedness of transition
 
-    # left transition
+    # left transition, adjacent edges
     if la.norm(e1v1-e2v2) < EPSILON:
         c_th = np.sin(theta)/np.sin(theta-phi)
-    # right transition
+    # right transition, adjacent edges
     elif la.norm(e1v2-e2v1) < EPSILON:
         c_th = np.sin(theta)/np.sin(theta+phi)
     # left transition
@@ -93,10 +93,10 @@ def classifyBoundary(poly, theta):
 
     # construct edge-edge visibility graph
     pls = Partial_Local_Sequence(poly)
-    poly_prime = pls.inserted_polygon
     bvg = Bounce_Graph(Bounce_Visibility_Diagram(pls))
     viz_edges = bvg.visibility_graph.edges
 
+    poly_prime = pls.inserted_polygon
     vs = poly_prime.complete_vertex_list
     components = poly_prime.vertex_list_per_poly
     outer_boundary = [v for i,v in components[0]]
@@ -148,6 +148,7 @@ def plot_poly(vs, data, poly):
         xpair = [pt1[0], pt2[0]]
         ypair = [pt1[1], pt2[1]]
         plt.plot(xpair, ypair, 'ko-')
+        plt.annotate(str(v1), pt1+np.array([5,5]))
         if v1 in data:
             dat = data[v1]
             plot_dat = [(subset, color(c)) for val, subset, c in dat]
@@ -156,8 +157,9 @@ def plot_poly(vs, data, poly):
 
 
 def test():
-    theta = 1.57
-    poly = Simple_Polygon("sh", simple_holes[0], simple_holes[1])
+    theta = 0.1
+    poly = Simple_Polygon("sh", poly1[0])
+    #poly = Simple_Polygon("sh", pent[0])
     pprime, data = classifyBoundary(poly, theta)
 
     outer_vs = [i for i,v in pprime.vertex_list_per_poly[0]]
@@ -167,7 +169,7 @@ def test():
     components = pprime.vertex_list_per_poly[1:]
     for c in components:
         vs = [i for i,v in c]
-        vs.reverse()
+        #vs.reverse()
         c_data = {i:data[i] for i in data.keys() if i in vs}
         plot_poly(vs, c_data, pprime)
     #for i in range(n):
@@ -177,5 +179,5 @@ def test():
 
 
 
-#test()
+test()
 

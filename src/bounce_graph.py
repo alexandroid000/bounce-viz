@@ -11,21 +11,26 @@ class Bounce_Graph(object):
     visibility_graph
     safe_action_graph
     '''
-    def create_bounce_visibility_graph(self, poly, requireContract = False):
+    def create_bounce_visibility_graph(self, poly, inserted_poly, requireContract = False):
         ''' creates directed edge-to-edge visibility graph; edge information is angle ranges which create contraction mapping
         '''
         bvg = nx.DiGraph()
 
-        for component in poly.vertex_list_per_poly:
+        for component in inserted_poly.vertex_list_per_poly:
             for start_i, start in component:
                 m = len(component)
-                viz_verts = visibleVertices(component, poly.vertex_list_per_poly, start_i % m)
-                vvs = [poly.vertex_list_per_poly[c][j][0]
+                viz_verts = visibleVertices(component, inserted_poly.vertex_list_per_poly,
+                poly, start_i % m)
+                if start_i == 21:
+                    print("visible from 21:", viz_verts)
+                if start_i == 22:
+                    print("visible from 22:", viz_verts)
+                vvs = [inserted_poly.vertex_list_per_poly[c][j][0]
                        for c, vv in enumerate(viz_verts)
                        for j in vv]
-                edges = [(start_i,v,validAnglesForContract(poly, start_i, v))
+                edges = [(start_i,v,validAnglesForContract(inserted_poly, start_i, v))
                          for v in vvs if
-                         check_valid_transit(v, start_i, poly)]
+                         check_valid_transit(v, start_i, inserted_poly)]
                 if requireContract:
                     c_edges = [(i,j, angs) for (i,j,angs) in edges if angs != []]
                     bvg.add_weighted_edges_from(c_edges)
@@ -66,5 +71,6 @@ class Bounce_Graph(object):
 
     def __init__(self, bvd):
         self.bounce_visibility_diagram = bvd
-        self.visibility_graph = self.create_bounce_visibility_graph(bvd.partial_local_sequence.inserted_polygon)
+        self.visibility_graph = self.create_bounce_visibility_graph(bvd.partial_local_sequence.polygon,
+        bvd.partial_local_sequence.inserted_polygon)
         #self.safe_action_graph = self.create_safe_action_graph(self.visibility_graph, bvd.partial_local_sequence.inserted_polygon, bvd.visible_vx_set_for_edges)

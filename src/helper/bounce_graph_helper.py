@@ -111,8 +111,6 @@ def check_valid_transit(v, start, poly):
     psize = poly.size
     poly_vx = poly.complete_vertex_list
 
-
-
     # check if two segments are collinear
     collinear = IsThreePointsOnLine(poly_vx[start],
     poly_vx[(start+1)%psize], poly_vx[v]) and IsThreePointsOnLine(poly_vx[start], poly_vx[(start+1)%psize], poly_vx[(v+1)%psize])
@@ -131,7 +129,8 @@ def check_valid_transit(v, start, poly):
                             and v != (start+1) % psize)
                 )
 
-    return (not aroundCorner) and (not collinear)
+    isValidTransit = (not aroundCorner) and (not collinear)
+    return isValidTransit
 
 # includes transient cycles
 # complexity O((n+e)(c+1)) if there are c cycles

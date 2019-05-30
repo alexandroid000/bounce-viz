@@ -120,7 +120,7 @@ def ShootRaysFromReflex(curr_poly_vxs, vertex_list_per_poly, j):
 
     return int_pts
 
-def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_poly, j):
+def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_poly, orig_poly, j):
     ''' shoot ray from visible vertices through a specific reflex vert
         j is the index of the reflex vertex
         Poly -> Int -> [(Point, Int)]
@@ -132,7 +132,7 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_p
     bv2 = r_v - next_r_v
 
     pts = []
-    visible_verts = visibleVertices(curr_poly_vxs, vertex_list_per_poly, j)
+    visible_verts = visibleVertices(curr_poly_vxs, vertex_list_per_poly, orig_poly, j)
 
     # only ray shoot from non-adjacent vertices
     # previous and next neighbors always visible

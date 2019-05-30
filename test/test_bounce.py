@@ -110,10 +110,10 @@ class TestGeomUtils(unittest.TestCase):
          p1 = Simple_Polygon("p1",poly1[0])
          outer_vxs = p1.vertex_list_per_poly[0]
 
-         t3 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly, 3)
-         t7 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly, 7)
-         t9 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly, 9)
-         t10 = ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly, 10)
+         t3 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly,p1, 3)
+         t7 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly,p1, 7)
+         t9 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly,p1, 9)
+         t10 = ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly,p1, 10)
          ts3 = [(np.array([-67.74193548, 182.25806452]), 4, 1), (np.array([109.82142857, 186.60714286]), 1, 5),
          (np.array([-60., 190.]), 4, 10)]
          ts7 = [(np.array([-206.18384401, -199.13649025]), 8, 4), (np.array([-127.36842105, -194.21052632]), 8,
@@ -148,23 +148,32 @@ class TestGeomUtils(unittest.TestCase):
                     (4, 0), (4, 1), (4, 2), (4, 3)]
 
     def test_viz_verts(self):
-        poly_vs = Partial_Local_Sequence(Simple_Polygon("sb",simple_bit[0])).inserted_polygon.complete_vertex_list
-        poly = Simple_Polygon("sb2", np.array(poly_vs))
-        vvs1 = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, 3)
-        vvs2 = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, 2)
+        poly = Simple_Polygon("sb",simple_bit[0])
+        poly_prime_vs = Partial_Local_Sequence(poly).inserted_polygon.complete_vertex_list
+        poly_prime = Simple_Polygon("sb2", np.array(poly_prime_vs))
+        vvs1 = visibleVertices(poly_prime.outer_boundary_vertices, poly_prime.vertex_list_per_poly, poly, 3)
+        vvs2 = visibleVertices(poly_prime.outer_boundary_vertices, poly_prime.vertex_list_per_poly, poly, 2)
         self.assertEqual([[2, 4, 5, 6, 7]], vvs1)
         self.assertEqual([[0, 1, 3, 4, 5, 6, 7, 8, 10, 11]], vvs2)
 
     def test_viz_gp(self):
-        poly_vs = Partial_Local_Sequence(Simple_Polygon("tr",tworooms[0])).inserted_polygon.complete_vertex_list
-        poly = Simple_Polygon("gptr", np.array(poly_vs))
-        vvs = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, 0)
+        poly = Simple_Polygon("tr",tworooms[0])
+        poly_prime_vs = Partial_Local_Sequence(poly).inserted_polygon.complete_vertex_list
+        poly_prime = Simple_Polygon("gptr", np.array(poly_prime_vs))
+        vvs = visibleVertices(poly_prime.outer_boundary_vertices, poly_prime.vertex_list_per_poly, poly, 0)
         self.assertEqual([[1, 2, 11, 12, 13, 14, 15]], vvs)
+
+
+    def test_viz_simple_gp(self):
+        poly = Simple_Polygon("sqgp", square_gp[0])
+        vvs = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, poly, 2)
+        self.assertEqual([[0, 1, 3, 4]], vvs)
+
 
 #def visibleVertices(curr_poly_vx, vertex_list_per_poly, j):
     def test_viz_holes(self):
         poly = Simple_Polygon("simple_holes", simple_holes[0], simple_holes[1])
-        vvs = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, 2)
+        vvs = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, poly, 2)
         expected = [[1,3],[1,2]]
         self.assertEqual(expected, vvs)
 
