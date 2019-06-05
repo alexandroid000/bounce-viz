@@ -21,10 +21,6 @@ class Bounce_Graph(object):
                 m = len(component)
                 viz_verts = visibleVertices(component, inserted_poly.vertex_list_per_poly,
                 poly, start_i % m)
-                if start_i == 21:
-                    print("visible from 21:", viz_verts)
-                if start_i == 22:
-                    print("visible from 22:", viz_verts)
                 vvs = [inserted_poly.vertex_list_per_poly[c][j][0]
                        for c, vv in enumerate(viz_verts)
                        for j in vv]

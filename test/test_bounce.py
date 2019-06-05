@@ -275,6 +275,32 @@ class TestGeomUtils(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
+    def test_edge_viz_tricky(self):
+        init_poly = Simple_Polygon("sh", pinched_square[0])
+        pls = Partial_Local_Sequence(init_poly)
+        bvd = Bounce_Visibility_Diagram(pls)
+        bvg = Bounce_Graph(bvd)
+        result = list(bvg.visibility_graph.edges)
+        expected = [(0,5), (0,6), (0,7), (0,11),
+                    (1,5), (1,6), (1,7), (1,8), (1,11),
+                    (2,5), (2,6), (2,7), (2,8), (2,9), (2,10), (2,11),
+                    (3,5), (3,8), (3,9), (3,10), (3,11),
+                    (4,5), (4,9), (4,10), (4,11),
+                    (5,0), (5,1), (5,2), (5,3), (5,4), (5,10), (5,11),
+                    (6,0), (6,1), (6,2), (6,8), (6,9), (6,10), (6,11),
+                    (7,0), (7,1), (7,2), (7,8), (7,9), (7,10),
+                    (8,1), (8,2), (8,3), (8,6), (8,7), (8,9), (8,10),
+                    (9,2), (9,3), (9,4), (9,6), (9,7), (9,8),
+                    (10,2), (10,3), (10,4), (10,5), (10,6), (10,7), (10,8),
+                    (11,0), (11,1), (11,2), (11,3), (11,4), (11,5), (11,6)]
+
+        missing = set(expected) - set(result)
+        print("our algorithm should have seen but didn't:", missing)
+        extra = set(result) - set(expected)
+        print("our algorithm saw when it shouldn't:", extra)
+
+        self.assertEqual(sorted(result), sorted(expected))
+
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)
 #        bvd = Bounce_Visibility_Diagram(pls)
