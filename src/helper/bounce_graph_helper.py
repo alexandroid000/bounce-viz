@@ -106,7 +106,6 @@ def check_valid_transit(v, start, poly):
 
     This works for outer boundary of polygon only right now, not holes.
     '''
-
     r_vs = poly.reflex_vertices
     psize = poly.size
     poly_vx = poly.complete_vertex_list
@@ -120,12 +119,13 @@ def check_valid_transit(v, start, poly):
                or
                ((start in r_vs) and (start == (v+1) % psize))
                or
-               ((v in r_vs) and IsThreePointsOnLine(poly_vx[start], poly_vx[v],
-                                                    poly_vx[(v+1)%psize])
+               ((IsLeftTurn(poly_vx[(v+1)%psize], poly_vx[v], poly_vx[(start+1)%psize])) 
+                and (IsLeftTurn(poly_vx[(v+1)%psize], poly_vx[v], poly_vx[start]) or IsThreePointsOnLine(poly_vx[start], poly_vx[v], poly_vx[(v+1)%psize]))
                             and start != ((v+1) % psize))
                or 
-               ((start in r_vs) and IsThreePointsOnLine(poly_vx[start],
-               poly_vx[v], poly_vx[(start+1)%psize])
+               ((IsLeftTurn(poly_vx[(start+1)%psize], poly_vx[start], poly_vx[(v+1)%psize])) 
+                and (IsLeftTurn(poly_vx[(start+1)%psize], poly_vx[start], poly_vx[v]) or IsThreePointsOnLine(poly_vx[start],
+               poly_vx[v], poly_vx[(start+1)%psize]))
                             and v != (start+1) % psize)
                 )
 

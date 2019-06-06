@@ -73,16 +73,16 @@ def isContraction(e1, e2, theta):
 
     # left transition, adjacent edges
     if la.norm(e1v1-e2v2) < EPSILON:
-        c_th = np.sin(theta)/np.sin(theta-phi)
+        c_th = np.sin(theta)/np.sin(theta+phi-np.pi)
     # right transition, adjacent edges
     elif la.norm(e1v2-e2v1) < EPSILON:
-        c_th = np.sin(theta)/np.sin(theta+phi)
+        c_th = np.sin(theta)/np.sin(phi-theta)
     # left transition
     elif IsLeftTurn(e1v1, e2v1, int_pt):
-        c_th = np.sin(theta)/np.sin(theta-phi)
+        c_th = np.sin(theta)/np.sin(phi-theta)
     # right transition
     else:
-        c_th = np.sin(theta)/np.sin(theta+phi)
+        c_th = np.sin(theta)/np.sin(theta+phi-np.pi)
 
     if abs(c_th) < 1.0:
         return True, c_th
@@ -205,4 +205,3 @@ def test():
 
 
 test()
-
