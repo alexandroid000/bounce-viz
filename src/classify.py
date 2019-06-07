@@ -79,10 +79,10 @@ def isContraction(e1, e2, theta):
         c_th = np.sin(theta)/np.sin(phi-theta)
     # left transition
     elif IsLeftTurn(e1v1, e2v1, int_pt):
-        c_th = np.sin(theta)/np.sin(phi-theta)
+        c_th = np.sin(theta)/np.sin(theta+phi-np.pi)
     # right transition
     else:
-        c_th = np.sin(theta)/np.sin(theta+phi-np.pi)
+        c_th = np.sin(theta)/np.sin(phi-theta)
 
     if abs(c_th) < 1.0:
         return True, c_th
@@ -204,4 +204,26 @@ def test():
 
 
 
-test()
+# test()
+
+def test_video(theta, index):
+    poly = Simple_Polygon("sh", pinched_square[0])
+    pprime, data = classifyBoundary(poly, theta)
+    outer_vs = [i for i,v in pprime.vertex_list_per_poly[0]]
+    outer_data = {i:data[i] for i in data.keys() if i in outer_vs}
+    plot_poly(outer_vs, outer_data, pprime)
+
+    components = pprime.vertex_list_per_poly[1:]
+    for c in components:
+        vs = [i for i,v in c]
+        c_data = {i:data[i] for i in data.keys() if i in vs}
+        plot_poly(vs, c_data, pprime)
+    plt.legend(['theta: {0:.2f}'.format(theta / np.pi * 180)])
+    plt.savefig("contract_test/pinched_square_test_{0:0=4d}.png".format(index),  dpi=200)
+    plt.clf()
+
+index = 0
+for i in np.arange(0, np.pi, 0.05)[1:]:
+    test_video(i, index)
+    index += 1
+
