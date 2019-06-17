@@ -17,6 +17,33 @@ import colorsys
 import os
 import subprocess
 
+def onSameEdge(s1, s2, poly_prime):
+
+    return False
+
+def classifySegment(s1, s2, bounce_vector, poly_prime):
+    res1 = ClosestPtAlongRay(s1, s1 + bounce_vector, poly_prime.vertex_list_per_poly)
+    res2 = ClosestPtAlongRay(s2, s2 + bounce_vector, poly_prime.vertex_list_per_poly)
+    if (not res1 or not res2):
+        # print('hitting corner')
+        raise ValueError
+    # if y1[1] != y2[1]:
+        # this is when the interval map to a corner or a clif
+    #     print(s1, s2, y1, y2)
+    #     print(j)
+    #     print(y1[1], y2[1])
+
+    y1, j = res1
+    y2, k = res2
+    # end points not on same edge
+    if j != k:
+        print("not on same target edge")
+        return 1.0
+
+    contraction_ratio = np.linalg.norm(y2-y1) / np.linalg.norm(s2 - s1)
+
+    return (contraction_ratio <= 1, np.array([s1, s2]), contraction_ratio)
+
 def classifyBoundary(poly, theta):
     # divid each edge into small intervals, shoot ray from the end points of the interval, compute the ratio between the ray hit interval and the start interval
 
@@ -41,20 +68,11 @@ def classifyBoundary(poly, theta):
             # calculate the small segment end point
             s1 = j*(v2-v1) + v1
             s2 = min(0.9, j+interval_len_ratio)*(v2-v1) + v1
-            y1 = ClosestPtAlongRay(s1, s1 + bounce_vector, poly_prime.vertex_list_per_poly)
-            y2 = ClosestPtAlongRay(s2, s2 + bounce_vector, poly_prime.vertex_list_per_poly)
-            if (not y1 or not y2):
-                # print('hitting corner')
+            try:
+                seg_data = classifySegment(s1,s2,bounce_vector,poly_prime)
+            except:
                 continue
-            # if y1[1] != y2[1]:
-                # this is when the interval map to a corner or a clif
-            #     print(s1, s2, y1, y2)
-            #     print(j)
-            #     print(y1[1], y2[1])
-            y1 = y1[0]
-            y2 = y2[0]
-            contraction_ratio = np.linalg.norm(y2-y1) / np.linalg.norm(s2 - s1)
-            class_data[i].append([contraction_ratio <= 1, np.array([s1, s2]), contraction_ratio])
+            class_data[i].append(seg_data)
     return poly_prime, class_data
 
 def plot_poly(vs, data, poly):
