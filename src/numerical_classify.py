@@ -17,32 +17,36 @@ import colorsys
 import os
 import subprocess
 
-def onSameEdge(s1, s2, poly_prime):
+# compute whether transition is contracting and what the coefficient is
+def isContraction(e1, e2, theta):
+    [e1v1, e1v2] = e1
+    [e2v1, e2v2] = e2
+    phi = AngleBetween(e1v2-e1v1, e2v2-e2v1) # in range [0,pi]
 
-    return False
+    try:
+        _, _, int_pt = ShootRayFromVect(e1v1, e1v2, e2v1, e2v2)
+    except: # lines are parallel, inducing neutrally stable 2-period cycle
+        return True, 1.0
 
-def classifySegment(s1, s2, bounce_vector, poly_prime):
-    res1 = ClosestPtAlongRay(s1, s1 + bounce_vector, poly_prime.vertex_list_per_poly)
-    res2 = ClosestPtAlongRay(s2, s2 + bounce_vector, poly_prime.vertex_list_per_poly)
-    if (not res1 or not res2):
-        # print('hitting corner')
-        raise ValueError
-    # if y1[1] != y2[1]:
-        # this is when the interval map to a corner or a clif
-    #     print(s1, s2, y1, y2)
-    #     print(j)
-    #     print(y1[1], y2[1])
+    # determine handedness of transition
 
-    y1, j = res1
-    y2, k = res2
-    # end points not on same edge
-    if j != k:
-        print("not on same target edge")
-        return 1.0
+    # left transition, adjacent edges
+    if la.norm(e1v1-e2v2) < EPSILON:
+        c_th = np.sin(theta)/np.sin(theta+phi-np.pi)
+    # right transition, adjacent edges
+    elif la.norm(e1v2-e2v1) < EPSILON:
+        c_th = np.sin(theta)/np.sin(phi-theta)
+    # left transition
+    elif IsLeftTurn(e1v1, e2v1, int_pt):
+        c_th = np.sin(theta)/np.sin(theta+phi-np.pi)
+    # right transition
+    else:
+        c_th = np.sin(theta)/np.sin(phi-theta)
 
-    contraction_ratio = np.linalg.norm(y2-y1) / np.linalg.norm(s2 - s1)
-
-    return (contraction_ratio <= 1, np.array([s1, s2]), contraction_ratio)
+    if abs(c_th) < 1.0:
+        return True, c_th
+    else:
+        return False, c_th
 
 def classifyBoundary(poly, theta):
     # divid each edge into small intervals, shoot ray from the end points of the interval, compute the ratio between the ray hit interval and the start interval
@@ -72,7 +76,21 @@ def classifyBoundary(poly, theta):
                 seg_data = classifySegment(s1,s2,bounce_vector,poly_prime)
             except:
                 continue
-            class_data[i].append(seg_data)
+            # if y1[1] != y2[1]:
+                # this is when the interval map to a corner or a clif
+            #     print(s1, s2, y1, y2)
+            #     print(j)
+            #     print(y1[1], y2[1])
+            end_edge = y1[1]
+            _, analytic_contraction_ratio = isContraction([v1, v2], [vxs[end_edge], vxs[(end_edge + 1) % len(vxs)]], theta)
+            analytic_contraction_ratio = abs(analytic_contraction_ratio)
+            contraction_ratio = np.linalg.norm(y2[0]-y1[0]) / np.linalg.norm(s2 - s1)
+            if (abs(analytic_contraction_ratio - contraction_ratio) > 0.2):
+                print(s1, s2, y1, y2)
+                print(j)
+                print(y1[1], y2[1])
+                print('contraction ratios: ', contraction_ratio, 'analytic_contraction_ratio: ', analytic_contraction_ratio)
+            class_data[i].append([analytic_contraction_ratio <= 1, np.array([s1, s2]), analytic_contraction_ratio])
     return poly_prime, class_data
 
 def plot_poly(vs, data, poly):
@@ -121,7 +139,7 @@ def test_video(theta, index):
 
     plt.legend(['theta: {0:.2f}'.format(theta / np.pi * 180)])
     plt.axis('off')
-    plt.savefig("contract_test/poly1_test_{0:0=4d}.png".format(index),  dpi=200)
+    plt.savefig("contract_test/analytic_poly1_test_{0:0=4d}.png".format(index),  dpi=200)
     plt.clf()
 
 index = 0
@@ -131,4 +149,4 @@ for i in np.arange(0.1, np.pi-0.1, 0.03)[0:]:
     index += 1
 
 os.chdir('./contract_test')
-subprocess.call(['ffmpeg', '-framerate', '5', '-i', 'poly1_test_%04d.png', '-c:v', 'libx264', '-r', '6', '-pix_fmt', 'yuv420p', 'poly1.mp4'])
+subprocess.call(['ffmpeg', '-framerate', '5', '-i', 'analytic_poly1_test_%04d.png', '-c:v', 'libx264', '-r', '6', '-pix_fmt', 'yuv420p', 'analytic_poly1.mp4'])
