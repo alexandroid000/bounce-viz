@@ -72,9 +72,10 @@ def classifyBoundary(poly, theta):
             # calculate the small segment end point
             s1 = j*(v2-v1) + v1
             s2 = min(0.9, j+interval_len_ratio)*(v2-v1) + v1
-            try:
-                seg_data = classifySegment(s1,s2,bounce_vector,poly_prime)
-            except:
+            y1 = ClosestPtAlongRay(s1, s1 + bounce_vector, poly_prime.vertex_list_per_poly)
+            y2 = ClosestPtAlongRay(s2, s2 + bounce_vector, poly_prime.vertex_list_per_poly)
+            if (not y1 or not y2):
+                # print('hitting corner')
                 continue
             # if y1[1] != y2[1]:
                 # this is when the interval map to a corner or a clif
