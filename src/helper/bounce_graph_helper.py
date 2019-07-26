@@ -58,7 +58,11 @@ def angleBound(poly, i, j):
 def intersect_intervals(i1, i2):
     (a,b) = i1
     (c,d) = i2
-    return (max(a,c), min(b,d))
+    (th1, th2) = (max(a,c), min(b,d))
+    if th1 < th2:
+        return (th1, th2)
+    else:
+        return (th1, th1)
 
 def all_overlaps(interval_sets):
     n = len(interval_sets)

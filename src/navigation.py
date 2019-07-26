@@ -8,6 +8,7 @@ def get_vertices_in_interval(poly_unit_map, interval):
     (s1, s2) = interval
     vxs = []
     for i in range(len(poly_unit_map)-1):
+        print(poly_unit_map[i])
         if poly_unit_map[i]<s1*10:
             continue
         if poly_unit_map[i]>s2*10:
@@ -25,7 +26,7 @@ def get_transition_over_path(path, safe_action_graph):
         transitions.append((i,j,ang_range))
     return transitions
 
-class FewestBouncesStrategy(object):
+class FewestBouncesStrategy():
     ''' Description of a navigation task for a given polygon
     Attributes
     ----------
@@ -61,16 +62,14 @@ class FewestBouncesStrategy(object):
                 paths.append(self.bvg.get_shortest_path(s, g, 'safe'))
         return get_transition_over_path(paths[0], self.bvg.safe_action_graph)
 
-    def __init__(self, start_interval, end_interval, bvg):
-        self.start_interval = start_interval
-        self.end_interval = end_interval  
+    def __init__(self, start, end, bvg):
+        self.start_nodes = start
+        self.goal_nodes = end  
         self.bvg = bvg
         self.bvd = bvg.bounce_visibility_diagram
         self.pls = self.bvd.partial_local_sequence
         self.polygon = self.pls.polygon
         self.inserted_polygon = self.pls.inserted_polygon
-        self.start_nodes = get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping, self.start_interval)
-        self.goal_nodes = get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping, self.end_interval)
 
 
 class ConstantStrategy():
@@ -89,8 +88,10 @@ class ConstantStrategy():
     def __init__(self, start, end, bvg):
         self.sbvg = bvg.safe_action_graph
         self.polygon = bvg.bounce_visibility_diagram.partial_local_sequence.inserted_polygon
-        self.start = get_vertices_in_interval(self.polygon.unit_interval_mapping, start)
-        self.end = get_vertices_in_interval(self.polygon.unit_interval_mapping, end)
+        self.start = start
+        self.end = end
+        #self.start = get_vertices_in_interval(self.polygon.unit_interval_mapping, start)
+        #self.end = get_vertices_in_interval(self.polygon.unit_interval_mapping, end)
 
     def navigate(self, depth = -1):
         if depth == -1:
@@ -102,8 +103,11 @@ class ConstantStrategy():
             frontier = []
             for startnode in pathstates:
                 for (v, angrange) in startnode:
+                    print("start:", v)
                     # list of nodes reached and corresponding angranges for kth step
                     # in BFS from one of the start nodes
+                    next_nodes = self.take_step(self.sbvg, v, angrange)
+                    print("next:", next_nodes)
                     frontier.append(self.take_step(self.sbvg, v, angrange))
             if self.atGoal(frontier):
                 goal_paths = [[(v,range) for (v,range) in f if v in self.end]
@@ -170,6 +174,6 @@ class ConstantStrategy():
         #    print(goal_ranges)
         #    overlaps = all_overlaps(goal_ranges)
 
-        return all(checkGoal)
+        return any(checkGoal)
 
 

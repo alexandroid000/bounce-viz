@@ -5,6 +5,8 @@ Polygonal environment vertices information. Model: List outer boundary vertices 
 import numpy as np
 # Some initial polygons
 # Use these below (inside main() to set the initial shape poly
+sort = [np.array([(0, 0), (800, 0), (800, 200), (1700, 300), (2160, -160), (2720, 400), (2160, 960), (1700, 500), (800, 600), (800, 800), (0,
+800)], dtype=np.float)]
 two_holes = [np.array([(0., 0.), (12., 0.), (12., 8.), (0., 8.)]), [np.array([(1., 4.), (3., 6.), (4., 2.)]), np.array([(6., 6.), (8., 7.), (9., 4.), (8., 3.)])]]
 two_triangles = [np.array([(0., 4.), (8.,0.), (8., 8.)]), [np.array([(3., 4.), (6., 5.), (6., 2.)])]]
 small_holes = [np.array([(0., 4.), (8.,0.), (7., 5.), (8., 8.)]), [np.array([(3., 5.), (6., 6.), (6., 3.)])]]
