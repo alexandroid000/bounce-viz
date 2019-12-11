@@ -3,12 +3,14 @@ import sys
 sys.path.append("./src")
 import unittest
 from bounce_graph import *
+from simple_polygon import *
 from bounce_visibility_diagram import *
 from partial_local_sequence import *
 from helper.visibility_helper import *
 from helper.bounce_graph_helper import *
 from navigation import *
 from maps import *
+from classify import *
 from math import pi
 import numpy as np
 
@@ -58,14 +60,11 @@ class TestGeomUtils(unittest.TestCase):
          self.assertTrue(IsInPoly((0.0,0.0), Simple_Polygon("sq",square[0])))
 
     def test_contains_w_hole(self):
-         self.assertTrue(IsInPoly((5.0,3.0),
-                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+         self.assertTrue(IsInPoly((5.0,3.0), Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
 
-         self.assertFalse(IsInPoly((2.0,1.5),
-                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+         self.assertFalse(IsInPoly((2.0,1.5), Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
 
-         self.assertFalse(IsInPoly((8.0,8.5),
-                         Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
+         self.assertFalse(IsInPoly((8.0,8.5), Simple_Polygon("sqh",simple_holes[0], simple_holes[1])))
 
     def test_notIn(self):
          self.assertFalse(IsInPoly((500.0,0.0), Simple_Polygon("p1",poly1[0])))
@@ -91,12 +90,14 @@ class TestGeomUtils(unittest.TestCase):
          self.assertAlmostEqual(y, 8.0)
 
     def test_intersect_interior(self):
-         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, Simple_Polygon("p1",poly1[0]))
+         poly = Simple_Polygon("p1",poly1[0])
+         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, poly.vertex_list_per_poly)
          self.assertAlmostEqual(x, 139.1304347826087)
          self.assertAlmostEqual(y, 0.0)
 
     def test_intersect_thru_vertex(self):
-         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), Simple_Polygon("p1",poly1[0]))
+         poly = Simple_Polygon("p1",poly1[0])
+         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), poly.vertex_list_per_poly)
          self.assertAlmostEqual(x, 198.21428571428572)
          self.assertAlmostEqual(y, 66.07142857142857)
 
@@ -104,12 +105,15 @@ class TestGeomUtils(unittest.TestCase):
          p1 = Simple_Polygon("p1",poly1[0])
          self.assertEqual([3,7,10], p1.reflex_vertices)
 
+#ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_poly, j):
     def test_transition_pts(self):
          p1 = Simple_Polygon("p1",poly1[0])
-         t3 = ShootRaysToReflexFromVerts(p1, 3)
-         t7 = ShootRaysToReflexFromVerts(p1, 7)
-         t9 = ShootRaysToReflexFromVerts(p1, 9)
-         t10 = ShootRaysToReflexFromVerts(p1, 10)
+         outer_vxs = p1.vertex_list_per_poly[0]
+
+         t3 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly,p1, 3)
+         t7 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly,p1, 7)
+         t9 =  ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly,p1, 9)
+         t10 = ShootRaysToReflexFromVerts(outer_vxs, 0, p1.vertex_list_per_poly,p1, 10)
          ts3 = [(np.array([-67.74193548, 182.25806452]), 4, 1), (np.array([109.82142857, 186.60714286]), 1, 5),
          (np.array([-60., 190.]), 4, 10)]
          ts7 = [(np.array([-206.18384401, -199.13649025]), 8, 4), (np.array([-127.36842105, -194.21052632]), 8,
@@ -124,14 +128,54 @@ class TestGeomUtils(unittest.TestCase):
          compare([], t9)
          compare(ts10, t10)
 
+    def test_pls_convex(self):
+        pent = Simple_Polygon("pent",np.array([(550,450), (645,519), (609,631), (491,631), (455,519)], dtype=np.float))
+        pls = Partial_Local_Sequence(pent)
+        poly_prime = pls.inserted_polygon
+
+        compare(pent.complete_vertex_list, poly_prime.complete_vertex_list)
+
+    def test_viz_convex(self):
+
+        pent = Simple_Polygon("pent",np.array([(550,450), (645,519), (609,631), (491,631), (455,519)], dtype=np.float))
+        pls = Partial_Local_Sequence(pent)
+        bvg = Bounce_Graph(Bounce_Visibility_Diagram(pls))
+        viz_edges = bvg.visibility_graph.edges
+        expected = [(0, 1), (0, 2), (0, 3), (0, 4),
+                    (1, 0), (1, 2), (1, 3), (1, 4),
+                    (2, 0), (2, 1), (2, 3), (2, 4),
+                    (3, 0), (3, 1), (3, 2), (3, 4),
+                    (4, 0), (4, 1), (4, 2), (4, 3)]
+
     def test_viz_verts(self):
-        p = Partial_Local_Sequence(Simple_Polygon("sb",simple_bit[0])).inserted_polygon
-        self.assertEqual([2, 4, 5, 6, 7], visibleVertices(p,3))
-        self.assertEqual([0, 1, 3, 4, 5, 6, 7, 8, 10, 11], visibleVertices(p,2))
+        poly = Simple_Polygon("sb",simple_bit[0])
+        poly_prime_vs = Partial_Local_Sequence(poly).inserted_polygon.complete_vertex_list
+        poly_prime = Simple_Polygon("sb2", np.array(poly_prime_vs))
+        vvs1 = visibleVertices(poly_prime.outer_boundary_vertices, poly_prime.vertex_list_per_poly, poly, 3)
+        vvs2 = visibleVertices(poly_prime.outer_boundary_vertices, poly_prime.vertex_list_per_poly, poly, 2)
+        self.assertEqual([[2, 4, 5, 6, 7]], vvs1)
+        self.assertEqual([[0, 1, 3, 4, 5, 6, 7, 8, 10, 11]], vvs2)
 
     def test_viz_gp(self):
-        p = Partial_Local_Sequence(Simple_Polygon("tr",tworooms[0])).inserted_polygon
-        self.assertEqual([1, 2, 11, 12, 13, 14, 15], visibleVertices(p, 0))
+        poly = Simple_Polygon("tr",tworooms[0])
+        poly_prime_vs = Partial_Local_Sequence(poly).inserted_polygon.complete_vertex_list
+        poly_prime = Simple_Polygon("gptr", np.array(poly_prime_vs))
+        vvs = visibleVertices(poly_prime.outer_boundary_vertices, poly_prime.vertex_list_per_poly, poly, 0)
+        self.assertEqual([[1, 2, 11, 12, 13, 14, 15]], vvs)
+
+
+    def test_viz_simple_gp(self):
+        poly = Simple_Polygon("sqgp", square_gp[0])
+        vvs = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, poly, 2)
+        self.assertEqual([[0, 1, 3, 4]], vvs)
+
+
+#def visibleVertices(curr_poly_vx, vertex_list_per_poly, j):
+    def test_viz_holes(self):
+        poly = Simple_Polygon("simple_holes", simple_holes[0], simple_holes[1])
+        vvs = visibleVertices(poly.outer_boundary_vertices, poly.vertex_list_per_poly, poly, 2)
+        expected = [[1,3],[1,2]]
+        self.assertEqual(expected, vvs)
 
     def test_angle_parallel(self):
         sq = Simple_Polygon("sq",square[0])
@@ -158,6 +202,104 @@ class TestGeomUtils(unittest.TestCase):
         self.assertAlmostEqual(min_c, min_a)
         self.assertAlmostEqual(max_c, max_a)
 
+    def test_simple_domain(self):
+        e1 = np.array([(0.0, 0.0), (2.0, 0.0)])
+        e2 = np.array([(3.0, 1.0), (1.0, 1.0)])
+        theta = np.pi/2
+        subset = findDomain(e1, e2, theta)
+        compare(subset, np.array([[1., 0.], [2., 0.]]))
+
+    def test_weirder_domain(self):
+        e1 = np.array([(1.0, 1.0), (0.0, 0.0)])
+        e2 = np.array([(3.0, -1.0), (3.0, 3.0)])
+        theta1 = 3.*np.pi/4.
+        theta2 = np.pi/2.
+        subset1 = findDomain(e1, e2, theta1)
+        subset2 = findDomain(e2, e1, theta2)
+        compare(subset1, np.array([[0., 0.], [1., 1.]]))
+        compare(subset2, np.array([[3., 0.], [3., 1.]]))
+
+    def test_miss(self):
+        e1 = np.array([(0.0, 0.0), (1.0, 0.0)])
+        e2 = np.array([(2.0, 1.0), (3.0, 1.0)])
+        theta = np.pi/2.
+        subset = findDomain(e1, e2, theta)
+        self.assertTrue(subset.size == 0)
+
+    def test_indexing(self):
+        poly = Simple_Polygon("sh", simple_holes[0], simple_holes[1])
+        self.assertEqual(next_v(0, poly), 1)
+        self.assertEqual(next_v(3, poly), 0)
+        self.assertEqual(next_v(4, poly), 5)
+        self.assertEqual(next_v(6, poly), 4)
+        poly2 = Simple_Polygon("pent", pent[0])
+        self.assertEqual(next_v(4, poly2), 0)
+
+
+    def test_contraction(self):
+        e1 = np.array([[20.,7.],[10.,0.]])
+        e2 = np.array([[10.,0.],[0.,7.]])
+        e3 = np.array([[16.,18.],[20.,7.]])
+        theta1 = 5.*np.pi/6.
+        theta2 = np.pi/6.
+        theta3 = np.pi/3.
+        val1, c1 = isContraction(e1, e2, theta1)
+        val2, c2 = isContraction(e1, e3, theta2)
+        val3, c3 = isContraction(e1, e3, theta3)
+        self.assertTrue(val1)
+        self.assertTrue(val2)
+        self.assertFalse(val3)
+
+    def test_regpoly_classify(self):
+        pent = Simple_Polygon("pent",np.array([(550,450), (645,519), (609,631), (491,631), (455,519)], dtype=np.float))
+
+        output = { 0: [[True, np.array([[550., 450.], [645., 519.]]), 0.20004096545497796]],
+                   1: [[True, np.array([[645., 519.], [609., 631.]]), 0.19989950974821585]],
+                   2: [[True, np.array([[609., 631.], [491., 631.]]), 0.19989950974821585]],
+                   3: [[True, np.array([[491., 631.], [455., 519.]]), 0.20004096545497796]],
+                   4: [[True, np.array([[455., 519.], [550., 450.]]), 0.1999777758081791]]}
+        pprime, segments = classifyBoundary(pent, 0.2)
+        compare(list(segments), list(output))
+
+
+    def test_edge_viz_graph_nonconv(self):
+        init_poly = Simple_Polygon("sh", simple_nonconv[0])
+        pls = Partial_Local_Sequence(init_poly)
+        bvd = Bounce_Visibility_Diagram(pls)
+        bvg = Bounce_Graph(bvd)
+        result = list(bvg.visibility_graph.edges)
+        expected = [(0, 3), (0, 4), (0, 5), (0, 6), (1, 2), (1, 3), (1, 4), (1,
+        5), (2, 1), (2, 4), (2, 5), (2, 6), (3, 0), (3, 1), (3, 4), (3, 5), (3,
+        6), (4, 0), (4, 1), (4, 2), (4, 3), (4, 5), (4, 6), (5, 0), (5, 1), (5,
+        2), (5, 3), (5, 4), (6, 0), (6, 2), (6, 3), (6, 4)]
+
+        self.assertEqual(result, expected)
+
+    def test_edge_viz_tricky(self):
+        init_poly = Simple_Polygon("sh", pinched_square[0])
+        pls = Partial_Local_Sequence(init_poly)
+        bvd = Bounce_Visibility_Diagram(pls)
+        bvg = Bounce_Graph(bvd)
+        result = list(bvg.visibility_graph.edges)
+        expected = [(0,5), (0,6), (0,7), (0,11),
+                    (1,5), (1,6), (1,7), (1,8), (1,11),
+                    (2,5), (2,6), (2,7), (2,8), (2,9), (2,10), (2,11),
+                    (3,5), (3,8), (3,9), (3,10), (3,11),
+                    (4,5), (4,9), (4,10), (4,11),
+                    (5,0), (5,1), (5,2), (5,3), (5,4), (5,10), (5,11),
+                    (6,0), (6,1), (6,2), (6,8), (6,9), (6,10), (6,11),
+                    (7,0), (7,1), (7,2), (7,8), (7,9), (7,10),
+                    (8,1), (8,2), (8,3), (8,6), (8,7), (8,9), (8,10),
+                    (9,2), (9,3), (9,4), (9,6), (9,7), (9,8),
+                    (10,2), (10,3), (10,4), (10,5), (10,6), (10,7), (10,8),
+                    (11,0), (11,1), (11,2), (11,3), (11,4), (11,5), (11,6)]
+
+        missing = set(expected) - set(result)
+        print("our algorithm should have seen but didn't:", missing)
+        extra = set(result) - set(expected)
+        print("our algorithm saw when it shouldn't:", extra)
+
+        self.assertEqual(sorted(result), sorted(expected))
 
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)

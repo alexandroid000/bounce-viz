@@ -86,24 +86,51 @@ def validAnglesForContract(poly, i, j):
 
     return intervals
 
-def check_valid_transit(v, r_vs, start, psize, poly_vx):
-    ''' don't allow transition to edge 'around corner'
-    don't allow zero-measure transition from one endpoint
-    TODO: clean up logic
+def whichComponent(v, poly):
     '''
-    return not (
+    returns the id of the component containing v
+    '''
+    currComponent = 0
+    for i, component in enumerate(poly.vertex_list_per_poly):
+        if v >= component[0][0]:
+            currComponent = i
+    return currComponent
+
+def check_valid_transit(v, start, poly):
+    '''
+    checks if the transition between the edge start, (start+1) and v, (v+1)
+    is a valid transition.
+
+    in a polygon without holes, this amounts to not allowing transitions to or
+    from edges "around a corner" (zero measure edges).
+
+    This works for outer boundary of polygon only right now, not holes.
+    '''
+    r_vs = poly.reflex_vertices
+    psize = poly.size
+    poly_vx = poly.complete_vertex_list
+
+    # check if two segments are collinear
+    collinear = IsThreePointsOnLine(poly_vx[start],
+    poly_vx[(start+1)%psize], poly_vx[v]) and IsThreePointsOnLine(poly_vx[start], poly_vx[(start+1)%psize], poly_vx[(v+1)%psize])
+
+    aroundCorner = (
                ((v in r_vs) and (v == (start+1) % psize))
                or
                ((start in r_vs) and (start == (v+1) % psize))
                or
-               ((v in r_vs) and IsThreePointsOnLine(poly_vx[start], poly_vx[v],
-                                                    poly_vx[(v+1)%psize])
+               ((IsLeftTurn(poly_vx[(v+1)%psize], poly_vx[v], poly_vx[(start+1)%psize])) 
+                and (IsLeftTurn(poly_vx[(v+1)%psize], poly_vx[v], poly_vx[start]) or IsThreePointsOnLine(poly_vx[start], poly_vx[v], poly_vx[(v+1)%psize]))
                             and start != ((v+1) % psize))
                or 
-               ((start in r_vs) and IsThreePointsOnLine(poly_vx[start],
-               poly_vx[v], poly_vx[(start+1)%psize])
+               ((IsLeftTurn(poly_vx[(start+1)%psize], poly_vx[start], poly_vx[(v+1)%psize])) 
+                and (IsLeftTurn(poly_vx[(start+1)%psize], poly_vx[start], poly_vx[v]) or IsThreePointsOnLine(poly_vx[start],
+               poly_vx[v], poly_vx[(start+1)%psize]))
                             and v != (start+1) % psize)
                 )
+
+    isValidTransit = (not aroundCorner) and (not collinear)
+    return isValidTransit
 
 # includes transient cycles
 # complexity O((n+e)(c+1)) if there are c cycles

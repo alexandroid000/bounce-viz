@@ -56,7 +56,7 @@ class Simple_Polygon(object):
         reflex_verts = []
         size = len(vs)
         for j in range(size):
-            v1, v2, v3 = vs[(j-1) %size][1], vs[j][1], vs[(j+1) %size][1]
+            v1, v2, v3 = vs[(j-1) % size][1], vs[j][1], vs[(j+1) % size][1]
             if IsRightTurn(v1,v2,v3) and not IsThreePointsOnLine(v1,v2,v3):
                 reflex_verts.append(vs[j][0])
 
@@ -112,9 +112,10 @@ class Simple_Polygon(object):
 
     def __init__(self, name, outer_boundary_vertices, holes = []):
         self.name = name
+        N = outer_boundary_vertices.shape[0]
         self.complete_vertex_list = [v for v in outer_boundary_vertices]
-        self.outer_boundary_vertices = [(i, np.array(outer_boundary_vertices[i])) for i in range(len(outer_boundary_vertices))]
-        size_list = self.get_hole_size_list(len(outer_boundary_vertices), holes)
+        self.outer_boundary_vertices = [(i, np.array(outer_boundary_vertices[i])) for i in range(N)]
+        size_list = self.get_hole_size_list(N, holes)
         self.holes = [[(i+size_list[j], np.array(holes[j][i])) for i in range(len(holes[j]))] for j in range(len(holes))]
         self.vertex_list_per_poly = [self.outer_boundary_vertices]
         for hole in self.holes:

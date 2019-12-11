@@ -1,6 +1,4 @@
-[submodule "papers/5d077b317860d5078bca102b"]
-	path = papers/5d077b317860d5078bca102b
-	url = https://git.overleaf.com/5d077b317860d5078bca102b
-[submodule "papers/ijrr_overleaf"]
-	path = papers/ijrr_overleaf
+
+[submodule "papers/--name"]
+	path = papers/--name
 	url = https://git.overleaf.com/5d077b317860d5078bca102b
