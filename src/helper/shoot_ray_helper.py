@@ -63,10 +63,46 @@ def RayInEdge(sp,bp,ep1,ep2):
             (IsRightTurn(sp,bp,ep2) and
              IsLeftTurn(sp,bp,ep1)))
 
-def ClosestPtAlongRay(p1, p2, vertex_list_per_poly, last_bounce_edge=-1):
+def ClosestPtFromPt(state, poly, last_bounce_edge=-1):
+    psize = poly.size
+    vs = poly.complete_vertex_list
+    closest_bounce = 100000000000
+    bounce_point = np.array([state[0], state[1]])
+    found_coll = False
+    bounce_edge = last_bounce_edge
+    (x,y,theta) = state
+
+    # check each edge for collision
+    for j in range(psize):
+        if (j != last_bounce_edge):
+            v1, v2 = vs[j], vs[(j+1) % psize]
+            try:
+                t,u,pt = ShootRay(state, v1, v2)
+                
+                # Find closest bounce for which t > 0
+                pdist = np.linalg.norm(pt-np.array([state[0], state[1]]))
+                if (t > 0) and (0 < u) and (u < 1) and (pdist < closest_bounce):
+                    found_coll = True
+                    bounce_point = pt
+                    closest_bounce = pdist
+                    bounce_edge = j
+            # bounce was parallel to edge j
+            # check if it's parallel and overlapping for degenerate polys
+            except:
+                pass
+    if found_coll:
+        return bounce_point, bounce_edge
+    else:
+        return False
+
+# shoot ray from p1 toward p2 in poly, return closest intersect point
+# will not return point on 'last_bounce_edge'
+def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
     '''
     shoot ray from p1 toward p2 in poly, return closest intersect point will not return point on 'last_bounce_edge'
     '''
+    psize = poly.size
+    vs = poly.complete_vertex_list
     closest_bounce = 100000000000
     bounce_point = np.array([0.0, 0.0])
     found_coll = False
