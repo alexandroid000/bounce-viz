@@ -19,15 +19,12 @@ dtype=np.float)]
 square = [np.array([(250,250),(-250,250),(-250,-250),(250,-250)],
 dtype=np.float)]
 pinched_square = [np.array([(250,250), (-250,250), (-100, 150), (-250,-250), (250,-250), (100, 150)], dtype=np.float)]
-square_gp = [np.array([(250,250),(-250,250),(-250,-250),(0,-250),(250,-250)],
+square_gp = [np.array([(250,250),(-250,250),(-250,-250),(0,-250),(250,-250)], dtype=np.float)]
 small_square = [np.array([(0,0),(1,0),(1,1),(0,1)],dtype=np.float)]
-shelf = [np.array([(250,250),(-250,250),(-250,-250), (-5,-250), (-100, -50), (100,-50), (5,-250), (250,-250)],
-dtype=np.float)]
+shelf = [np.array([(250,250),(-250,250),(-250,-250),(-5,-250),(-100, -50), (100,-50), (5,-250), (250,-250)], dtype=np.float)]
 # rm = [np.array(rooms(5,200,0,0), dtype=np.float)]
-simple_nonconv = [np.array([(250,250),(0,100),(-250,250),(-250,-250),(250,-250)],
-dtype=np.float)]
-simple_nonconv_deep = [np.array([(250,250),(0,-100),(-250,250),(-250,-250),(250,-250)],
-dtype=np.float)]
+simple_nonconv = [np.array([(250,250),(0,100),(-250,250),(-250,-250),(250,-250)], dtype=np.float)]
+simple_nonconv_deep = [np.array([(250,250),(0,-100),(-250,250),(-250,-250),(250,-250)], dtype=np.float)]
 simple_bit = [np.array([(250,250),(-100,0),(-250,250),(-250,-250),(150,-100),(250,-250)],
 dtype=np.float)]
 irrsquare = [np.array([(51.5,50),(-50,51.5),(-51.5,-50),(50,-50)],
