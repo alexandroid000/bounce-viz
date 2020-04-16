@@ -101,13 +101,12 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
     '''
     shoot ray from p1 toward p2 in poly, return closest intersect point will not return point on 'last_bounce_edge'
     '''
-    psize = poly.size
     vs = poly.complete_vertex_list
     closest_bounce = 100000000000
     bounce_point = np.array([0.0, 0.0])
     found_coll = False
     bounce_edge = last_bounce_edge
-    for poly_vxs in vertex_list_per_poly:
+    for poly_vxs in poly.vertex_list_per_poly:
         psize = len(poly_vxs)
         # check each edge for collision
         for j in range(psize):
@@ -130,7 +129,7 @@ def ClosestPtAlongRay(p1,p2,poly,last_bounce_edge=-1):
     else:
         return False
 
-def ShootRaysFromReflex(curr_poly_vxs, vertex_list_per_poly, j):
+def ShootRaysFromReflex(curr_poly_vxs, vertex_list_per_poly, j, poly):
     ''' shoot two rays from each reflex vertex, along incident edges
         group by edge so we can insert them in correct order
     '''
@@ -142,13 +141,13 @@ def ShootRaysFromReflex(curr_poly_vxs, vertex_list_per_poly, j):
     int_pts = []
 
     # ClosestPtAlongRay returns False if we shoot ray into existing vertex
-    result = ClosestPtAlongRay(p1_ccw, p2, vertex_list_per_poly)
+    result = ClosestPtAlongRay(p1_ccw, p2, poly)
     if result:
         pt, k = result
         if not VertexExists(pt, curr_poly_vxs):
             int_pts.append((pt,k, (j+1) % curr_poly_size))
 
-    result = ClosestPtAlongRay(p1_cw, p2, vertex_list_per_poly)
+    result = ClosestPtAlongRay(p1_cw, p2, poly)
     if result:
         pt, k = result
         if not VertexExists(pt, curr_poly_vxs):
@@ -156,7 +155,7 @@ def ShootRaysFromReflex(curr_poly_vxs, vertex_list_per_poly, j):
 
     return int_pts
 
-def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_poly, orig_poly, j):
+def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_poly, poly, j):
     ''' shoot ray from visible vertices through a specific reflex vert
         j is the index of the reflex vertex
         Poly -> Int -> [(Point, Int)]
@@ -168,7 +167,7 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_p
     bv2 = r_v - next_r_v
 
     pts = []
-    visible_verts = visibleVertices(curr_poly_vxs, vertex_list_per_poly, orig_poly, j)
+    visible_verts = visibleVertices(curr_poly_vxs, vertex_list_per_poly, poly, j)
 
     # only ray shoot from non-adjacent vertices
     # previous and next neighbors always visible
@@ -180,7 +179,7 @@ def ShootRaysToReflexFromVerts(curr_poly_vxs, curr_poly_index, vertex_list_per_p
                 mid_vector = vis_poly_vx[v][1] - r_v
                 if (vector_bwt_two_vector(mid_vector, bv1, bv2)):
                     continue
-                res = ClosestPtAlongRay(vis_poly_vx[v][1], r_v, vertex_list_per_poly)
+                res = ClosestPtAlongRay(vis_poly_vx[v][1], r_v, poly)
                 if res:
                     pt, k = res
                     if not VertexExists(pt, curr_poly_vxs):

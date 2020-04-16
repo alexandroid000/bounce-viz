@@ -1,8 +1,7 @@
 from maps import *
 from settings import *
 from helper.geometry_helper import *
-from helper.shoot_ray_helper import ShootRaysFromReflex
-from helper.visibility_helper import ShootRaysToReflexFromVerts
+from helper.shoot_ray_helper import ShootRaysFromReflex, ShootRaysToReflexFromVerts
 from partial_local_sequence import Partial_Local_Sequence
 
 import numpy as np

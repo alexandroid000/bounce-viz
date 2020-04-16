@@ -14,10 +14,10 @@ class Partial_Local_Sequence(object):
     sequence_info : list
         A 2D array stores the partial local sequence for each vertex in polygon in rows
     '''
-    def compute_sequence(self, input_polygon):
+    def compute_sequence(self, poly):
         ''' Compute the partial local sequence for all vertices of the polygon
         '''
-        rvs = input_polygon.reflex_vertices
+        rvs = poly.reflex_vertices
         sequence_info = []
         def compute_seq_for_single_polygon(curr_polygon_vx, curr_polygon_index):
             curr_seq_info = []
@@ -25,14 +25,14 @@ class Partial_Local_Sequence(object):
                 if not curr_polygon_vx[i][0] in rvs:
                     curr_seq_info.append([])
                     continue
-                r_children = ShootRaysFromReflex(curr_polygon_vx, input_polygon.vertex_list_per_poly, i)
-                transition_pts = ShootRaysToReflexFromVerts(curr_polygon_vx, curr_polygon_index, input_polygon.vertex_list_per_poly, input_polygon, i)
+                r_children = ShootRaysFromReflex(curr_polygon_vx, poly.vertex_list_per_poly, i, poly)
+                transition_pts = ShootRaysToReflexFromVerts(curr_polygon_vx, curr_polygon_index, poly.vertex_list_per_poly, poly, i)
                 # transition_pts = []
                 transition_pts.extend(r_children)
                 curr_seq_info.append(transition_pts)
             return curr_seq_info
-        sequence_info.extend(compute_seq_for_single_polygon(input_polygon.outer_boundary_vertices, 0))
-        for index, hole in enumerate(input_polygon.holes):
+        sequence_info.extend(compute_seq_for_single_polygon(poly.outer_boundary_vertices, 0))
+        for index, hole in enumerate(poly.holes):
             sequence_info.extend(compute_seq_for_single_polygon(hole, index+1))
         return sequence_info
 
