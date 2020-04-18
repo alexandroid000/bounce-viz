@@ -10,3 +10,5 @@ PyQt5-sip==4.19.12
 python-dateutil==2.7.3
 six==1.11.0
 VisiLibity==1.0.10
+colorful==0.5.4
+cyaron==0.4.2
