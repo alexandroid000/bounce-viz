@@ -3,6 +3,7 @@ A collection of python utilities for visibility-based decomposition of
 polygons, and strategy generation for mobile "bouncing" robots.
 
 ## Installation and Setup for macOS
+
 1. Clone this repository into $bounce_viz:
 
    ```bash

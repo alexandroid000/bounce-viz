@@ -2,21 +2,23 @@
 import sys
 sys.path.append('../src')
 from helper.visualization_helper import *
+from environments.maps import simple_bit
+from simple_polygon import Simple_Polygon
 from bounce_visibility_diagram import Bounce_Visibility_Diagram
 from bounce_graph import Bounce_Graph
 from navigation import Navigation
 
 if __name__ == '__main__':
-    poly = simple_bit
-    poly_vx = poly.vertices
-    poly_name = 'simple_bit'
+    poly = Simple_Polygon("sp",simple_bit[0])
+    poly_vx = poly.complete_vertex_list
+    poly_name = "sp"
     pls = Partial_Local_Sequence(poly)
     bvd = Bounce_Visibility_Diagram(pls)
     bounce_graph = Bounce_Graph(bvd)
 
-    pls2 = Partial_Local_Sequence(poly2)
-    origin = poly2.vertices[10]
-    sequence = pls2.sequence_info[10]
+#    pls2 = Partial_Local_Sequence(poly2)
+#    origin = poly2.vertices[10]
+#    sequence = pls2.sequence_info[10]
     
     start = (0.1, 0.15)
     goal = (0.51, 0.66)
