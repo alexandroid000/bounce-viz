@@ -91,13 +91,13 @@ class TestGeomUtils(unittest.TestCase):
 
     def test_intersect_interior(self):
          poly = Simple_Polygon("p1",poly1[0])
-         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, poly.vertex_list_per_poly)
+         (x,y), _ = ClosestPtAlongRay(self.origin, self.p1, poly)
          self.assertAlmostEqual(x, 139.1304347826087)
          self.assertAlmostEqual(y, 0.0)
 
     def test_intersect_thru_vertex(self):
          poly = Simple_Polygon("p1",poly1[0])
-         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), poly.vertex_list_per_poly)
+         (x,y), _ = ClosestPtAlongRay(self.origin, (150,50), poly)
          self.assertAlmostEqual(x, 198.21428571428572)
          self.assertAlmostEqual(y, 66.07142857142857)
 
@@ -267,7 +267,7 @@ class TestGeomUtils(unittest.TestCase):
         pls = Partial_Local_Sequence(init_poly)
         bvd = Bounce_Visibility_Diagram(pls)
         bvg = Bounce_Graph(bvd)
-        result = list(bvg.visibility_graph.edges)
+        result = sorted(list(bvg.visibility_graph.edges))
         expected = [(0, 3), (0, 4), (0, 5), (0, 6), (1, 2), (1, 3), (1, 4), (1,
         5), (2, 1), (2, 4), (2, 5), (2, 6), (3, 0), (3, 1), (3, 4), (3, 5), (3,
         6), (4, 0), (4, 1), (4, 2), (4, 3), (4, 5), (4, 6), (5, 0), (5, 1), (5,
@@ -280,7 +280,7 @@ class TestGeomUtils(unittest.TestCase):
         pls = Partial_Local_Sequence(init_poly)
         bvd = Bounce_Visibility_Diagram(pls)
         bvg = Bounce_Graph(bvd)
-        result = list(bvg.visibility_graph.edges)
+        result = sorted(list(bvg.visibility_graph.edges))
         expected = [(0,5), (0,6), (0,7), (0,11),
                     (1,5), (1,6), (1,7), (1,8), (1,11),
                     (2,5), (2,6), (2,7), (2,8), (2,9), (2,10), (2,11),
