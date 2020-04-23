@@ -1,6 +1,6 @@
 import networkx as nx
 
-from helper.visibility_helper import visibleVertices
+from helper.visibility_helper import visibleVertices, get_all_edge_visible_vertices
 from helper.bounce_graph_helper import check_valid_transit, validAnglesForContract, SafeAngles
 
 class Bounce_Graph(object):
@@ -16,24 +16,26 @@ class Bounce_Graph(object):
         '''
         bvg = nx.DiGraph()
 
-        for component in inserted_poly.vertex_list_per_poly:
-            for start_i, start in component:
-                m = len(component)
-                viz_verts = visibleVertices(component, inserted_poly.vertex_list_per_poly,
-                poly, start_i % m)
+        vvs = get_all_edge_visible_vertices(inserted_poly)
+
+        for c_i, viz_from_component in enumerate(vvs):
+            m = len(viz_from_component) # size of current component
+            for start_i, viz_from_edge in enumerate(viz_from_component):
                 vvs = [inserted_poly.vertex_list_per_poly[c][j][0]
-                       for c, vv in enumerate(viz_verts)
+                       for c, vv in enumerate(viz_from_edge)
                        for j in vv]
                 edges = [(start_i,v,validAnglesForContract(inserted_poly, start_i, v))
                          for v in vvs if
                          check_valid_transit(v, start_i, inserted_poly)]
+
+
                 additional_edges = [(start_i, (v-1) % inserted_poly.size,validAnglesForContract(inserted_poly, start_i, (v-1) % inserted_poly.size))
                          for v in vvs if
                          (check_valid_transit((v-1) % inserted_poly.size, start_i, inserted_poly) and (start_i, (v-1) % inserted_poly.size,validAnglesForContract(inserted_poly, start_i, (v-1) % inserted_poly.size)) not in edges)]
                 edges.extend(additional_edges)
 
                 # addition edges from the vertices visible to the other end of the edge
-                next_viz_verts = visibleVertices(component, inserted_poly.vertex_list_per_poly,
+                next_viz_verts = visibleVertices(inserted_poly.vertex_list_per_poly[c_i], inserted_poly.vertex_list_per_poly,
                 poly, (start_i + 1) % m)
                 next_vvs = [inserted_poly.vertex_list_per_poly[c][j][0]
                        for c, vv in enumerate(next_viz_verts)

@@ -267,20 +267,20 @@ class TestGeomUtils(unittest.TestCase):
         pls = Partial_Local_Sequence(init_poly)
         bvd = Bounce_Visibility_Diagram(pls)
         bvg = Bounce_Graph(bvd)
-        result = sorted(list(bvg.visibility_graph.edges))
+        result = list(bvg.visibility_graph.edges)
         expected = [(0, 3), (0, 4), (0, 5), (0, 6), (1, 2), (1, 3), (1, 4), (1,
         5), (2, 1), (2, 4), (2, 5), (2, 6), (3, 0), (3, 1), (3, 4), (3, 5), (3,
         6), (4, 0), (4, 1), (4, 2), (4, 3), (4, 5), (4, 6), (5, 0), (5, 1), (5,
         2), (5, 3), (5, 4), (6, 0), (6, 2), (6, 3), (6, 4)]
 
-        self.assertEqual(result, expected)
+        self.assertEqual(sorted(result), sorted(expected))
 
     def test_edge_viz_tricky(self):
         init_poly = Simple_Polygon("sh", pinched_square[0])
         pls = Partial_Local_Sequence(init_poly)
         bvd = Bounce_Visibility_Diagram(pls)
         bvg = Bounce_Graph(bvd)
-        result = sorted(list(bvg.visibility_graph.edges))
+        result = list(bvg.visibility_graph.edges)
         expected = [(0,5), (0,6), (0,7), (0,11),
                     (1,5), (1,6), (1,7), (1,8), (1,11),
                     (2,5), (2,6), (2,7), (2,8), (2,9), (2,10), (2,11),
@@ -300,6 +300,21 @@ class TestGeomUtils(unittest.TestCase):
         print("our algorithm saw when it shouldn't:", extra)
 
         self.assertEqual(sorted(result), sorted(expected))
+
+    def test_valid_transit(self):
+        init_poly = Simple_Polygon("sh", pinched_square[0])
+        pls = Partial_Local_Sequence(init_poly)
+        test1 = check_valid_transit(10, 1, pls.inserted_polygon)
+        self.assertFalse(test1)
+
+    def test_mutual_vis(self):
+        init_poly = Simple_Polygon("sh", pinched_square[0])
+        pls = Partial_Local_Sequence(init_poly)
+        vvs = get_all_edge_visible_vertices(pls.inserted_polygon)
+        viz_from_10 = vvs[0][10][0]
+        expected = [2,3,4,5,6,7,8,9]
+        self.assertEqual(sorted(viz_from_10), sorted(expected))
+
 
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)

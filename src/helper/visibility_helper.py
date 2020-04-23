@@ -93,7 +93,7 @@ def get_all_edge_visible_vertices(poly):
             # if the following line included, allows transition to next edge by wall
             # following, even if reflex angle
             # TODO: figure out if we want to allow this behavior
-            viz_vxs[index].append((i+1)%len(curr_poly_vx)) 
+            #viz_vxs[index].append((i+1)%len(curr_poly_vx)) 
             # vizSets[i] = viz_vxs
             curr_viz_sets.append(viz_vxs)
 

@@ -108,25 +108,60 @@ def check_valid_transit(v, start, poly):
     '''
     r_vs = poly.reflex_vertices
     psize = poly.size
-    poly_vx = poly.complete_vertex_list
+    vs = poly.complete_vertex_list
+    s1, s2 = start, (start+1)%psize
+    v1, v2 = v, (v+1)%psize
 
     # check if two segments are collinear
-    collinear = IsThreePointsOnLine(poly_vx[start],
-    poly_vx[(start+1)%psize], poly_vx[v]) and IsThreePointsOnLine(poly_vx[start], poly_vx[(start+1)%psize], poly_vx[(v+1)%psize])
+    collinear = IsThreePointsOnLine(vs[s1], vs[s2], vs[v1]) \
+                and IsThreePointsOnLine(vs[s1], vs[s2], vs[v2])
+
+    obscured = False
+    for r in r_vs:
+        if IsThreePointsOnLine(vs[v1], vs[r], vs[s2]):
+            obscured = True
+
 
     aroundCorner = (
-               ((v in r_vs) and (v == (start+1) % psize))
+               # edges adjacent at reflex
+                ((v1 in r_vs) and (v1 == s2))
                or
-               ((start in r_vs) and (start == (v+1) % psize))
+                # edges adjacent at reflex opposite order
+                ((s1 in r_vs) and (s1 == v2))
                or
-               ((IsLeftTurn(poly_vx[(v+1)%psize], poly_vx[v], poly_vx[(start+1)%psize])) 
-                and (IsLeftTurn(poly_vx[(v+1)%psize], poly_vx[v], poly_vx[start]) or IsThreePointsOnLine(poly_vx[start], poly_vx[v], poly_vx[(v+1)%psize]))
-                            and start != ((v+1) % psize))
-               or 
-               ((IsLeftTurn(poly_vx[(start+1)%psize], poly_vx[start], poly_vx[(v+1)%psize])) 
-                and (IsLeftTurn(poly_vx[(start+1)%psize], poly_vx[start], poly_vx[v]) or IsThreePointsOnLine(poly_vx[start],
-               poly_vx[v], poly_vx[(start+1)%psize]))
-                            and v != (start+1) % psize)
+                # s1 is completely to the right of (v1, v2)
+                # should be caught by visibility checks?
+                (IsRightTurn(vs[v1], vs[v2], vs[s2])
+                and IsRightTurn(vs[v1], vs[v2], vs[s1]))
+               or
+                # point v2 created by visibility event along (s1, s2)
+                # only point v2 is visible from (s1, s2)
+                (IsThreePointsOnLine(vs[s1], vs[s2], vs[v2])
+                and
+                IsRightTurn(vs[s1], vs[s2], vs[v]))
+               or
+                # point v1 created by visibility event along (s1, s2)
+                # only point v1 is visible from (s1, s2)
+                (IsThreePointsOnLine(vs[s1], vs[s2], vs[v1])
+                and
+                IsRightTurn(vs[s1], vs[s2], vs[v2]))
+               or
+                # point s1 created by visibility event along vector (v1, v2)
+                # only s1 visible from (v1,v2)
+                (IsThreePointsOnLine(vs[s1], vs[v], vs[v2])
+                and
+                IsLeftTurn(vs[v2], vs[v1], vs[s2]) )
+               or
+                # point s2 created by visibility event along vector (v1, v2)
+                # only s2 visible from (v1,v2)
+                (IsThreePointsOnLine(vs[s2], vs[v], vs[v2])
+                and
+                IsRightTurn(vs[v1], vs[v2], vs[s1]))
+
+#               or
+#                # general position check
+#                (IsThreePointsOnLine(poly_vx[start], poly_vx[v], poly_vx[(v+1)%psize])
+#                and start != (v+1) % psize)
                 )
 
     isValidTransit = (not aroundCorner) and (not collinear)
