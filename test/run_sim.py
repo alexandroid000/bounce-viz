@@ -9,12 +9,16 @@ from bounce_graph import Bounce_Graph
 from navigation import Navigation
 
 if __name__ == '__main__':
-    poly = Simple_Polygon("sp",simple_bit[0])
+    poly = Simple_Polygon("sp",pinched_square[0])
     poly_vx = poly.complete_vertex_list
     poly_name = "sp"
     pls = Partial_Local_Sequence(poly)
+    ins_vs = np.array(pls.inserted_polygon.complete_vertex_list)
+    visualize_polygon(ins_vs, "test")
     bvd = Bounce_Visibility_Diagram(pls)
     bounce_graph = Bounce_Graph(bvd)
+    result = list(bounce_graph.visibility_graph.edges)
+    print(result)
 
 #    pls2 = Partial_Local_Sequence(poly2)
 #    origin = poly2.vertices[10]
