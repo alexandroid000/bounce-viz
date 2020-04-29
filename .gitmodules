@@ -4,4 +4,4 @@
 	url = https://git.overleaf.com/5d077b317860d5078bca102b
 [submodule "src/environments"]
 	path = src/environments
-	url = github:alexandroid000/environments
+	url = git@github.com:alexandroid000/environments.git
