@@ -330,6 +330,10 @@ class TestGeomUtils(unittest.TestCase):
         e2 = np.array([[1.0, 0.0], [1., 1.]])
         correct_thetas = (np.pi/4, 0.)
         compare(correct_thetas, SafeAngles(e1,e2))
+        e3 = np.array([[1.,1.],[-1.,1.]])
+        e4 = np.array([[-2.,-2.],[2.,-2.]])
+        correct_thetas2 = (3.*np.pi/4., np.pi/4.)
+        compare(correct_thetas2, SafeAngles(e3,e4))
 
 
 #    def test_graph_reduce(self):

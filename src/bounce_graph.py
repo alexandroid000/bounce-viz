@@ -68,7 +68,7 @@ class Bounce_Graph(object):
         viz_vxs = visible_vx_set_for_edges[0]
         for i in safe_action_graph.nodes():
             outgoing = bvg.edges([i])
-            vset = viz_vxs[i]+[i]
+            vset = (viz_vxs[i]+[i])[0]
             for e in outgoing:
                 e = e[1]
                 e1 = (vs[i], vs[(i+1)%psize])
