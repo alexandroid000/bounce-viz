@@ -85,7 +85,7 @@ def visualize_bounce_visibility_diagram(bvd, hline = None, fname = 'bvd.png'):
     fname:string
         The output file name for the link diagram
     '''
-    i_poly_vx = bvd.partial_local_sequence.inserted_polygon.vertices
+    i_poly_vx = np.array(bvd.partial_local_sequence.inserted_polygon.complete_vertex_list)
     psize = i_poly_vx.shape[0]
     acc_edge_len = bvd.partial_local_sequence.inserted_polygon.unit_interval_mapping
     jet = plt.cm.jet
