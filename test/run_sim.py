@@ -24,7 +24,7 @@ if __name__ == '__main__':
 #    origin = poly2.vertices[10]
 #    sequence = pls2.sequence_info[10]
     
-    start = (0.1, 0.15)
+    start = (0.05, 0.15)
     goal = (0.51, 0.66)
     nav_task = Navigation(start, goal, bounce_graph)
     path = nav_task.navigate()

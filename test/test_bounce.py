@@ -325,6 +325,11 @@ class TestGeomUtils(unittest.TestCase):
         self.assertEqual(r1, [8])
         self.assertEqual(sorted(r2), [1,2,3])
 
+    def test_SafeAngles(self):
+        e1 = np.array([[0.0,0.0], [1.0, 0.0]])
+        e2 = np.array([[1.0, 0.0], [1., 1.]])
+        correct_thetas = (np.pi/4, 0.)
+        compare(correct_thetas, SafeAngles(e1,e2))
 
 
 #    def test_graph_reduce(self):

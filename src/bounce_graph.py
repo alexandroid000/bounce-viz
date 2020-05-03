@@ -63,9 +63,12 @@ class Bounce_Graph(object):
         safe_action_graph.add_nodes_from(bvg.nodes())
         new_edges = []
         vs = poly.complete_vertex_list
+        if len(visible_vx_set_for_edges) != 1:
+            raise ValueError("TODO: add support for holes in polygons")
+        viz_vxs = visible_vx_set_for_edges[0]
         for i in safe_action_graph.nodes():
             outgoing = bvg.edges([i])
-            vset = visible_vx_set_for_edges[i]+[i]
+            vset = viz_vxs[i]+[i]
             for e in outgoing:
                 e = e[1]
                 e1 = (vs[i], vs[(i+1)%psize])
@@ -90,4 +93,4 @@ class Bounce_Graph(object):
         self.bounce_visibility_diagram = bvd
         self.visibility_graph = self.create_bounce_visibility_graph(bvd.partial_local_sequence.polygon,
         bvd.partial_local_sequence.inserted_polygon)
-        #self.safe_action_graph = self.create_safe_action_graph(self.visibility_graph, bvd.partial_local_sequence.inserted_polygon, bvd.visible_vx_set_for_edges)
+        self.safe_action_graph = self.create_safe_action_graph(self.visibility_graph, bvd.partial_local_sequence.inserted_polygon, bvd.visible_vx_set_for_edges)

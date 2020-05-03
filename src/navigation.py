@@ -56,8 +56,10 @@ class Navigation(object):
         ''' Executing the navigation task with a given strategy
         '''
         paths = []
-        for g in get_edges_intersecting_interval(self.inserted_polygon.unit_interval_mapping, self.end_position):
-            for s in get_edges_intersecting_interval(self.inserted_polygon.unit_interval_mapping, self.start_position):
+        start_nodes = get_edges_intersecting_interval(self.inserted_polygon.unit_interval_mapping, self.start_position)
+        end_nodes = get_edges_intersecting_interval(self.inserted_polygon.unit_interval_mapping, self.end_position)
+        for g in end_nodes:
+            for s in start_nodes:
                 paths.append(self.bvg.get_shortest_path(s, g, 'safe'))
         return get_transition_over_path(paths[0], self.bvg.safe_action_graph)
 
