@@ -315,6 +315,17 @@ class TestGeomUtils(unittest.TestCase):
         expected = [2,3,4,5,6,7,8,9]
         self.assertEqual(sorted(viz_from_10), sorted(expected))
 
+    def test_edges_in_interval(self):
+        poly = Simple_Polygon("sp",pinched_square[0])
+        pls = Partial_Local_Sequence(poly)
+        mapping = pls.inserted_polygon.unit_interval_mapping
+        r1 = get_edges_intersecting_interval(mapping, (0.51, 0.66))
+        r2 = get_edges_intersecting_interval(mapping, (0.05, 0.15))
+
+        self.assertEqual(r1, [8])
+        self.assertEqual(sorted(r2), [1,2,3])
+
+
 
 #    def test_graph_reduce(self):
 #        pls = Partial_Local_Sequence(square)

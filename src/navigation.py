@@ -1,14 +1,31 @@
-def get_vertices_in_interval(poly_unit_map, interval):
-    ''' Find vertices on the polygon that are in the range specified
+def get_edges_intersecting_interval(poly_unit_map, interval):
+    ''' Find edges on the polygon that intersect with the interval
+        Interval from (0,1) parameterization of polygon
+        TODO: Only works for polygons with no obstacles/holes right now
+        does not currently sort output, no need to for now
     '''
     (s1, s2) = interval
     vxs = []
-    for i in range(len(poly_unit_map)-1):
-        if poly_unit_map[i]<s1*10:
-            continue
-        if poly_unit_map[i]>s2*10:
-            break
-        vxs.append(i)
+    if len(poly_unit_map[1]) == 0:
+        map = poly_unit_map[0]
+
+        first_i = 0
+
+        # first element of map always 0
+        # last element of map always 1
+        for i in range(len(map)-1):
+            if map[i]<s1:
+                first_i = i
+                continue
+            if map[i]>s2:
+                break
+            vxs.append(i)
+
+        # add index of first edge intersecting with interval
+        vxs.append(first_i)
+    else:
+        raise ValueError("Polygon contains holes")
+
     return vxs
 
 def get_transition_over_path(path, safe_action_graph):
@@ -39,8 +56,8 @@ class Navigation(object):
         ''' Executing the navigation task with a given strategy
         '''
         paths = []
-        for g in get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping, self.end_position):
-            for s in get_vertices_in_interval(self.inserted_polygon.unit_interval_mapping, self.start_position):
+        for g in get_edges_intersecting_interval(self.inserted_polygon.unit_interval_mapping, self.end_position):
+            for s in get_edges_intersecting_interval(self.inserted_polygon.unit_interval_mapping, self.start_position):
                 paths.append(self.bvg.get_shortest_path(s, g, 'safe'))
         return get_transition_over_path(paths[0], self.bvg.safe_action_graph)
 
