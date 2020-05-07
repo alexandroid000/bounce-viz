@@ -58,6 +58,11 @@ class Navigation(object):
         paths = []
         start_nodes = get_edges_intersecting_interval(self.inserted_polygon.unit_interval_mapping, self.start_position)
         end_nodes = get_edges_intersecting_interval(self.inserted_polygon.unit_interval_mapping, self.end_position)
+        if len(start_nodes) != 1 or len(end_nodes) != 1:
+            print("Start nodes:", start_nodes)
+            print("Goal nodes:", end_nodes)
+            print("Vertex mapping:", self.inserted_polygon.unit_interval_mapping)
+            raise ValueError("Please choose start/goal intervals contained within one edge")
         for g in end_nodes:
             for s in start_nodes:
                 paths.append(self.bvg.get_shortest_path(s, g, 'safe'))

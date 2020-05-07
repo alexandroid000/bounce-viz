@@ -50,6 +50,36 @@ def visualize_polygon(poly, fname):
     if DEBUG:
         plt.show()
 
+
+def visualize_subset_polygon(poly, fname, subset):
+    ''' Draws polygon with numbered vertices
+        Colors selected subset of edges red
+    '''
+    psize = poly.shape[0]
+    jet = plt.cm.jet
+    colors = jet(np.linspace(0, 1, psize))
+
+    # plot only polygon, no axis or frame
+    fig = plt.figure(frameon=False)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.axis('off')
+    wall = np.vstack((poly, poly[0]))
+    plt.plot(wall[:, 0], wall[:, 1], 'black')
+    for i in subset:
+        edge = np.array([wall[i], wall[i+1]])
+        plt.plot(edge[:, 0], edge[:, 1], 'red', linewidth=2)
+    for i in range(psize):
+        point = poly[i]
+        plt.scatter(point[0], point[1], color='black', s=20)
+    plt.axis('equal')
+
+    print("Saving", image_save_folder+'/'+fname+'.png')
+    plt.savefig(osp.join(image_save_folder,fname+'.png'), dpi = 300, bbox_inches='tight')
+    if DEBUG:
+        plt.show()
+
+
+
 def visualize_partial_local_sequence_for_one_vx(poly_vx, origin, sequence, fname = 'partial_local_sequence'):
     ''' Draw the partial local sequence for a given vertex
     '''

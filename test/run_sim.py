@@ -26,18 +26,19 @@ if __name__ == '__main__':
 
 
     # perform navigation
-    start = (0.05, 0.15)
+    start = (0.01, 0.02)
     goal = (0.51, 0.66)
     nav_task = Navigation(start, goal, bounce_graph)
     path = nav_task.navigate()
+    print("Found Path!")
     print(path)
 
 
-    poly_vx = np.array(pls.polygon.complete_vertex_list)
-    ins_poly_vx = np.array(pls.inserted_polygon.complete_vertex_list)
-    visualize_all_partial_order_sequence(poly_vx, ins_poly_vx, pls.sequence_info)
-    visualize_polygon(poly_vx, poly_name)
-    visualize_bounce_visibility_diagram(bvd, hline = 1.4707)
-    visualize_partial_local_sequence_for_one_vx(poly2.vertices, origin, sequence)
+    #poly_vx = np.array(pls.polygon.complete_vertex_list)
+    #ins_poly_vx = np.array(pls.inserted_polygon.complete_vertex_list)
+    #visualize_all_partial_order_sequence(poly_vx, ins_poly_vx, pls.sequence_info)
+    #visualize_polygon(poly_vx, poly_name)
+    #visualize_bounce_visibility_diagram(bvd, hline = 1.4707)
+    #visualize_partial_local_sequence_for_one_vx(poly2.vertices, origin, sequence)
     # intervals = PropagatePath(pls.inserted_polygon.vertices, path, start)
     # VizPath(p1, intervals)

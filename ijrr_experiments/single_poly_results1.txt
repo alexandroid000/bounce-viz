@@ -1,0 +1,125 @@
+Polygon 0
+spike: 0.1
+irr: 0.1
+fraction unreachable: 0.01728125366755645
+
+Polygon 1
+spike: 0.2
+irr: 0.1
+fraction unreachable: 0.0030695057450917038
+
+Polygon 2
+spike: 0.30000000000000004
+irr: 0.1
+fraction unreachable: 0.007406583380862419
+
+Polygon 3
+spike: 0.4
+irr: 0.1
+fraction unreachable: 0.010871998881677482
+
+Polygon 4
+spike: 0.5
+irr: 0.1
+fraction unreachable: 0.003771155986773876
+
+Polygon 5
+spike: 0.1
+irr: 0.17500000000000002
+fraction unreachable: 0.006213002350270669
+
+Polygon 6
+spike: 0.2
+irr: 0.17500000000000002
+fraction unreachable: 0.0022480944242785905
+
+Polygon 7
+spike: 0.30000000000000004
+irr: 0.17500000000000002
+fraction unreachable: 0.012861903641673979
+
+Polygon 8
+spike: 0.4
+irr: 0.17500000000000002
+fraction unreachable: 0.010464622615568242
+
+Polygon 9
+spike: 0.5
+irr: 0.17500000000000002
+fraction unreachable: 0.00504493119336033
+
+Polygon 10
+spike: 0.1
+irr: 0.25
+fraction unreachable: 0.03949300660760224
+
+Polygon 11
+spike: 0.2
+irr: 0.25
+fraction unreachable: 0.01606835849495522
+
+Polygon 12
+spike: 0.30000000000000004
+irr: 0.25
+fraction unreachable: 0.009974140829945244
+
+Polygon 13
+spike: 0.4
+irr: 0.25
+fraction unreachable: 0.007554290785536065
+
+Polygon 14
+spike: 0.5
+irr: 0.25
+fraction unreachable: 0.00969534332493874
+
+Polygon 15
+spike: 0.1
+irr: 0.32500000000000007
+fraction unreachable: 0.023932826471732414
+
+Polygon 16
+spike: 0.2
+irr: 0.32500000000000007
+fraction unreachable: 0.008707989035584063
+
+Polygon 17
+spike: 0.30000000000000004
+irr: 0.32500000000000007
+fraction unreachable: 0.01254137879196443
+
+Polygon 18
+spike: 0.4
+irr: 0.32500000000000007
+fraction unreachable: 0.00638785690201596
+
+Polygon 19
+spike: 0.5
+irr: 0.32500000000000007
+fraction unreachable: 0.022673239702369993
+
+Polygon 20
+spike: 0.1
+irr: 0.4
+fraction unreachable: 0.04504175996496361
+
+Polygon 21
+spike: 0.2
+irr: 0.4
+fraction unreachable: 0.04236283157853418
+
+Polygon 22
+spike: 0.30000000000000004
+irr: 0.4
+fraction unreachable: 0.055464087039723164
+
+Polygon 23
+spike: 0.4
+irr: 0.4
+fraction unreachable: 0.05272433696260599
+
+Polygon 24
+spike: 0.5
+irr: 0.4
+fraction unreachable: 0.01684549115291397
+

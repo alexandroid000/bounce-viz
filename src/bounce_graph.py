@@ -75,7 +75,7 @@ class Bounce_Graph(object):
                 e2 = (vs[e], vs[(e+1)%psize])
                 e_viz = (e in vset) and ((e+1)%psize in vset)
                 if SafeAngles(e1,e2) and e_viz:
-                    curr_weight = '{0:.2f}'.format(SafeAngles(e1,e2)[1])
+                    curr_weight = '{:.2f}, {:.2f}'.format(*SafeAngles(e1,e2))
                     new_edges.append((i,e,curr_weight))
         safe_action_graph.add_weighted_edges_from(new_edges)
         return safe_action_graph
