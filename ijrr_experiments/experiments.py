@@ -50,36 +50,58 @@ def edgeFrac(poly, edges):
         frac += s
     return frac
 
+fracs = np.zeros(25)
+params = np.zeros((25,2))
 
-polys = generatePolygonsGrid(5, 0.1, 0.4, 0.1, 0.5)
+for iteration in range(10):
+    print("Iteration",iteration)
 
-for i, ((spike,irr), poly) in enumerate(polys):
-    p = Simple_Polygon("sp",poly)
-    poly_vx = p.complete_vertex_list
+    # generates 25 polygons
+    polys = generatePolygonsGrid(5, 0.1, 0.4, 0.1, 0.5)
 
-    # generate visibility discretization and visualize
-    pls = Partial_Local_Sequence(p)
-    ins_vs = np.array(pls.inserted_polygon.complete_vertex_list)
-    visualize_polygon(ins_vs, "poly"+str(i))
-    bvd = Bounce_Visibility_Diagram(pls)
+    for i, ((spike,irr), poly) in enumerate(polys):
+        print("polygon",i)
+        p = Simple_Polygon("sp",poly)
+        poly_vx = p.complete_vertex_list
 
-    # compute transition graphs between segments on boundary
-    bounce_graph = Bounce_Graph(bvd)
-    #visualize_graph(bounce_graph.visibility_graph, "bg"+str(i))
-    #visualize_graph(bounce_graph.safe_action_graph, "safe_bg"+str(i))
-    unreach_segs = containsUnreachableSegs(p, bounce_graph.safe_action_graph)
-    print(unreach_segs)
-    if unreach_segs != []:
-        print("Visualizing Unreachable Set")
-        visualize_subset_polygon(ins_vs, "reachable_boundary"+str(i), unreach_segs)
+        # generate visibility discretization and visualize
+        pls = Partial_Local_Sequence(p)
+        ins_vs = np.array(pls.inserted_polygon.complete_vertex_list)
+        #visualize_polygon(ins_vs, "poly"+str(i))
+        bvd = Bounce_Visibility_Diagram(pls)
 
-    frac = edgeFrac(pls.inserted_polygon, unreach_segs)
-    with open("single_poly_results.txt",'a+') as f:
-        f.write("Polygon "+str(i)+'\n')
-        f.write("spike: "+str(spike)+'\n')
-        f.write("irr: "+str(irr)+'\n')
-        f.write("fraction unreachable: "+str(frac)+'\n')
-        f.write('\n')
+        # compute transition graphs between segments on boundary
+        bounce_graph = Bounce_Graph(bvd)
+        #visualize_graph(bounce_graph.visibility_graph, "bg"+str(i))
+        #visualize_graph(bounce_graph.safe_action_graph, "safe_bg"+str(i))
+        unreach_segs = containsUnreachableSegs(p, bounce_graph.safe_action_graph)
+        #if unreach_segs != []:
+        #    print("Visualizing Unreachable Set")
+        #    visualize_subset_polygon(ins_vs, "reachable_boundary"+str(i), unreach_segs)
+
+        frac = edgeFrac(pls.inserted_polygon, unreach_segs)
+        fracs[i] += frac
+        params[i][0] = spike
+        params[i][1] = irr
+
+        LOG = False
+        if LOG:
+            with open("single_poly_results.txt",'a+') as f:
+                f.write("Polygon "+str(i)+'\n')
+                f.write("spike: "+str(spike)+'\n')
+                f.write("irr: "+str(irr)+'\n')
+                f.write("fraction unreachable: "+str(frac)+'\n')
+                f.write('\n')
+
+fracs = fracs/24.
+print(fracs)
+print(params)
+
+data = fracs.reshape((5,5))
+
+plt.imshow(data, cmap='hot', interpolation='nearest')
+plt.savefig('heatmap.png', dpi = 300, bbox_inches='tight')
+
 
 # - queries:
 #     - what percentage of polygons contain parts that are not reachable using
