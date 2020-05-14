@@ -19,9 +19,9 @@ import matplotlib.patheffects as pe
 
 # random tree of convex rooms
 
-num_rooms = 15
-corridors, rooms = random_tree(num_rooms)
-hobbit_hole = genTreeEnv(num_rooms, rooms, corridors)
+#num_rooms = 15
+#corridors, rooms, T = random_tree(num_rooms)
+#hobbit_hole = genTreeEnv(num_rooms, rooms, corridors)
 
 # random star polygons (sweep queries over range of irregularity/spikiness)
 
@@ -58,6 +58,8 @@ iterations = 10
 
 fracs = np.zeros(N**2)
 params = np.zeros((N**2,2))
+s_cc = np.zeros((N,N))
+w_cc = np.zeros((N,N))
 
 extremum_examples = []
 
@@ -87,6 +89,13 @@ for iteration in range(iterations):
         #visualize_graph(bounce_graph.visibility_graph, "bg"+str(i))
         #visualize_graph(bounce_graph.safe_action_graph, "safe_bg"+str(i))
         unreach_segs = containsUnreachableSegs(p, bounce_graph.safe_action_graph)
+
+        num_c = nx.number_strongly_connected_components(bounce_graph.safe_action_graph)
+        num_c_w = nx.number_weakly_connected_components(bounce_graph.safe_action_graph)
+        s_cc[i // N][i % N] += num_c
+        w_cc[i // N][i % N] += num_c_w
+        print("strongly connected components in polygon", i // N, i % N,": ", num_c)
+        print("weakly connected components in polygon", i // N, i % N,": ", num_c_w)
         #if unreach_segs != []:
         #    print("Visualizing Unreachable Set")
         #    visualize_subset_polygon(ins_vs, "reachable_boundary"+str(i), unreach_segs)
@@ -106,8 +115,8 @@ for iteration in range(iterations):
                 f.write('\n')
 
 avg_frac = fracs/iterations
-
-print(avg_frac)
+avg_s_cc = s_cc/iterations
+avg_w_cc = w_cc/iterations
 
 data = avg_frac.reshape((N,N))
 
@@ -116,34 +125,7 @@ irr_vals = params[::N,1]
 print("x axis:",spike_vals)
 print("y axis:",irr_vals)
 
-
-fig, ax1 = plt.subplots()
-
-# make reachability fraction heatmap
-heatmap = ax1.pcolor(data)
-plt.colorbar(heatmap)
-ax1.set_xticks(np.arange(data.shape[1])+0.5, minor=False)
-ax1.set_yticks(np.arange(data.shape[0])+0.5, minor=False)
-ax1.set_xticklabels(spike_vals.round(2), minor=False)
-ax1.set_yticklabels(irr_vals.round(2), minor=False)
-ax1.set_xlabel('Spikiness')
-ax1.set_ylabel('Irregularity')
-ax1.set_title('Average Fraction of Unreachable Polygon Boundary')
-
-# make inset (outset?) polygon examples
-left, right, bottom, top, width, height = [-0.1, 0.9, -0.1, 0.8, 0.2, 0.2]
-q11, q12, q21, q22 = [(0.5, 0.5), (N-0.5, 0.5), (0.5, N-0.5), (N-0.5, N-0.5)]
-low_s_low_i = fig.add_axes([left, bottom, width, height])
-high_s_low_i = fig.add_axes([right, bottom, width, height])
-low_s_high_i = fig.add_axes([left, top, width, height])
-high_s_high_i = fig.add_axes([right, top, width, height])
-low_s_low_i.axis('off')
-high_s_low_i.axis('off')
-low_s_high_i.axis('off')
-high_s_high_i.axis('off')
-
-
-def plot_poly_example(poly, axB, locationA):
+def plot_poly_example(poly, axA, axB, locationA):
 
 
     p1 = list(np.vstack((poly, poly[0])))
@@ -153,19 +135,67 @@ def plot_poly_example(poly, axB, locationA):
     center = np.average(p1, axis=0)
 
     con = ConnectionPatch(
-        xyA = locationA, coordsA = ax1.transData,
+        xyA = locationA, coordsA = axA.transData,
         xyB = center, coordsB = axB.transData,
         arrowstyle="->", shrinkB=5, mutation_scale=20, lw=2,
         path_effects=[pe.Stroke(linewidth=5, foreground='w'), pe.Normal()])
-    ax1.add_artist(con)
+    axA.add_artist(con)
 
-plot_poly_example(extremum_examples[0], low_s_low_i, q11)
-plot_poly_example(extremum_examples[1], high_s_low_i, q12)
-plot_poly_example(extremum_examples[2], low_s_high_i, q21)
-plot_poly_example(extremum_examples[3], high_s_high_i, q22)
+def reachability_heatmap(data):
+
+    fig1, ax1 = plt.subplots()
+
+    # make reachability fraction heatmap
+    heatmap = ax1.pcolor(data)
+    plt.colorbar(heatmap)
+    ax1.set_xticks(np.arange(data.shape[1])+0.5, minor=False)
+    ax1.set_yticks(np.arange(data.shape[0])+0.5, minor=False)
+    ax1.set_xticklabels(spike_vals.round(2), minor=False)
+    ax1.set_yticklabels(irr_vals.round(2), minor=False)
+    ax1.set_xlabel('Spikiness')
+    ax1.set_ylabel('Irregularity')
+    ax1.set_title('Average Fraction of Unreachable Polygon Boundary')
+
+    # make inset (outset?) polygon examples
+    left, right, bottom, top, width, height = [-0.1, 0.9, -0.1, 0.8, 0.2, 0.2]
+    q11, q12, q21, q22 = [(0.5, 0.5), (N-0.5, 0.5), (0.5, N-0.5), (N-0.5, N-0.5)]
+    low_s_low_i = fig1.add_axes([left, bottom, width, height])
+    high_s_low_i = fig1.add_axes([right, bottom, width, height])
+    low_s_high_i = fig1.add_axes([left, top, width, height])
+    high_s_high_i = fig1.add_axes([right, top, width, height])
+    low_s_low_i.axis('off')
+    high_s_low_i.axis('off')
+    low_s_high_i.axis('off')
+    high_s_high_i.axis('off')
+
+    plot_poly_example(extremum_examples[0], ax1, low_s_low_i, q11)
+    plot_poly_example(extremum_examples[1], ax1, high_s_low_i, q12)
+    plot_poly_example(extremum_examples[2], ax1, low_s_high_i, q21)
+    plot_poly_example(extremum_examples[3], ax1, high_s_high_i, q22)
 
 
-plt.savefig('heatmap.png', dpi = 300, bbox_inches='tight')
+    plt.savefig('heatmap.png', dpi = 300, bbox_inches='tight')
+    plt.clf()
+
+def cc_heatmap(data, title, fname):
+
+    fig2, ax2 = plt.subplots()
+
+    # make connected component heatmap
+    heatmap = ax2.pcolor(data)
+    plt.colorbar(heatmap)
+    ax2.set_xticks(np.arange(data.shape[1])+0.5, minor=False)
+    ax2.set_yticks(np.arange(data.shape[0])+0.5, minor=False)
+    ax2.set_xticklabels(spike_vals.round(2), minor=False)
+    ax2.set_yticklabels(irr_vals.round(2), minor=False)
+    ax2.set_xlabel('Spikiness')
+    ax2.set_ylabel('Irregularity')
+    ax2.set_title(title)
+
+    plt.savefig(fname, dpi = 300, bbox_inches='tight')
+
+cc_heatmap(avg_s_cc, 'Average Number of Strongly Connected Components in Polygons', 'scc_heatmap.png')
+cc_heatmap(avg_w_cc, 'Average Number of Weakly Connected Components in Polygons', 'wcc_heatmap.png')
 
 
 # - queries:

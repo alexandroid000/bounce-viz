@@ -43,7 +43,7 @@ def visualize_polygon(poly, fname):
     for i in range(psize):
         point = poly[i]
         plt.scatter(point[0], point[1], color=colors[i], s=100)
-        plt.annotate(str(i), (point[0]+5, point[1]+20), size = 20)
+        plt.annotate(str(i), (point[0]+5, point[1]+5), size = 20)
     plt.axis('equal')
 
     plt.savefig(osp.join(image_save_folder,fname+'.png'), dpi = 300, bbox_inches='tight')
